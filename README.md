@@ -16,14 +16,17 @@ Spedex is a fintech workspace for tracking how fast money moves and where it goe
 ```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\activate
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+cp .env.example .env             # then edit .env with your values
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-The API defaults to SQLite at `backend/spedex.db`. Set `DATABASE_URL` to a PostgreSQL connection string to switch databases.
+The API defaults to SQLite at `backend/spedex.db`. Set `DATABASE_URL` to a PostgreSQL connection string (e.g. Neon, Supabase) to switch databases.
 
-Demo credentials:
+Set `SPEDEX_SEED_DEMO=true` in your `.env` to seed a demo account on first startup.
+
+Demo credentials (when seeded):
 
 - Email: `alex@spedex.app`
 - Password: `spedex123`
@@ -45,6 +48,22 @@ cd dashboard_app
 npm install
 npm run dev
 ```
+
+## Deploying to Vercel
+
+```bash
+npm i -g vercel
+vercel
+```
+
+Set these environment variables in the Vercel dashboard:
+
+| Variable | Description |
+|---|---|
+| `SPEDEX_SECRET_KEY` | Strong random string — `openssl rand -hex 32` |
+| `DATABASE_URL` | PostgreSQL connection string (e.g. Neon) |
+| `SPEDEX_CORS_ORIGINS` | Your deployed frontend URL |
+| `SPEDEX_SEED_DEMO` | `true` for staging, leave unset for production |
 
 ## API Highlights
 

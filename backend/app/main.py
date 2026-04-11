@@ -49,11 +49,12 @@ app.add_middleware(
 @app.on_event("startup")
 def startup() -> None:
     Base.metadata.create_all(bind=engine)
-    session = SessionLocal()
-    try:
-        seed_database(session)
-    finally:
-        session.close()
+    if settings.seed_demo:
+        session = SessionLocal()
+        try:
+            seed_database(session)
+        finally:
+            session.close()
 
 
 def get_demo_user(session: Session) -> User:

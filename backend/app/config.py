@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import warnings
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -13,13 +14,15 @@ else:
 
 DEFAULT_SQLITE = DEFAULT_SQLITE_PATH.as_posix()
 
+_DEV_SECRET = "spedex-dev-secret"
+
 
 @dataclass(frozen=True)
 class Settings:
     app_name: str = "Spedex API"
     api_prefix: str = "/api"
     database_url: str = os.getenv("DATABASE_URL", f"sqlite:///{DEFAULT_SQLITE}")
-    secret_key: str = os.getenv("SPEDEX_SECRET_KEY", os.getenv("LEDGER_SECRET_KEY", "spedex-dev-secret"))
+    secret_key: str = os.getenv("SPEDEX_SECRET_KEY", os.getenv("LEDGER_SECRET_KEY", _DEV_SECRET))
     token_expire_minutes: int = int(
         os.getenv("SPEDEX_TOKEN_EXPIRE_MINUTES", os.getenv("LEDGER_TOKEN_EXPIRE_MINUTES", "1440"))
     )
@@ -34,6 +37,15 @@ class Settings:
         ).split(",")
         if origin.strip()
     )
+    # Set to "true" to seed a demo user on first startup (dev/staging only)
+    seed_demo: bool = os.getenv("SPEDEX_SEED_DEMO", "").lower() in {"1", "true", "yes"}
 
 
 settings = Settings()
+
+if settings.secret_key == _DEV_SECRET:
+    warnings.warn(
+        "SPEDEX_SECRET_KEY is using the insecure default value. "
+        "Set a strong secret via the SPEDEX_SECRET_KEY environment variable before deploying to production.",
+        stacklevel=1,
+    )

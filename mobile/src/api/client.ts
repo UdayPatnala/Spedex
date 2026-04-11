@@ -10,10 +10,15 @@ import type {
   VendorDirectoryData,
 } from "../types";
 
-const API_BASE_URL = Platform.select({
-  android: "http://10.0.2.2:8000/api",
-  default: "http://localhost:8000/api",
-});
+// In production set EXPO_PUBLIC_API_BASE_URL in your .env or EAS secrets.
+// Falls back to localhost (desktop) or 10.0.2.2 (Android emulator) for local dev.
+const API_BASE_URL: string =
+  (process.env.EXPO_PUBLIC_API_BASE_URL as string | undefined) ??
+  Platform.select({
+    android: "http://10.0.2.2:8000/api",
+    default: "http://localhost:8000/api",
+  }) ??
+  "http://localhost:8000/api";
 
 let authToken: string | null = null;
 
