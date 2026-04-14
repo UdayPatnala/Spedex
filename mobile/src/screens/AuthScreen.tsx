@@ -43,14 +43,14 @@ export function AuthScreen() {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.content}>
         <Text style={styles.brand}>Spedex</Text>
-        <Text style={styles.eyebrow}>Speed + Spending Index</Text>
+        <Text style={styles.eyebrow}>Campus Wallet</Text>
         <Text style={styles.title}>
-          {mode === "login" ? "Welcome back" : "Create your Spedex account"}
+          {mode === "login" ? "Welcome back" : "Create your student wallet"}
         </Text>
         <Text style={styles.subtitle}>
           {mode === "login"
-            ? "Sign in to view your live spending, payees, reminders, and analytics."
-            : "Set up a new account and we will provision a starter finance workspace for you."}
+            ? "Sign in to track your semester expenses and fast-pay campus vendors."
+            : "Set up a new account for 1-tap campus payments."}
         </Text>
 
         <View style={styles.switchRow}>

@@ -27,6 +27,7 @@ export function PaymentConfirmScreen({ navigation, route }: any) {
   const vendor: Vendor = route.params?.vendor ?? mockHomeOverview.quick_pay[0];
   const [selectedApp, setSelectedApp] = useState(upiApps[0]);
   const [submitting, setSubmitting] = useState(false);
+  const [pendingTxnId, setPendingTxnId] = useState<number | null>(null);
   const amount = route.params?.amount ?? vendor.default_amount;
 
   const iconName = useMemo(() => iconFor(vendor.icon), [vendor.icon]);
@@ -40,15 +41,28 @@ export function PaymentConfirmScreen({ navigation, route }: any) {
         upi_handle: vendor.upi_handle || selectedApp.handle,
         payee_name: vendor.name,
       });
+      setPendingTxnId(prepared.transaction.id);
       await Linking.openURL(prepared.upi_url);
-      Alert.alert("Redirecting", prepared.redirect_message);
     } catch {
-      const fallbackUrl = `upi://pay?pa=${vendor.upi_handle || selectedApp.handle}&pn=${vendor.name}&am=${amount.toFixed(2)}&cu=INR`;
-      try {
-        await Linking.openURL(fallbackUrl);
-      } catch {
-        Alert.alert("Unable to launch UPI app", "Install a UPI application or update the payee handle.");
+      Alert.alert("Unable to launch UPI app", "Please ensure a UPI app is installed.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleConfirm = async (status: "completed" | "failed") => {
+    if (!pendingTxnId) return;
+    try {
+      setSubmitting(true);
+      await spedexApi.completePayment(pendingTxnId, status);
+      if (status === "completed") {
+        Alert.alert("Success", "Payment marked as completed!");
+        navigation.goBack();
+      } else {
+        setPendingTxnId(null);
       }
+    } catch {
+      Alert.alert("Error", "Could not sync transaction state.");
     } finally {
       setSubmitting(false);
     }
@@ -125,12 +139,34 @@ export function PaymentConfirmScreen({ navigation, route }: any) {
           })}
         </View>
 
-        <Pressable onPress={handlePayment} disabled={submitting}>
-          <LinearGradient colors={[colors.primary, colors.primaryContainer]} style={styles.payButton}>
-            <Text style={styles.payButtonText}>{submitting ? "Preparing..." : "Proceed to Pay"}</Text>
-            <MaterialIcons name="keyboard-double-arrow-right" size={24} color={colors.surfaceLowest} />
-          </LinearGradient>
-        </Pressable>
+        {pendingTxnId ? (
+          <View style={{ gap: spacing.md }}>
+            <Text style={{ textAlign: "center", color: colors.onSurface, fontWeight: "700" }}>Did the payment succeed?</Text>
+            <View style={{ flexDirection: "row", gap: spacing.md }}>
+              <Pressable
+                style={[styles.payButton, { flex: 1, backgroundColor: colors.surfaceContainer }]}
+                onPress={() => handleConfirm("failed")}
+                disabled={submitting}
+              >
+                <Text style={[styles.payButtonText, { color: colors.error }]}>Failed</Text>
+              </Pressable>
+              <Pressable
+                style={[styles.payButton, { flex: 1, backgroundColor: colors.primary }]}
+                onPress={() => handleConfirm("completed")}
+                disabled={submitting}
+              >
+                <Text style={[styles.payButtonText, { color: colors.surfaceLowest }]}>Yes, Paid!</Text>
+              </Pressable>
+            </View>
+          </View>
+        ) : (
+          <Pressable onPress={handlePayment} disabled={submitting}>
+            <LinearGradient colors={[colors.primary, colors.primaryContainer]} style={styles.payButton}>
+              <Text style={styles.payButtonText}>{submitting ? "Preparing..." : "Proceed to Pay"}</Text>
+              <MaterialIcons name="keyboard-double-arrow-right" size={24} color={colors.surfaceLowest} />
+            </LinearGradient>
+          </Pressable>
+        )}
 
         <View style={styles.footer}>
           <View style={styles.footerLock}>

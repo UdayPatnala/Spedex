@@ -62,4 +62,9 @@ export const spedexApi = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  completePayment: (transactionId: number, status: string) =>
+    request<any>(`/payments/${transactionId}/complete`, {
+      method: "POST",
+      body: JSON.stringify({ status }),
+    }),
 };

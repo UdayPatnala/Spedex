@@ -117,7 +117,7 @@ function BrandLockup({ compact = false }: { compact?: boolean }) {
       <img className="brand-mark-image" src="/spedex-mark.svg" alt="Spedex logo" />
       <div className="brand-copy">
         <h1>Spedex</h1>
-        <p>Rose Gold Money Index</p>
+        <p>Campus Wallet</p>
       </div>
     </div>
   );
@@ -136,8 +136,8 @@ function Sidebar({
 
       <div className="sidebar-panel">
         <p className="eyebrow">Workspace</p>
-        <strong>Premium India Desk</strong>
-        <span className="subtle">UPI-ready payments, budget signals, and soft pink clarity.</span>
+        <strong>Student Wallet</strong>
+        <span className="subtle">1-tap hostel payments, allowance limits, and campus analytics.</span>
       </div>
 
       <nav className="sidebar-nav">
@@ -235,12 +235,12 @@ function AuthView({
       <section className="auth-card">
         <BrandLockup />
         <div className="auth-hero">
-          <p className="eyebrow">Rose Gold Access</p>
+          <p className="eyebrow">Student Portal</p>
           <h2 className="page-title">
-            {mode === "login" ? "Sign in to your premium rupee desk" : "Open a new Spedex workspace"}
+            {mode === "login" ? "Sign in to your campus wallet" : "Open a new student workspace"}
           </h2>
           <p className="subtle">
-            Track UPI payments, keep weekend spends in control, and surface category signals with a calmer premium UI.
+            Track mess fees, xerox bills, and your monthly allowance seamlessly with 1-tap payment routers.
           </p>
         </div>
 
@@ -310,10 +310,10 @@ function HomeView({
     <div className="dashboard-grid">
       <section className="hero-panel full-width">
         <div>
-          <p className="eyebrow">Rose Gold Desk</p>
-          <h2 className="page-title hero-title">Track every rupee with softer edges and sharper signals.</h2>
+          <p className="eyebrow">Campus Wallet</p>
+          <h2 className="page-title hero-title">Don't lose track of your allowance over small taps.</h2>
           <p className="hero-copy">
-            Spedex keeps your quick UPI payees, premium budget pacing, and high-value reminders in one calm surface.
+            Spedex locks your daily college vendors, hostel rent reminders, and tight monthly pacing into a single tap interface.
           </p>
         </div>
         <div className="hero-metrics">
