@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from .models import Budget, Reminder, Transaction, User, Vendor
 from .security import hash_password
 
-DEMO_EMAIL = "ananya@spedex.app"
+DEMO_EMAIL = "alex@spedex.app"
 DEMO_PASSWORD = "spedex123"
 
 
@@ -248,9 +248,9 @@ def seed_database(session: Session) -> None:
     now = datetime.utcnow()
     demo_user = session.scalar(select(User).where(User.email == DEMO_EMAIL))
     if demo_user:
-        demo_user.name = "Ananya Rao"
+        demo_user.name = "Alex"
         demo_user.plan = "Rose Gold"
-        demo_user.avatar_initials = "AR"
+        demo_user.avatar_initials = "AL"
         populate_sample_account(session, demo_user, now=now, replace_existing=True)
         session.commit()
         return
@@ -260,11 +260,11 @@ def seed_database(session: Session) -> None:
         return
 
     user = User(
-        name="Ananya Rao",
+        name="Alex",
         email=DEMO_EMAIL,
         password_hash=hash_password(DEMO_PASSWORD),
         plan="Rose Gold",
-        avatar_initials="AR",
+        avatar_initials="AL",
         member_since=now - timedelta(days=420),
     )
     session.add(user)
