@@ -21,7 +21,7 @@ _DEV_SECRET = "spedex-dev-secret"
 class Settings:
     app_name: str = "Spedex API"
     api_prefix: str = "/api"
-    database_url: str = os.getenv("DATABASE_URL", f"sqlite:///{DEFAULT_SQLITE}")
+    database_url: str = os.getenv("DATABASE_URL", os.getenv("NEON_DATABASE_URL", f"sqlite:///{DEFAULT_SQLITE}"))
     secret_key: str = os.getenv("SPEDEX_SECRET_KEY", os.getenv("LEDGER_SECRET_KEY", _DEV_SECRET))
     token_expire_minutes: int = int(
         os.getenv("SPEDEX_TOKEN_EXPIRE_MINUTES", os.getenv("LEDGER_TOKEN_EXPIRE_MINUTES", "1440"))
@@ -32,7 +32,7 @@ class Settings:
             "SPEDEX_CORS_ORIGINS",
             os.getenv(
                 "LEDGER_CORS_ORIGINS",
-                "http://localhost:3000,http://localhost:5173,http://localhost:8081,exp://127.0.0.1:19000",
+                "http://localhost:3000,http://localhost:5173,http://localhost:8081,exp://127.0.0.1:19000,https://spe-dex.vercel.app,https://spedex.onrender.com",
             ),
         ).split(",")
         if origin.strip()

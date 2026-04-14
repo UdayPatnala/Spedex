@@ -1,7 +1,7 @@
 import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 import QRCode from "react-qr-code";
 
-import { getCurrentUser, loadDashboardBundle, login, setAuthToken, signUp } from "./api";
+import { getCurrentUser, loadDashboardBundle, login, setAuthToken, signUp, warmUpBackend } from "./api";
 import type {
   AnalyticsData,
   BudgetScreenData,
@@ -732,6 +732,7 @@ export default function App() {
   const [authPassword, setAuthPassword] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
   const [authSubmitting, setAuthSubmitting] = useState(false);
+  const [warmingUp, setWarmingUp] = useState(false);
 
   const deferredSearch = useDeferredValue(searchQuery);
 
@@ -739,6 +740,17 @@ export default function App() {
     let mounted = true;
 
     async function restoreSession() {
+      // Warm up Render backend (free tier cold start can take ~15s)
+      const isProduction = typeof window !== "undefined" &&
+        window.location.hostname !== "localhost" &&
+        window.location.hostname !== "127.0.0.1";
+
+      if (isProduction) {
+        setWarmingUp(true);
+        await warmUpBackend();
+        setWarmingUp(false);
+      }
+
       try {
         const raw = window.localStorage.getItem(STORAGE_KEY);
         if (!raw) {
@@ -845,13 +857,20 @@ export default function App() {
     setActiveView("home");
   }
 
-  if (!sessionReady) {
+  if (warmingUp || !sessionReady) {
     return (
       <main className="auth-shell">
-        <section className="auth-card">
+        <section className="auth-card" style={{ textAlign: "center" }}>
           <BrandLockup />
-          <p className="eyebrow">Loading</p>
-          <h2 className="page-title">Restoring your Spedex session</h2>
+          <p className="eyebrow">{warmingUp ? "Please wait" : "Loading"}</p>
+          <h2 className="page-title">
+            {warmingUp ? "Waking up server\u2026 (~15s)" : "Restoring your session"}
+          </h2>
+          {warmingUp && (
+            <p className="subtle" style={{ marginTop: 8 }}>
+              Render free tier sleeps after inactivity. This only happens once.
+            </p>
+          )}
         </section>
       </main>
     );

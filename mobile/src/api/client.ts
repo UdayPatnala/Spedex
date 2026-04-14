@@ -10,7 +10,7 @@ import type {
   VendorDirectoryData,
 } from "../types";
 
-// In production set EXPO_PUBLIC_API_BASE_URL in your .env or EAS secrets.
+// In production set EXPO_PUBLIC_API_BASE_URL=https://spedex.onrender.com/api in your .env or EAS secrets.
 // Falls back to localhost (desktop) or 10.0.2.2 (Android emulator) for local dev.
 const API_BASE_URL: string =
   (process.env.EXPO_PUBLIC_API_BASE_URL as string | undefined) ??

@@ -7,6 +7,8 @@ import type {
   VendorDirectoryData,
 } from "./types";
 
+const RENDER_API = "https://spedex.onrender.com/api";
+
 function resolveApiBaseUrl() {
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL;
@@ -15,7 +17,7 @@ function resolveApiBaseUrl() {
   if (typeof window !== "undefined") {
     const { hostname } = window.location;
     if (hostname !== "localhost" && hostname !== "127.0.0.1") {
-      return "/_/backend/api";
+      return RENDER_API;
     }
   }
 
@@ -72,4 +74,14 @@ export async function loadDashboardBundle() {
   ]);
 
   return { overview, vendors, budget, analytics };
+}
+
+/** Ping the backend to wake it up from Render cold start */
+export async function warmUpBackend(): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/health`, { signal: AbortSignal.timeout(15000) });
+    return res.ok;
+  } catch {
+    return false;
+  }
 }

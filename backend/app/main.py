@@ -51,6 +51,11 @@ def startup() -> None:
     Base.metadata.create_all(bind=engine)
 
 
+@app.get("/api/health")
+def health_check():
+    return {"status": "ok", "service": "spedex-api"}
+
+
 def get_user_from_authorization(session: Session, authorization: str | None) -> User:
     if not authorization:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication required")
@@ -504,6 +509,15 @@ def complete_payment(
     if not transaction or transaction.user_id != user.id:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
     transaction.status = payload.status
+
+    # Update matching budget spent amount when payment succeeds
+    if payload.status == "completed":
+        budget = session.execute(
+            select(Budget).where(Budget.user_id == user.id, Budget.category == transaction.category)
+        ).scalar_one_or_none()
+        if budget:
+            budget.spent = budget.spent + transaction.amount
+
     session.add(transaction)
     session.commit()
     session.refresh(transaction)
