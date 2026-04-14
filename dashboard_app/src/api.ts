@@ -4,6 +4,8 @@ import type {
   BudgetScreenData,
   DashboardOverview,
   SpedexUser,
+  Vendor,
+  VendorCreate,
   VendorDirectoryData,
 } from "./types";
 
@@ -87,6 +89,13 @@ export async function loadDashboardBundle() {
   ]);
 
   return { overview, vendors, budget, analytics };
+}
+
+export function addVendor(payload: VendorCreate) {
+  return request<Vendor>("/vendors", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 
 /** Ping the backend to wake it up from Render cold start */

@@ -23,7 +23,7 @@ export function HomeScreen({ navigation }: any) {
 
   if (!data) return <SafeAreaView style={styles.safeArea} />;
 
-  const spendRatio = Math.min(data.today_spend / data.today_budget, 1);
+  const spendRatio = Math.min(data.today_spend / (data.today_budget || 1), 1) || 0;
 
   const openPayment = (vendor?: Vendor) => {
     navigation.getParent()?.navigate("PaymentConfirm", { vendor, amount: vendor?.default_amount });
@@ -90,21 +90,28 @@ export function HomeScreen({ navigation }: any) {
 
         <Text style={styles.sectionTitle}>Recent Transactions</Text>
         <View style={styles.transactionList}>
-          {data.recent_transactions.map((transaction) => (
-            <View key={transaction.id} style={styles.transactionRow}>
-              <View style={styles.transactionIcon}>
-                <MaterialIcons name="payments" size={20} color={colors.primary} />
-              </View>
-              <View style={styles.transactionMeta}>
-                <Text style={styles.transactionTitle}>{transaction.description}</Text>
-                <Text style={styles.transactionSubtitle}>{transaction.category}</Text>
-              </View>
-              <Text style={styles.transactionAmount}>
-                {transaction.direction === "expense" ? "-" : "+"}
-                {formatCurrency(transaction.amount)}
-              </Text>
+          {data.recent_transactions.length === 0 ? (
+            <View style={{ padding: 24, alignItems: "center", backgroundColor: colors.surfaceContainer, borderRadius: 16 }}>
+              <MaterialIcons name="receipt-long" size={48} color={colors.onSurfaceVariant} style={{ opacity: 0.5, marginBottom: 8 }} />
+              <Text style={{ color: colors.onSurface, fontWeight: "600" }}>No transactions yet.</Text>
             </View>
-          ))}
+          ) : (
+            data.recent_transactions.map((transaction) => (
+              <View key={transaction.id} style={styles.transactionRow}>
+                <View style={styles.transactionIcon}>
+                  <MaterialIcons name="payments" size={20} color={colors.primary} />
+                </View>
+                <View style={styles.transactionMeta}>
+                  <Text style={styles.transactionTitle}>{transaction.description}</Text>
+                  <Text style={styles.transactionSubtitle}>{transaction.category}</Text>
+                </View>
+                <Text style={styles.transactionAmount}>
+                  {transaction.direction === "expense" ? "-" : "+"}
+                  {formatCurrency(transaction.amount)}
+                </Text>
+              </View>
+            ))
+          )}
         </View>
       </ScrollView>
 

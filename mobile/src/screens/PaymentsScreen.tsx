@@ -79,41 +79,49 @@ export function PaymentsScreen({ navigation }: any) {
           />
         </View>
 
-        {Object.entries(groups).map(([groupName, vendors]) => (
-          <View key={groupName} style={styles.groupSection}>
-            <View style={styles.groupHeader}>
-              <View style={styles.groupLine} />
-              <Text style={styles.groupTitle}>{groupName}</Text>
-              <View style={styles.groupLine} />
-            </View>
-            {vendors.map((vendor) => {
-              const palette = accentPalette(vendor.accent);
-              return (
-                <Pressable
-                  key={vendor.id}
-                  style={styles.vendorCard}
-                  onPress={() => navigation.getParent()?.navigate("PaymentConfirm", { vendor, amount: vendor.default_amount })}
-                >
-                  <View style={styles.vendorInfo}>
-                    <View style={[styles.vendorIcon, { backgroundColor: palette.bg }]}>
-                      <MaterialIcons name={iconFor(vendor.icon) as any} size={26} color={palette.text} />
-                    </View>
-                    <View>
-                      <Text style={styles.vendorName}>{vendor.name}</Text>
-                      <Text style={[styles.vendorChip, { color: palette.text, backgroundColor: `${palette.bg}AA` }]}>
-                        {vendor.category}
-                      </Text>
-                    </View>
-                  </View>
-                  <View style={styles.vendorMeta}>
-                    <Text style={styles.vendorAmount}>{formatCurrency(vendor.default_amount)}</Text>
-                    <MaterialIcons name="edit" size={16} color={colors.onSurfaceVariant} />
-                  </View>
-                </Pressable>
-              );
-            })}
+        {Object.keys(groups).length === 0 ? (
+          <View style={{ padding: 32, alignItems: "center", marginTop: 24 }}>
+            <MaterialIcons name="folder-open" size={64} color={colors.onSurfaceVariant} style={{ opacity: 0.3 }} />
+            <Text style={{ marginTop: 16, fontSize: 18, fontWeight: "600", color: colors.onSurface }}>Directory is empty</Text>
+            <Text style={{ marginTop: 8, color: colors.onSurfaceVariant, textAlign: "center" }}>Tap 'Add New Vendor' to create your first payee.</Text>
           </View>
-        ))}
+        ) : (
+          Object.entries(groups).map(([groupName, vendors]) => (
+            <View key={groupName} style={styles.groupSection}>
+              <View style={styles.groupHeader}>
+                <View style={styles.groupLine} />
+                <Text style={styles.groupTitle}>{groupName}</Text>
+                <View style={styles.groupLine} />
+              </View>
+              {vendors.map((vendor) => {
+                const palette = accentPalette(vendor.accent);
+                return (
+                  <Pressable
+                    key={vendor.id}
+                    style={styles.vendorCard}
+                    onPress={() => navigation.getParent()?.navigate("PaymentConfirm", { vendor, amount: vendor.default_amount })}
+                  >
+                    <View style={styles.vendorInfo}>
+                      <View style={[styles.vendorIcon, { backgroundColor: palette.bg }]}>
+                        <MaterialIcons name={iconFor(vendor.icon) as any} size={26} color={palette.text} />
+                      </View>
+                      <View>
+                        <Text style={styles.vendorName}>{vendor.name}</Text>
+                        <Text style={[styles.vendorChip, { color: palette.text, backgroundColor: `${palette.bg}AA` }]}>
+                          {vendor.category}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.vendorMeta}>
+                      <Text style={styles.vendorAmount}>{formatCurrency(vendor.default_amount)}</Text>
+                      <MaterialIcons name="edit" size={16} color={colors.onSurfaceVariant} />
+                    </View>
+                  </Pressable>
+                );
+              })}
+            </View>
+          ))
+        )}
       </ScrollView>
     </SafeAreaView>
   );

@@ -28,12 +28,12 @@ from .schemas import (
     TokenResponse,
     TransactionOut,
     UserOut,
+    VendorCreate,
     VendorDirectoryResponse,
     VendorOut,
     WeeklySpendPoint,
 )
 from .security import create_access_token, decode_access_token, hash_password, verify_password
-from .seed import populate_sample_account
 
 app = FastAPI(title=settings.app_name)
 
@@ -311,7 +311,7 @@ def signup(payload: SignupRequest, session: Session = Depends(get_db)) -> TokenR
     )
     session.add(user)
     session.flush()
-    populate_sample_account(session, user)
+    # Mock data generation removed for empty-state
     session.commit()
     session.refresh(user)
     return TokenResponse(access_token=create_access_token(str(user.id)), user=serialize_user(user))
@@ -401,6 +401,34 @@ def mobile_vendors(session: Session = Depends(get_db), user: User = Depends(get_
     for vendor in vendors:
         groups[vendor.category].append(serialize_vendor(vendor))
     return VendorDirectoryResponse(user=serialize_user(user), groups=dict(groups))
+
+
+@app.post("/api/vendors", response_model=VendorOut)
+def create_vendor(payload: VendorCreate, session: Session = Depends(get_db), user: User = Depends(get_current_user)) -> VendorOut:
+    accent_map = {
+        "Dining": "rose", "Groceries": "mint", "Shopping": "lavender", 
+        "Transport": "amber", "Bills": "amber", "Subscriptions": "lavender", 
+        "Rent": "rose", "Health": "mint", "Miscellaneous": "lavender"
+    }
+    icon_map = {
+        "Dining": "restaurant", "Groceries": "shopping_basket", "Shopping": "shopping_bag",
+        "Transport": "directions_bus", "Bills": "bolt", "Rent": "home_work",
+        "Subscriptions": "cloud", "Health": "fitness_center", "Miscellaneous": "payments"
+    }
+    vendor = Vendor(
+        user_id=user.id,
+        name=payload.name,
+        category=payload.category,
+        icon=icon_map.get(payload.category, "payments"),
+        accent=accent_map.get(payload.category, "lavender"),
+        upi_handle=payload.upi_handle,
+        default_amount=payload.default_amount,
+        is_quick_pay=payload.is_quick_pay
+    )
+    session.add(vendor)
+    session.commit()
+    session.refresh(vendor)
+    return serialize_vendor(vendor)
 
 
 @app.get("/api/mobile/analytics", response_model=AnalyticsResponse)

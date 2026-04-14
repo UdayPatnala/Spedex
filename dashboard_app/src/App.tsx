@@ -1,7 +1,7 @@
 import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 import QRCode from "react-qr-code";
 
-import { getCurrentUser, loadDashboardBundle, login, setAuthToken, signUp, warmUpBackend } from "./api";
+import { addVendor, getCurrentUser, loadDashboardBundle, login, setAuthToken, signUp, warmUpBackend } from "./api";
 import type {
   AnalyticsData,
   BudgetScreenData,
@@ -18,9 +18,9 @@ const STORAGE_KEY = "spedex.dashboard.session";
 
 const navItems: Array<{ id: ViewId; label: string; icon: string }> = [
   { id: "home", label: "Overview", icon: "home" },
-  { id: "payments", label: "UPI Desk", icon: "account_balance_wallet" },
-  { id: "analytics", label: "Signals", icon: "bar_chart" },
-  { id: "budget", label: "Budgets", icon: "event_note" },
+  { id: "payments", label: "UPI Desk", icon: "wallet" },
+  { id: "analytics", label: "Signals", icon: "insights" },
+  { id: "budget", label: "Budgets", icon: "calendar_month" },
   { id: "settings", label: "Profile", icon: "settings" },
 ];
 
@@ -153,7 +153,7 @@ function Sidebar({
         ))}
       </nav>
 
-      <a href="https://spe-dex.vercel.app/spedex.apk" className="sidebar-cta" style={{ textDecoration: 'none', textAlign: 'center' }}>
+      <a href="/spedex.apk" download className="sidebar-cta" style={{ textDecoration: 'none', textAlign: 'center' }}>
         Download Mobile APK
       </a>
     </aside>
@@ -283,6 +283,44 @@ function AuthView({
   );
 }
 
+function AddVendorModal({
+  onClose,
+  onSave,
+}: {
+  onClose: () => void;
+  onSave: (payload: { name: string; category: string; upi_handle: string; default_amount: number }) => Promise<void>;
+}) {
+  const [name, setName] = useState("");
+  const [category, setCategory] = useState("Dining");
+  const [upi, setUpi] = useState("");
+  const [amount, setAmount] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleSubmit() {
+    setSubmitting(true);
+    await onSave({ name, category, upi_handle: upi, default_amount: parseFloat(amount) || 0 });
+    setSubmitting(false);
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="qr-modal-card" onClick={e => e.stopPropagation()}>
+        <h3>Add New Vendor</h3>
+        <p className="subtle" style={{marginBottom: 16}}>Create a payee for 1-tap transfers.</p>
+        <div className="auth-form">
+          <input placeholder="Vendor Name" value={name} onChange={e => setName(e.target.value)} />
+          <input placeholder="Category (e.g. Dining, Shopping)" value={category} onChange={e => setCategory(e.target.value)} />
+          <input placeholder="UPI Handle (e.g. xyz@oksbi)" value={upi} onChange={e => setUpi(e.target.value)} />
+          <input type="number" placeholder="Default Amount" value={amount} onChange={e => setAmount(e.target.value)} />
+          <button className="auth-submit" onClick={handleSubmit} disabled={submitting}>
+            {submitting ? "Saving..." : "Save Vendor"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function QuickPayCard({ vendor }: { vendor: Vendor }) {
   return (
     <button className="quick-pay-card" type="button">
@@ -299,9 +337,11 @@ function QuickPayCard({ vendor }: { vendor: Vendor }) {
 function HomeView({
   overview,
   filteredTransactions,
+  onAddVendor,
 }: {
   overview: DashboardOverview;
   filteredTransactions: Transaction[];
+  onAddVendor: () => void;
 }) {
   const weeklyMax = Math.max(...overview.weekly_spending, 1);
 
@@ -359,7 +399,7 @@ function HomeView({
             {overview.quick_pay.map((vendor) => (
               <QuickPayCard key={vendor.id} vendor={vendor} />
             ))}
-            <button className="quick-pay-card add" type="button">
+            <button className="quick-pay-card add" type="button" onClick={onAddVendor}>
               <div className="icon-badge accent-lavender">
                 <span className="material-symbols-outlined">add</span>
               </div>
@@ -375,7 +415,13 @@ function HomeView({
             <span className="status-chip soft">Filtered live</span>
           </div>
           <div className="transactions-list">
-            {filteredTransactions.map((transaction) => (
+            {filteredTransactions.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "2rem", color: "var(--text-subtle)", background: "rgba(255,255,255,0.4)", borderRadius: 12 }}>
+                <span className="material-symbols-outlined" style={{ fontSize: 48, opacity: 0.5, marginBottom: 8 }}>receipt_long</span>
+                <p>No transactions yet.</p>
+                <p className="subtle">Record an expense or pay a vendor to see it here.</p>
+              </div>
+            ) : filteredTransactions.map((transaction) => (
               <div key={transaction.id} className="transaction-row">
                 <div className={`icon-badge ${transaction.direction === "income" ? "accent-mint" : "accent-rose"}`}>
                   <span className="emoji-glyph">
@@ -461,7 +507,7 @@ function HomeView({
   );
 }
 
-function PaymentsView({ vendors }: { vendors: VendorDirectoryData }) {
+function PaymentsView({ vendors, onAddVendor }: { vendors: VendorDirectoryData; onAddVendor: () => void }) {
   const [activeVendor, setActiveVendor] = useState<Vendor | null>(null);
 
   return (
@@ -484,11 +530,16 @@ function PaymentsView({ vendors }: { vendors: VendorDirectoryData }) {
             <p className="eyebrow">UPI Directory</p>
             <h2 className="page-title section-title">Payees</h2>
           </div>
-          <span className="status-chip">India-first</span>
+          <button className="status-chip" onClick={onAddVendor} style={{ cursor: "pointer", border: "none" }}>+ Add</button>
         </div>
 
         <div className="vendors-list">
-          {Object.entries(vendors.groups).map(([groupName, groupVendors]) => (
+          {Object.keys(vendors.groups).length === 0 ? (
+            <div style={{ textAlign: "center", padding: "3rem 2rem", color: "var(--text-subtle)", background: "rgba(255,255,255,0.4)", borderRadius: 12 }}>
+              <p>Your directory is empty.</p>
+              <button className="auth-submit" onClick={onAddVendor} style={{ marginTop: 16 }}>Add your first vendor</button>
+            </div>
+          ) : Object.entries(vendors.groups).map(([groupName, groupVendors]) => (
             <div key={groupName} className="full-width">
               <div className="section-header">
                 <p className="eyebrow">{categoryLabel(groupName)}</p>
@@ -522,6 +573,18 @@ function PaymentsView({ vendors }: { vendors: VendorDirectoryData }) {
 }
 
 function AnalyticsView({ analytics }: { analytics: AnalyticsData }) {
+  if (analytics.total_spent === 0) {
+    return (
+      <div className="analytics-shell">
+        <section className="card" style={{ textAlign: "center", padding: "4rem 2rem" }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 64, opacity: 0.3, marginBottom: 16 }}>insights</span>
+          <h2 className="page-title">No spending data yet.</h2>
+          <p className="subtle">Record transactions to unlock intelligent insights, category breakdowns, and weekly pacing metrics.</p>
+        </section>
+      </div>
+    );
+  }
+
   const maxAmount = Math.max(...analytics.weekly_spend.map((item) => item.amount), 1);
 
   return (
@@ -733,6 +796,7 @@ export default function App() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [authSubmitting, setAuthSubmitting] = useState(false);
   const [warmingUp, setWarmingUp] = useState(false);
+  const [showAddVendor, setShowAddVendor] = useState(false);
 
   const deferredSearch = useDeferredValue(searchQuery);
 
@@ -857,6 +921,20 @@ export default function App() {
     setActiveView("home");
   }
 
+  async function handleAddVendor(payload: any) {
+    try {
+      await addVendor(payload);
+      setShowAddVendor(false);
+      const bundle = await loadDashboardBundle();
+      setOverview(bundle.overview);
+      setVendors(bundle.vendors);
+      setBudget(bundle.budget);
+      setAnalytics(bundle.analytics);
+    } catch (e) {
+      alert("Failed to add vendor.");
+    }
+  }
+
   if (warmingUp || !sessionReady) {
     return (
       <main className="auth-shell">
@@ -906,9 +984,9 @@ export default function App() {
     );
   }
 
-  let content = <HomeView overview={overview} filteredTransactions={filteredTransactions} />;
+  let content = <HomeView overview={overview} filteredTransactions={filteredTransactions} onAddVendor={() => setShowAddVendor(true)} />;
   if (activeView === "payments") {
-    content = <PaymentsView vendors={vendors} />;
+    content = <PaymentsView vendors={vendors} onAddVendor={() => setShowAddVendor(true)} />;
   } else if (activeView === "analytics") {
     content = <AnalyticsView analytics={analytics} />;
   } else if (activeView === "budget") {
@@ -919,6 +997,7 @@ export default function App() {
 
   return (
     <div className="app-shell">
+      {showAddVendor && <AddVendorModal onClose={() => setShowAddVendor(false)} onSave={handleAddVendor} />}
       <Sidebar activeView={activeView} onSelect={(view) => startTransition(() => setActiveView(view))} />
       <main className="main-pane">
         <Topbar

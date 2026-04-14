@@ -24,6 +24,14 @@ export type Vendor = {
   is_quick_pay: boolean;
 };
 
+export type VendorCreate = {
+  name: string;
+  category: string;
+  upi_handle: string;
+  default_amount?: number;
+  is_quick_pay?: boolean;
+};
+
 export type Transaction = {
   id: number;
   description: string;

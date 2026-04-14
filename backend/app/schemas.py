@@ -31,6 +31,14 @@ class TokenResponse(BaseModel):
     user: UserOut
 
 
+class VendorCreate(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    category: str
+    upi_handle: str
+    default_amount: float = 0.0
+    is_quick_pay: bool = False
+
+
 class VendorOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
