@@ -1,4 +1,4 @@
-package com.example.demo.model;
+package com.spedex.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

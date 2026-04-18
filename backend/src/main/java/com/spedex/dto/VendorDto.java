@@ -1,4 +1,4 @@
-package com.example.demo.dto;
+package com.spedex.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
