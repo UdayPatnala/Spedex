@@ -1,5 +1,9 @@
 import { MaterialIcons } from "@expo/vector-icons";
 import { CameraView, useCameraPermissions } from "expo-camera";
+import * as ImagePicker from "expo-image-picker";
+import jsQR from "jsqr";
+import { PNG } from "pngjs/browser";
+import { Buffer } from "buffer";
 import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 import {
   Alert,
@@ -11,6 +15,7 @@ import {
   Text,
   TextInput,
   View,
+  Linking,
 } from "react-native";
 
 import { spedexApi } from "../api/client";
@@ -24,32 +29,20 @@ export function PaymentsScreen({ navigation }: any) {
   const deferredQuery = useDeferredValue(query);
   const [permission, requestPermission] = useCameraPermissions();
   const [isScannerVisible, setIsScannerVisible] = useState(false);
+  const [isOptionsVisible, setIsOptionsVisible] = useState(false);
+  const [isManualVisible, setIsManualVisible] = useState(false);
+  const [isEditVisible, setIsEditVisible] = useState(false);
+
+  const [editingVendorId, setEditingVendorId] = useState<number | null>(null);
+  const [vendorName, setVendorName] = useState("");
+  const [vendorUpi, setVendorUpi] = useState("");
+  const [vendorAmount, setVendorAmount] = useState("");
+  const [vendorPhone, setVendorPhone] = useState("");
+  const [amountStep, setAmountStep] = useState(false);
 
   useEffect(() => {
     spedexApi.getVendorDirectory().then(setData).catch(console.error);
   }, []);
-
-  const handleBarCodeScanned = ({ data: qrData }: { data: string }) => {
-    setIsScannerVisible(false);
-    
-    // UPI parsing logic: upi://pay?pa=handle@upi&pn=Name&am=Amount
-    if (qrData.startsWith("upi://pay")) {
-      const url = new URL(qrData.replace("upi://pay", "http://fake.com")); // Trick URL parser
-      const pa = url.searchParams.get("pa");
-      const pn = url.searchParams.get("pn");
-      const am = url.searchParams.get("am");
-
-      if (pa) {
-        navigation.getParent()?.navigate("PaymentConfirm", {
-          vendor: { name: pn || "Unknown Merchant", upi_handle: pa },
-          amount: am ? parseFloat(am) : 0,
-        });
-        return;
-      }
-    }
-    
-    Alert.alert("Invalid QR", "This does not appear to be a valid payment QR code.");
-  };
 
   const openScanner = async () => {
     if (!permission?.granted) {
@@ -59,8 +52,135 @@ export function PaymentsScreen({ navigation }: any) {
         return;
       }
     }
+    setIsOptionsVisible(false);
     setIsScannerVisible(true);
   };
+
+  const openImagePicker = async () => {
+    setIsOptionsVisible(false);
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 1,
+      base64: true
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0 && result.assets[0].base64) {
+      try {
+        // We will try our best to decode standard PNG/JPEGs
+        // This is a naive polyfill, in production a native module like react-native-vision-camera is required
+        const b64 = result.assets[0].base64;
+        const decoded = Buffer.from(b64, 'base64');
+
+        try {
+            // PNG Decoding
+            const png = new PNG();
+            png.parse(decoded, (error: any, parsed: any) => {
+              if (error) throw error;
+              const code = jsQR(parsed.data, parsed.width, parsed.height);
+              if (code) {
+                  handleQRData(code.data);
+              } else {
+                  Alert.alert("Scan Failed", "No QR code found in PNG image.");
+              }
+            });
+        } catch (e) {
+            // If it's a JPEG or decoding fails, fallback
+            Alert.alert("Feature Limited", "Native JPEG/PNG decoding not fully available in this sandbox environment without native modules. Please use Camera scan.");
+        }
+      } catch(e) {
+         Alert.alert("Error", "Could not process image.");
+      }
+    }
+  };
+
+  const handleQRData = async (qrData: string) => {
+    setIsScannerVisible(false);
+    
+    if (qrData.startsWith("upi://pay")) {
+      const url = new URL(qrData.replace("upi://pay", "http://fake.com")); // Trick URL parser
+      const pa = url.searchParams.get("pa");
+      const pn = url.searchParams.get("pn");
+      const am = url.searchParams.get("am");
+
+      if (pa) {
+        // Prepare state for Amount Step
+        setVendorName(pn || "Unknown Merchant");
+        setVendorUpi(pa);
+        if (am) {
+            setVendorAmount(am);
+        } else {
+            setVendorAmount("");
+        }
+        setAmountStep(true);
+        setIsManualVisible(true);
+        return;
+      }
+    }
+    
+    Alert.alert("Invalid QR", "This does not appear to be a valid payment QR code.");
+  };
+
+  const handleBarCodeScanned = ({ data: qrData }: { data: string }) => {
+    handleQRData(qrData);
+  };
+
+  const submitManualVendor = async () => {
+    if (!vendorName.trim()) {
+      Alert.alert("Error", "Please enter a name.");
+      return;
+    }
+    if (!vendorPhone.trim() && !vendorUpi.trim()) {
+      Alert.alert("Error", "Please enter a phone number or UPI ID.");
+      return;
+    }
+    setAmountStep(true);
+  };
+
+  const saveVendor = async () => {
+    try {
+        const upi = vendorUpi ? vendorUpi : (vendorPhone.includes('@') ? vendorPhone : `${vendorPhone}@upi`);
+        let res;
+
+        if (editingVendorId) {
+            res = await spedexApi.editVendor(editingVendorId, {
+                name: vendorName,
+                upi_handle: upi,
+                default_amount: parseFloat(vendorAmount) || 0
+            });
+        } else {
+            res = await spedexApi.addVendor({
+                name: vendorName,
+                upi_handle: upi,
+                default_amount: parseFloat(vendorAmount) || 0
+            });
+        }
+
+        if (res && res.status === "success") {
+            Alert.alert("Success", editingVendorId ? "Vendor updated!" : "Vendor saved!");
+            setIsManualVisible(false);
+            setIsEditVisible(false);
+            setAmountStep(false);
+            setVendorName("");
+            setVendorUpi("");
+            setVendorPhone("");
+            setVendorAmount("");
+            setEditingVendorId(null);
+            spedexApi.getVendorDirectory().then(setData).catch(console.error);
+        }
+    } catch (e) {
+        Alert.alert("Error", "Could not save vendor.");
+    }
+  };
+
+  const openEdit = (vendor: Vendor) => {
+    setEditingVendorId(vendor.id);
+    setVendorName(vendor.name);
+    setVendorUpi(vendor.upi_handle);
+    setVendorAmount(vendor.default_amount.toString());
+    setIsEditVisible(true);
+  };
+
 
   if (!data) return <SafeAreaView style={styles.safeArea} />;
 
@@ -100,7 +220,7 @@ export function PaymentsScreen({ navigation }: any) {
             <Text style={styles.eyebrow}>Manage Directory</Text>
             <Text style={styles.title}>Vendors</Text>
           </View>
-          <Pressable style={styles.addButton}>
+          <Pressable style={styles.addButton} onPress={() => setIsOptionsVisible(true)}>
             <MaterialIcons name="add" size={18} color={colors.surfaceLowest} />
             <Text style={styles.addLabel}>Add New Vendor</Text>
           </Pressable>
@@ -133,13 +253,134 @@ export function PaymentsScreen({ navigation }: any) {
             <CameraView
               style={styles.camera}
               onBarcodeScanned={handleBarCodeScanned}
-              barcodeSettings={{ barcodeTypes: ["qr"] }}
+              barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
             />
             <View style={styles.scannerOverlay}>
               <View style={styles.scanFrame} />
               <Text style={styles.scanHint}>Point at a UPI or Spedex QR code</Text>
             </View>
           </SafeAreaView>
+        </Modal>
+
+        {/* Options Modal */}
+        <Modal visible={isOptionsVisible} animationType="fade" transparent={true}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.optionsContent}>
+              <Text style={styles.modalTitle}>Add Vendor</Text>
+              <Pressable style={styles.optionButton} onPress={openScanner}>
+                <MaterialIcons name="camera-alt" size={24} color={colors.primary} />
+                <Text style={styles.optionText}>Scan QR Code</Text>
+              </Pressable>
+              <Pressable style={styles.optionButton} onPress={openImagePicker}>
+                <MaterialIcons name="image" size={24} color={colors.primary} />
+                <Text style={styles.optionText}>Upload QR from Gallery</Text>
+              </Pressable>
+              <Pressable style={styles.optionButton} onPress={() => { setIsOptionsVisible(false); setIsManualVisible(true); }}>
+                <MaterialIcons name="keyboard" size={24} color={colors.primary} />
+                <Text style={styles.optionText}>Enter Manually</Text>
+              </Pressable>
+              <Pressable style={[styles.optionButton, { marginTop: 16 }]} onPress={() => setIsOptionsVisible(false)}>
+                <Text style={[styles.optionText, { color: colors.error, textAlign: 'center', width: '100%' }]}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+
+        {/* Manual Add / Amount Step Modal */}
+        <Modal visible={isManualVisible} animationType="slide" transparent={true}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>{amountStep ? "Default Amount" : "Vendor Details"}</Text>
+                <Pressable onPress={() => { setIsManualVisible(false); setAmountStep(false); }}>
+                  <MaterialIcons name="close" size={24} color={colors.onSurface} />
+                </Pressable>
+              </View>
+
+              {!amountStep ? (
+                  <>
+                      <TextInput
+                        style={styles.modalInput}
+                        placeholder="Vendor Name"
+                        value={vendorName}
+                        onChangeText={setVendorName}
+                        placeholderTextColor={colors.onSurfaceVariant}
+                      />
+                      <TextInput
+                        style={styles.modalInput}
+                        placeholder="Phone Number or UPI ID"
+                        value={vendorUpi || vendorPhone}
+                        onChangeText={(t) => {
+                            if (t.includes('@')) {
+                                setVendorUpi(t);
+                                setVendorPhone("");
+                            } else {
+                                setVendorPhone(t);
+                                setVendorUpi("");
+                            }
+                        }}
+                        placeholderTextColor={colors.onSurfaceVariant}
+                      />
+                      <Pressable style={styles.modalSubmitButton} onPress={submitManualVendor}>
+                        <Text style={styles.modalSubmitText}>Next</Text>
+                      </Pressable>
+                  </>
+              ) : (
+                  <>
+                      <TextInput
+                        style={styles.modalInput}
+                        placeholder="Default Amount (Optional)"
+                        value={vendorAmount}
+                        onChangeText={setVendorAmount}
+                        keyboardType="numeric"
+                        placeholderTextColor={colors.onSurfaceVariant}
+                      />
+                      <Pressable style={styles.modalSubmitButton} onPress={saveVendor}>
+                        <Text style={styles.modalSubmitText}>Save Vendor</Text>
+                      </Pressable>
+                  </>
+              )}
+            </View>
+          </View>
+        </Modal>
+
+        {/* Edit Vendor Modal */}
+        <Modal visible={isEditVisible} animationType="slide" transparent={true}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>Edit Vendor</Text>
+                <Pressable onPress={() => setIsEditVisible(false)}>
+                  <MaterialIcons name="close" size={24} color={colors.onSurface} />
+                </Pressable>
+              </View>
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Vendor Name"
+                value={vendorName}
+                onChangeText={setVendorName}
+                placeholderTextColor={colors.onSurfaceVariant}
+              />
+              <TextInput
+                style={styles.modalInput}
+                placeholder="UPI ID"
+                value={vendorUpi}
+                onChangeText={setVendorUpi}
+                placeholderTextColor={colors.onSurfaceVariant}
+              />
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Default Amount"
+                value={vendorAmount}
+                onChangeText={setVendorAmount}
+                keyboardType="numeric"
+                placeholderTextColor={colors.onSurfaceVariant}
+              />
+              <Pressable style={styles.modalSubmitButton} onPress={saveVendor}>
+                <Text style={styles.modalSubmitText}>Save Changes</Text>
+              </Pressable>
+            </View>
+          </View>
         </Modal>
 
         {Object.keys(groups).length === 0 ? (
@@ -177,7 +418,7 @@ export function PaymentsScreen({ navigation }: any) {
                     </View>
                     <View style={styles.vendorMeta}>
                       <Text style={styles.vendorAmount}>{formatCurrency(vendor.default_amount)}</Text>
-                      <MaterialIcons name="edit" size={16} color={colors.onSurfaceVariant} />
+                      <Pressable onPress={(e) => { e.stopPropagation(); openEdit(vendor); }} hitSlop={10}><MaterialIcons name="edit" size={16} color={colors.onSurfaceVariant} /></Pressable>
                     </View>
                   </Pressable>
                 );
@@ -395,6 +636,70 @@ const styles = StyleSheet.create({
   vendorMeta: {
     alignItems: "flex-end",
     gap: 6,
+  },
+
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: colors.surfaceLowest,
+    padding: spacing.xl,
+    borderTopLeftRadius: radii.xl,
+    borderTopRightRadius: radii.xl,
+  },
+  optionsContent: {
+    backgroundColor: colors.surfaceLowest,
+    padding: spacing.xl,
+    margin: spacing.xl,
+    borderRadius: radii.xl,
+    justifyContent: "center",
+  },
+  optionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: spacing.md,
+    backgroundColor: colors.surfaceLow,
+    borderRadius: radii.md,
+    marginTop: spacing.sm,
+    gap: spacing.md,
+  },
+  optionText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: colors.onSurface,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: spacing.lg,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "800",
+    color: colors.onSurface,
+  },
+  modalInput: {
+    backgroundColor: colors.surfaceLow,
+    color: colors.onSurface,
+    padding: spacing.md,
+    borderRadius: radii.md,
+    fontSize: 16,
+    marginBottom: spacing.md,
+  },
+  modalSubmitButton: {
+    backgroundColor: colors.primary,
+    padding: spacing.md,
+    borderRadius: radii.md,
+    alignItems: "center",
+    marginTop: spacing.sm,
+  },
+  modalSubmitText: {
+    color: colors.surfaceLowest,
+    fontWeight: "700",
+    fontSize: 16,
   },
   vendorAmount: {
     color: colors.onSurface,

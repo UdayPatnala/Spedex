@@ -70,6 +70,45 @@ public class DashboardService {
         return overview;
     }
 
+    public Map<String, Object> addVendor(String email, Map<String, String> payload) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        Vendor vendor = new Vendor();
+        vendor.setName(payload.get("name"));
+        vendor.setUpiHandle(payload.containsKey("upi_handle") ? payload.get("upi_handle") : payload.get("phone_number") + "@upi");
+        vendor.setCategory("Other");
+        vendor.setAccent("blue");
+        vendor.setIcon("person");
+        vendor.setIsQuickPay(false);
+        vendor.setDefaultAmount(payload.containsKey("default_amount") ? Double.parseDouble(payload.get("default_amount")) : 0.0);
+        vendor.setUser(user);
+        vendor = vendorRepository.save(vendor);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("vendor", vendor);
+        return response;
+    }
+
+    public Map<String, Object> editVendor(String email, Long id, Map<String, String> payload) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        Vendor vendor = vendorRepository.findById(id).orElseThrow();
+
+        if (!vendor.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        if (payload.containsKey("name")) vendor.setName(payload.get("name"));
+        if (payload.containsKey("upi_handle")) vendor.setUpiHandle(payload.get("upi_handle"));
+        if (payload.containsKey("default_amount")) vendor.setDefaultAmount(Double.parseDouble(payload.get("default_amount")));
+
+        vendor = vendorRepository.save(vendor);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("vendor", vendor);
+        return response;
+    }
+
     public Map<String, Object> getVendors(String email) {
         User user = userRepository.findByEmail(email).orElseThrow();
         List<Vendor> vendors = vendorRepository.findByUserId(user.getId());

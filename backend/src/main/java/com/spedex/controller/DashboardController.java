@@ -28,6 +28,18 @@ public class DashboardController {
         return ResponseEntity.ok(dashboardService.getVendors(email));
     }
 
+    @PostMapping("/mobile/vendors")
+    public ResponseEntity<Map<String, Object>> addVendor(@RequestBody Map<String, String> payload) {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(dashboardService.addVendor(email, payload));
+    }
+
+    @PutMapping("/mobile/vendors/{id}")
+    public ResponseEntity<Map<String, Object>> editVendor(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(dashboardService.editVendor(email, id, payload));
+    }
+
     @GetMapping("/mobile/budgets")
     public ResponseEntity<Map<String, Object>> budgets() {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

@@ -81,6 +81,16 @@ export const spedexApi = {
       method: "POST",
       body: JSON.stringify({ status }),
     }),
+  addVendor: (payload: { name: string; phone_number?: string; upi_handle?: string; default_amount?: number }) =>
+    request<any>("/mobile/vendors", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  editVendor: (id: number, payload: { name?: string; upi_handle?: string; default_amount?: number }) =>
+    request<any>(`/mobile/vendors/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
   updateProfile: (payload: { name?: string; profile_picture_url?: string }) =>
     request<SpedexUser>("/auth/profile", {
       method: "PUT",
