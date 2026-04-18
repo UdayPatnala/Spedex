@@ -1,6 +1,7 @@
 package com.spedex.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,8 +22,8 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${spedex.cors.allowed-origins}")
-    private String allowedOrigins;
+    @Value("#{'${spedex.cors.allowed-origins}'.split(',')}")
+    private List<String> allowedOrigins;
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthFilter;
@@ -51,7 +52,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        List<String> origins = allowedOrigins.stream()
+                .map(String::trim)
+                .toList();
+        configuration.setAllowedOriginPatterns(origins);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
