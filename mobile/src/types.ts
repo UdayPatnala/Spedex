@@ -5,6 +5,7 @@ export type SpedexUser = {
   plan: string;
   avatar_initials: string;
   member_since: string;
+  profile_picture_url?: string | null;
 };
 
 export type AuthResponse = {

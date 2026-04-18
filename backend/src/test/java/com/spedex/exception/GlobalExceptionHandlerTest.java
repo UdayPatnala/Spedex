@@ -20,19 +20,19 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleRuntimeException_NotFound_ReturnsUnauthorized() {
+    void handleRuntimeException_NotFound_ReturnsNotFound() {
         String message = "User not found";
         RuntimeException exception = new RuntimeException(message);
 
         ResponseEntity<Map<String, String>> response = globalExceptionHandler.handleRuntimeException(exception);
 
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(message, response.getBody().get("detail"));
+        assertEquals("Requested resource was not found", response.getBody().get("detail"));
     }
 
     @Test
-    void handleRuntimeException_Invalid_ReturnsUnauthorized() {
+    void handleRuntimeException_InvalidCredentials_ReturnsUnauthorized() {
         String message = "Invalid credentials";
         RuntimeException exception = new RuntimeException(message);
 
@@ -40,7 +40,7 @@ class GlobalExceptionHandlerTest {
 
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(message, response.getBody().get("detail"));
+        assertEquals("Authentication failed", response.getBody().get("detail"));
     }
 
     @Test
@@ -52,7 +52,7 @@ class GlobalExceptionHandlerTest {
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(message, response.getBody().get("detail"));
+        assertEquals("Invalid request or resource already exists", response.getBody().get("detail"));
     }
 
     @Test
@@ -64,6 +64,6 @@ class GlobalExceptionHandlerTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals(message, response.getBody().get("detail"));
+        assertEquals("An unexpected error occurred", response.getBody().get("detail"));
     }
 }

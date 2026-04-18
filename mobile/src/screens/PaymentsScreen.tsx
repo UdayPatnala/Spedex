@@ -24,15 +24,50 @@ export function PaymentsScreen({ navigation }: any) {
   const deferredQuery = useDeferredValue(query);
   const [permission, requestPermission] = useCameraPermissions();
   const [isScannerVisible, setIsScannerVisible] = useState(false);
+  const [isOptionsVisible, setIsOptionsVisible] = useState(false);
+  const [isEditorVisible, setIsEditorVisible] = useState(false);
+  const [editingVendorId, setEditingVendorId] = useState<number | null>(null);
+  const [vendorName, setVendorName] = useState("");
+  const [vendorUpi, setVendorUpi] = useState("");
+  const [vendorAmount, setVendorAmount] = useState("");
 
   useEffect(() => {
     spedexApi.getVendorDirectory().then(setData).catch(console.error);
   }, []);
 
-  const handleBarCodeScanned = ({ data: qrData }: { data: string }) => {
+  const resetEditor = () => {
+    setEditingVendorId(null);
+    setVendorName("");
+    setVendorUpi("");
+    setVendorAmount("");
+  };
+
+  const closeEditor = () => {
+    setIsEditorVisible(false);
+    resetEditor();
+  };
+
+  const reloadVendors = () => {
+    spedexApi.getVendorDirectory().then(setData).catch(console.error);
+  };
+
+  const openNewVendorEditor = () => {
+    resetEditor();
+    setIsOptionsVisible(false);
+    setIsEditorVisible(true);
+  };
+
+  const openEditVendor = (vendor: Vendor) => {
+    setEditingVendorId(vendor.id);
+    setVendorName(vendor.name);
+    setVendorUpi(vendor.upi_handle);
+    setVendorAmount(vendor.default_amount ? String(vendor.default_amount) : "");
+    setIsEditorVisible(true);
+  };
+
+  const handleQrData = (qrData: string) => {
     setIsScannerVisible(false);
-    
-    // UPI parsing logic: upi://pay?pa=handle@upi&pn=Name&am=Amount
+
     if (qrData.startsWith("upi://pay")) {
       const url = new URL(qrData.replace("upi://pay", "http://fake.com")); // Trick URL parser
       const pa = url.searchParams.get("pa");
@@ -40,15 +75,20 @@ export function PaymentsScreen({ navigation }: any) {
       const am = url.searchParams.get("am");
 
       if (pa) {
-        navigation.getParent()?.navigate("PaymentConfirm", {
-          vendor: { name: pn || "Unknown Merchant", upi_handle: pa },
-          amount: am ? parseFloat(am) : 0,
-        });
+        setEditingVendorId(null);
+        setVendorName(pn || "Unknown Merchant");
+        setVendorUpi(pa);
+        setVendorAmount(am ?? "");
+        setIsEditorVisible(true);
         return;
       }
     }
-    
+
     Alert.alert("Invalid QR", "This does not appear to be a valid payment QR code.");
+  };
+
+  const handleBarCodeScanned = ({ data: qrData }: { data: string }) => {
+    handleQrData(qrData);
   };
 
   const openScanner = async () => {
@@ -59,7 +99,39 @@ export function PaymentsScreen({ navigation }: any) {
         return;
       }
     }
+    setIsOptionsVisible(false);
     setIsScannerVisible(true);
+  };
+
+  const saveVendor = async () => {
+    if (!vendorName.trim()) {
+      Alert.alert("Missing name", "Please enter a vendor name.");
+      return;
+    }
+    if (!vendorUpi.trim()) {
+      Alert.alert("Missing UPI", "Please enter a UPI handle.");
+      return;
+    }
+
+    try {
+      if (editingVendorId) {
+        await spedexApi.editVendor(editingVendorId, {
+          name: vendorName.trim(),
+          upi_handle: vendorUpi.trim(),
+          default_amount: vendorAmount.trim() ? parseFloat(vendorAmount) : 0,
+        });
+      } else {
+        await spedexApi.addVendor({
+          name: vendorName.trim(),
+          upi_handle: vendorUpi.trim(),
+          default_amount: vendorAmount.trim() ? parseFloat(vendorAmount) : 0,
+        });
+      }
+      closeEditor();
+      reloadVendors();
+    } catch {
+      Alert.alert("Unable to save vendor", "Please check the details and try again.");
+    }
   };
 
   if (!data) return <SafeAreaView style={styles.safeArea} />;
@@ -114,7 +186,7 @@ export function PaymentsScreen({ navigation }: any) {
             <Text style={styles.eyebrow}>Manage Directory</Text>
             <Text style={styles.title}>Vendors</Text>
           </View>
-          <Pressable style={styles.addButton}>
+          <Pressable style={styles.addButton} onPress={() => setIsOptionsVisible(true)}>
             <MaterialIcons name="add" size={18} color={colors.surfaceLowest} />
             <Text style={styles.addLabel}>Add New Vendor</Text>
           </Pressable>
@@ -147,13 +219,71 @@ export function PaymentsScreen({ navigation }: any) {
             <CameraView
               style={styles.camera}
               onBarcodeScanned={handleBarCodeScanned}
-              barcodeSettings={{ barcodeTypes: ["qr"] }}
+              barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
             />
             <View style={styles.scannerOverlay}>
               <View style={styles.scanFrame} />
               <Text style={styles.scanHint}>Point at a UPI or Spedex QR code</Text>
             </View>
           </SafeAreaView>
+        </Modal>
+
+        <Modal visible={isOptionsVisible} animationType="fade" transparent>
+          <View style={styles.modalOverlay}>
+            <View style={styles.sheetCard}>
+              <Text style={styles.modalTitle}>Add Vendor</Text>
+              <Pressable style={styles.optionButton} onPress={openScanner}>
+                <MaterialIcons name="qr-code-scanner" size={22} color={colors.primary} />
+                <Text style={styles.optionText}>Scan UPI QR</Text>
+              </Pressable>
+              <Pressable style={styles.optionButton} onPress={openNewVendorEditor}>
+                <MaterialIcons name="edit" size={22} color={colors.primary} />
+                <Text style={styles.optionText}>Enter Details Manually</Text>
+              </Pressable>
+              <Pressable style={styles.secondaryButton} onPress={() => setIsOptionsVisible(false)}>
+                <Text style={styles.secondaryButtonText}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={isEditorVisible} animationType="slide" transparent>
+          <View style={styles.modalOverlay}>
+            <View style={styles.sheetCard}>
+              <View style={styles.modalHeader}>
+                <Text style={styles.modalTitle}>{editingVendorId ? "Edit Vendor" : "Save Vendor"}</Text>
+                <Pressable onPress={closeEditor}>
+                  <MaterialIcons name="close" size={22} color={colors.onSurface} />
+                </Pressable>
+              </View>
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Vendor Name"
+                placeholderTextColor={colors.onSurfaceVariant}
+                value={vendorName}
+                onChangeText={setVendorName}
+              />
+              <TextInput
+                style={styles.modalInput}
+                placeholder="UPI Handle"
+                placeholderTextColor={colors.onSurfaceVariant}
+                autoCapitalize="none"
+                value={vendorUpi}
+                onChangeText={setVendorUpi}
+              />
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Default Amount"
+                placeholderTextColor={colors.onSurfaceVariant}
+                keyboardType="numeric"
+                value={vendorAmount}
+                onChangeText={setVendorAmount}
+              />
+              <Pressable style={styles.primaryButton} onPress={saveVendor}>
+                <Text style={styles.primaryButtonText}>{editingVendorId ? "Save Changes" : "Save Vendor"}</Text>
+              </Pressable>
+            </View>
+          </View>
         </Modal>
 
         {Object.keys(groups).length === 0 ? (
@@ -191,7 +321,15 @@ export function PaymentsScreen({ navigation }: any) {
                     </View>
                     <View style={styles.vendorMeta}>
                       <Text style={styles.vendorAmount}>{formatCurrency(vendor.default_amount)}</Text>
-                      <MaterialIcons name="edit" size={16} color={colors.onSurfaceVariant} />
+                      <Pressable
+                        hitSlop={10}
+                        onPress={(event) => {
+                          event.stopPropagation();
+                          openEditVendor(vendor);
+                        }}
+                      >
+                        <MaterialIcons name="edit" size={16} color={colors.onSurfaceVariant} />
+                      </Pressable>
                     </View>
                   </Pressable>
                 );
@@ -405,6 +543,71 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     marginTop: 6,
     fontWeight: "800",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    backgroundColor: "rgba(16, 24, 40, 0.45)",
+    padding: spacing.lg,
+  },
+  sheetCard: {
+    backgroundColor: colors.surfaceLowest,
+    borderRadius: radii.xl,
+    padding: spacing.xl,
+    gap: spacing.md,
+    ...shadows.card,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  modalTitle: {
+    color: colors.onSurface,
+    fontSize: 22,
+    fontWeight: "800",
+  },
+  optionButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    backgroundColor: colors.surfaceLow,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+  },
+  optionText: {
+    color: colors.onSurface,
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  modalInput: {
+    backgroundColor: colors.surfaceLow,
+    color: colors.onSurface,
+    borderRadius: radii.md,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    fontSize: 16,
+  },
+  primaryButton: {
+    marginTop: spacing.sm,
+    backgroundColor: colors.primary,
+    borderRadius: radii.md,
+    alignItems: "center",
+    paddingVertical: spacing.md,
+  },
+  primaryButtonText: {
+    color: colors.surfaceLowest,
+    fontWeight: "800",
+    fontSize: 16,
+  },
+  secondaryButton: {
+    alignItems: "center",
+    paddingVertical: spacing.sm,
+  },
+  secondaryButtonText: {
+    color: colors.onSurfaceVariant,
+    fontWeight: "700",
   },
   vendorMeta: {
     alignItems: "flex-end",

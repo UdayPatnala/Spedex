@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
+            String fieldName = error instanceof FieldError fieldError ? fieldError.getField() : "detail";
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
@@ -37,12 +37,18 @@ public class GlobalExceptionHandler {
 
         if (e.getMessage() != null) {
             String lowerCaseMsg = e.getMessage().toLowerCase();
-            if (lowerCaseMsg.contains("not found") || lowerCaseMsg.contains("invalid")) {
+            if (lowerCaseMsg.contains("unauthorized") || lowerCaseMsg.contains("credentials")) {
                 status = HttpStatus.UNAUTHORIZED;
-                message = "Authentication failed or resource not found";
+                message = "Authentication failed";
+            } else if (lowerCaseMsg.contains("not found")) {
+                status = HttpStatus.NOT_FOUND;
+                message = "Requested resource was not found";
             } else if (lowerCaseMsg.contains("exists")) {
                 status = HttpStatus.BAD_REQUEST;
                 message = "Invalid request or resource already exists";
+            } else if (lowerCaseMsg.contains("invalid") || lowerCaseMsg.contains("missing")) {
+                status = HttpStatus.BAD_REQUEST;
+                message = "Invalid request";
             }
         }
         

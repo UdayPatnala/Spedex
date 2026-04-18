@@ -10,7 +10,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(originPatterns = "*", allowCredentials = "true")
 public class DashboardController {
 
     @Autowired
@@ -26,6 +25,18 @@ public class DashboardController {
     public ResponseEntity<Map<String, Object>> vendors() {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.ok(dashboardService.getVendors(email));
+    }
+
+    @PostMapping({"/mobile/vendors", "/vendors"})
+    public ResponseEntity<Map<String, Object>> addVendor(@RequestBody Map<String, String> payload) {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(dashboardService.addVendor(email, payload));
+    }
+
+    @PutMapping({"/mobile/vendors/{id}", "/vendors/{id}"})
+    public ResponseEntity<Map<String, Object>> editVendor(@PathVariable Long id, @RequestBody Map<String, String> payload) {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(dashboardService.editVendor(email, id, payload));
     }
 
     @GetMapping("/mobile/budgets")

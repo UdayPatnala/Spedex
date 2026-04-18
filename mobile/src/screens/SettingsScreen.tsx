@@ -9,7 +9,6 @@ import {
   Text,
   TextInput,
   View,
-  Image,
 } from "react-native";
 
 import { spedexApi } from "../api/client";
@@ -33,7 +32,7 @@ export function SettingsScreen() {
     digest: true,
   });
 
-  const profile = user ?? { name: "User", email: "", avatar_initials: "U", plan: "Free" };
+  const profile = user ?? { name: "User", email: "", avatar_initials: "U", plan: "Free", profile_picture_url: null };
 
   const handleSave = async () => {
     try {

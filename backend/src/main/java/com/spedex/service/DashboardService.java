@@ -96,6 +96,69 @@ public class DashboardService {
         return overview;
     }
 
+    public Map<String, Object> addVendor(String email, Map<String, String> payload) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+
+        String category = normalizeCategory(payload.get("category"));
+        String name = payload.getOrDefault("name", "").trim();
+        if (name.isEmpty()) {
+            throw new RuntimeException("Missing vendor name");
+        }
+        Vendor vendor = new Vendor();
+        vendor.setUser(user);
+        vendor.setName(name);
+        vendor.setCategory(category);
+        vendor.setAccent(resolveAccent(category));
+        vendor.setIcon(resolveIcon(category));
+        vendor.setUpiHandle(normalizeUpiHandle(payload));
+        vendor.setDefaultAmount(parseAmount(payload.get("default_amount")));
+        vendor.setIsQuickPay(Boolean.parseBoolean(payload.getOrDefault("is_quick_pay", "false")));
+
+        Vendor savedVendor = vendorRepository.save(vendor);
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("vendor", savedVendor);
+        return response;
+    }
+
+    public Map<String, Object> editVendor(String email, Long id, Map<String, String> payload) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        Vendor vendor = vendorRepository.findById(id).orElseThrow();
+
+        if (!vendor.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        if (payload.containsKey("name") && payload.get("name") != null) {
+            String name = payload.get("name").trim();
+            if (name.isEmpty()) {
+                throw new RuntimeException("Missing vendor name");
+            }
+            vendor.setName(name);
+        }
+        if (payload.containsKey("category") && payload.get("category") != null) {
+            String category = normalizeCategory(payload.get("category"));
+            vendor.setCategory(category);
+            vendor.setAccent(resolveAccent(category));
+            vendor.setIcon(resolveIcon(category));
+        }
+        if (payload.containsKey("upi_handle") || payload.containsKey("phone_number")) {
+            vendor.setUpiHandle(normalizeUpiHandle(payload));
+        }
+        if (payload.containsKey("default_amount")) {
+            vendor.setDefaultAmount(parseAmount(payload.get("default_amount")));
+        }
+        if (payload.containsKey("is_quick_pay")) {
+            vendor.setIsQuickPay(Boolean.parseBoolean(payload.get("is_quick_pay")));
+        }
+
+        Vendor savedVendor = vendorRepository.save(vendor);
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("vendor", savedVendor);
+        return response;
+    }
+
     public Map<String, Object> getVendors(String email) {
         User user = userRepository.findByEmail(email).orElseThrow();
         List<Vendor> vendors = vendorRepository.findByUserId(user.getId());
@@ -139,5 +202,52 @@ public class DashboardService {
         response.put("weekday_ratio", 50);
         response.put("weekend_ratio", 50);
         return response;
+    }
+
+    private String normalizeCategory(String category) {
+        if (category == null || category.isBlank()) {
+            return "Miscellaneous";
+        }
+        return category.trim();
+    }
+
+    private String normalizeUpiHandle(Map<String, String> payload) {
+        String upiHandle = payload.getOrDefault("upi_handle", "").trim();
+        if (!upiHandle.isEmpty()) {
+            return upiHandle;
+        }
+
+        String phoneNumber = payload.getOrDefault("phone_number", "").trim();
+        if (phoneNumber.isEmpty()) {
+            throw new RuntimeException("Invalid vendor payment details");
+        }
+        return phoneNumber.contains("@") ? phoneNumber : phoneNumber + "@upi";
+    }
+
+    private double parseAmount(String rawAmount) {
+        if (rawAmount == null || rawAmount.isBlank()) {
+            return 0.0;
+        }
+        return Double.parseDouble(rawAmount);
+    }
+
+    private String resolveAccent(String category) {
+        return switch (category.toLowerCase()) {
+            case "dining", "food", "restaurant" -> "rose";
+            case "groceries", "shopping" -> "amber";
+            case "transport", "travel" -> "mint";
+            default -> "lavender";
+        };
+    }
+
+    private String resolveIcon(String category) {
+        return switch (category.toLowerCase()) {
+            case "dining", "food", "restaurant" -> "restaurant";
+            case "groceries" -> "shopping_basket";
+            case "shopping" -> "shopping_bag";
+            case "transport", "travel" -> "directions_bus";
+            case "bills", "utilities" -> "bolt";
+            default -> "payments";
+        };
     }
 }

@@ -92,7 +92,7 @@ export async function loadDashboardBundle() {
 }
 
 export function addVendor(payload: VendorCreate) {
-  return request<Vendor>("/vendors", {
+  return request<{ status: string; vendor: Vendor }>("/mobile/vendors", {
     method: "POST",
     body: JSON.stringify(payload),
   });
