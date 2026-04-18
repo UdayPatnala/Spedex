@@ -9,6 +9,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(originPatterns = "*", allowCredentials = "true")
 public class HealthController {
 
     @GetMapping("/health")
