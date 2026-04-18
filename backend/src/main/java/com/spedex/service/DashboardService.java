@@ -7,6 +7,7 @@ import com.spedex.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,7 +63,32 @@ public class DashboardService {
         
         overview.put("recent_transactions", transactions.stream().limit(5).collect(Collectors.toList()));
         overview.put("reminders", reminderRepository.findByUserId(user.getId()));
-        overview.put("weekly_spending", Arrays.asList(0, 0, 0, 0)); // To be implemented with date filtering
+
+        // Calculate weekly spending with date filtering
+        LocalDateTime now = LocalDateTime.now();
+        List<Double> weeklySpendingDouble = new ArrayList<>(Arrays.asList(0.0, 0.0, 0.0, 0.0));
+
+        transactions.stream()
+                .filter(t -> "expense".equals(t.getDirection()))
+                .filter(t -> t.getOccurredAt() != null &&
+                             t.getOccurredAt().getYear() == now.getYear() &&
+                             t.getOccurredAt().getMonthValue() == now.getMonthValue())
+                .forEach(t -> {
+                    int day = t.getOccurredAt().getDayOfMonth();
+                    int weekIndex;
+                    if (day <= 7) weekIndex = 0;
+                    else if (day <= 14) weekIndex = 1;
+                    else if (day <= 21) weekIndex = 2;
+                    else weekIndex = 3;
+
+                    weeklySpendingDouble.set(weekIndex, weeklySpendingDouble.get(weekIndex) + t.getAmount());
+                });
+
+        List<Integer> weeklySpending = weeklySpendingDouble.stream()
+                .map(Double::intValue)
+                .collect(Collectors.toList());
+
+        overview.put("weekly_spending", weeklySpending);
         overview.put("peak_day_label", "N/A");
         overview.put("weekly_average", monthlyTotal / 4.0);
         overview.put("security_message", "Your wallet is secured with multi-factor UPI authentication.");
