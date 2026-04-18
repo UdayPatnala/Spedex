@@ -57,14 +57,18 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         
-        // Broad but secure patterns for Vercel and Localhost
-        config.setAllowedOriginPatterns(Arrays.asList(
-            "https://*.vercel.app",
-            "https://spe-dex.vercel.app",
-            "https://spedex.vercel.app",
-            "http://localhost:[*]",
-            "http://127.0.0.1:[*]"
-        ));
+        // Use explicitly allowed origins to prevent CORS misconfiguration
+        if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
+            config.setAllowedOrigins(allowedOrigins);
+        } else {
+            // Safe fallback if allowed-origins is misconfigured
+            config.setAllowedOrigins(Arrays.asList(
+                "https://spe-dex.vercel.app",
+                "https://spedex.vercel.app",
+                "http://localhost:5173",
+                "http://localhost:3000"
+            ));
+        }
         
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Origin", "Accept", "X-Requested-With"));
