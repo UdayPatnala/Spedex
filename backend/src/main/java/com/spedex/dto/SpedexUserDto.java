@@ -12,4 +12,6 @@ public class SpedexUserDto {
     public String avatarInitials;
     @JsonProperty("member_since")
     public String memberSince; // ISO string
+    @JsonProperty("profile_picture_url")
+    public String profilePictureUrl;
 }

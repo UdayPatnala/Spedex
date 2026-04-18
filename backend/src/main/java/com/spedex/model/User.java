@@ -21,6 +21,7 @@ public class User {
 
     private String plan = "Premium";
     private String avatarInitials = "AL";
+    private String profilePictureUrl;
     private LocalDateTime memberSince = LocalDateTime.now();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -48,6 +49,8 @@ public class User {
     public void setPlan(String plan) { this.plan = plan; }
     public String getAvatarInitials() { return avatarInitials; }
     public void setAvatarInitials(String avatarInitials) { this.avatarInitials = avatarInitials; }
+    public String getProfilePictureUrl() { return profilePictureUrl; }
+    public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
     public LocalDateTime getMemberSince() { return memberSince; }
     public void setMemberSince(LocalDateTime memberSince) { this.memberSince = memberSince; }
     public List<Vendor> getVendors() { return vendors; }

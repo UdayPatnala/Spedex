@@ -7,9 +7,12 @@ import {
   StyleSheet,
   Switch,
   Text,
+  TextInput,
   View,
+  Image,
 } from "react-native";
 
+import { spedexApi } from "../api/client";
 import { useAuth } from "../auth/AuthProvider";
 import { colors, radii, shadows, spacing } from "../theme/tokens";
 
@@ -20,29 +23,81 @@ const settingRows = [
 ];
 
 export function SettingsScreen() {
-  const { signOut, user } = useAuth();
+  const { signOut, user, refreshUser } = useAuth();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(user?.name || "");
+  const [editPic, setEditPic] = useState(user?.profile_picture_url || "");
   const [toggles, setToggles] = useState({
     notifications: true,
     biometric: true,
     digest: true,
   });
+
   const profile = user ?? { name: "User", email: "", avatar_initials: "U", plan: "Free" };
+
+  const handleSave = async () => {
+    try {
+      await spedexApi.updateProfile({ name: editName, profile_picture_url: editPic });
+      await refreshUser();
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Failed to update profile", error);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.brand}>Spedex</Text>
+        <View style={styles.headerRow}>
+          <Text style={styles.brand}>Spedex</Text>
+          <Pressable onPress={() => isEditing ? handleSave() : setIsEditing(true)}>
+            <Text style={styles.editAction}>{isEditing ? "Save" : "Edit Profile"}</Text>
+          </Pressable>
+        </View>
 
         <View style={styles.profileCard}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{profile.avatar_initials}</Text>
+            {profile.profile_picture_url ? (
+              <View style={styles.avatarImageOverflow}>
+                 <MaterialIcons name="person" size={40} color={colors.primary} />
+              </View>
+            ) : (
+              <Text style={styles.avatarText}>{profile.avatar_initials}</Text>
+            )}
           </View>
           <View style={styles.profileMeta}>
-            <Text style={styles.name}>{profile.name}</Text>
-            <Text style={styles.email}>{profile.email}</Text>
-            <View style={styles.planBadge}>
-              <Text style={styles.planLabel}>{profile.plan}</Text>
-            </View>
+            {isEditing ? (
+              <View style={styles.editForm}>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Display Name</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={editName}
+                    onChangeText={setEditName}
+                    placeholder="Enter name"
+                    placeholderTextColor={colors.onSurfaceVariant}
+                  />
+                </View>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Profile Picture URL</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={editPic}
+                    onChangeText={setEditPic}
+                    placeholder="https://..."
+                    placeholderTextColor={colors.onSurfaceVariant}
+                  />
+                </View>
+              </View>
+            ) : (
+              <>
+                <Text style={styles.name}>{profile.name}</Text>
+                <Text style={styles.email}>{profile.email}</Text>
+                <View style={styles.planBadge}>
+                  <Text style={styles.planLabel}>{profile.plan}</Text>
+                </View>
+              </>
+            )}
           </View>
         </View>
 
@@ -230,5 +285,50 @@ const styles = StyleSheet.create({
     color: colors.surfaceLowest,
     fontWeight: "800",
     fontSize: 16,
+  },
+  headerRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  editAction: {
+    color: colors.primary,
+    fontWeight: "800",
+    fontSize: 16,
+  },
+  avatarImageOverflow: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    overflow: "hidden",
+    backgroundColor: colors.surfaceLow,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  profileImage: {
+    width: "100%",
+    height: "100%",
+  },
+  editForm: {
+    gap: spacing.md,
+    marginTop: 4,
+  },
+  inputGroup: {
+    gap: 4,
+  },
+  inputLabel: {
+    color: colors.onSurfaceVariant,
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+  },
+  textInput: {
+    backgroundColor: colors.surfaceLow,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    color: colors.onSurface,
+    fontSize: 15,
+    fontWeight: "600",
   },
 });

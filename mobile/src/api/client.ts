@@ -81,4 +81,9 @@ export const spedexApi = {
       method: "POST",
       body: JSON.stringify({ status }),
     }),
+  updateProfile: (payload: { name?: string; profile_picture_url?: string }) =>
+    request<SpedexUser>("/auth/profile", {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
 };

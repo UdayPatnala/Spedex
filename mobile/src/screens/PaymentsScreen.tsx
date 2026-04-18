@@ -1,6 +1,9 @@
 import { MaterialIcons } from "@expo/vector-icons";
+import { CameraView, useCameraPermissions } from "expo-camera";
 import { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 import {
+  Alert,
+  Modal,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -19,10 +22,45 @@ export function PaymentsScreen({ navigation }: any) {
   const [data, setData] = useState<VendorDirectoryData | null>(null);
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
+  const [permission, requestPermission] = useCameraPermissions();
+  const [isScannerVisible, setIsScannerVisible] = useState(false);
 
   useEffect(() => {
     spedexApi.getVendorDirectory().then(setData).catch(console.error);
   }, []);
+
+  const handleBarCodeScanned = ({ data: qrData }: { data: string }) => {
+    setIsScannerVisible(false);
+    
+    // UPI parsing logic: upi://pay?pa=handle@upi&pn=Name&am=Amount
+    if (qrData.startsWith("upi://pay")) {
+      const url = new URL(qrData.replace("upi://pay", "http://fake.com")); // Trick URL parser
+      const pa = url.searchParams.get("pa");
+      const pn = url.searchParams.get("pn");
+      const am = url.searchParams.get("am");
+
+      if (pa) {
+        navigation.getParent()?.navigate("PaymentConfirm", {
+          vendor: { name: pn || "Unknown Merchant", upi_handle: pa },
+          amount: am ? parseFloat(am) : 0,
+        });
+        return;
+      }
+    }
+    
+    Alert.alert("Invalid QR", "This does not appear to be a valid payment QR code.");
+  };
+
+  const openScanner = async () => {
+    if (!permission?.granted) {
+      const { granted } = await requestPermission();
+      if (!granted) {
+        Alert.alert("Permission required", "Camera access is needed to scan QR codes.");
+        return;
+      }
+    }
+    setIsScannerVisible(true);
+  };
 
   if (!data) return <SafeAreaView style={styles.safeArea} />;
 
@@ -68,16 +106,41 @@ export function PaymentsScreen({ navigation }: any) {
           </Pressable>
         </View>
 
-        <View style={styles.searchWrap}>
-          <MaterialIcons name="search" size={20} color={colors.onSurfaceVariant} />
-          <TextInput
-            placeholder="Search by name or category..."
-            placeholderTextColor={colors.onSurfaceVariant}
-            value={query}
-            onChangeText={(value) => startTransition(() => setQuery(value))}
-            style={styles.searchInput}
-          />
+        <View style={styles.searchRow}>
+          <View style={styles.searchWrap}>
+            <MaterialIcons name="search" size={20} color={colors.onSurfaceVariant} />
+            <TextInput
+              placeholder="Search by name or category..."
+              placeholderTextColor={colors.onSurfaceVariant}
+              value={query}
+              onChangeText={(value) => startTransition(() => setQuery(value))}
+              style={styles.searchInput}
+            />
+          </View>
+          <Pressable style={styles.scanButton} onPress={openScanner}>
+            <MaterialIcons name="qr-code-scanner" size={24} color={colors.primary} />
+          </Pressable>
         </View>
+
+        <Modal visible={isScannerVisible} animationType="slide">
+          <SafeAreaView style={styles.scannerContainer}>
+            <View style={styles.scannerHeader}>
+              <Text style={styles.scannerTitle}>Scan Payment QR</Text>
+              <Pressable onPress={() => setIsScannerVisible(false)} style={styles.closeButton}>
+                <MaterialIcons name="close" size={28} color={colors.onSurface} />
+              </Pressable>
+            </View>
+            <CameraView
+              style={styles.camera}
+              onBarcodeScanned={handleBarCodeScanned}
+              barcodeSettings={{ barcodeTypes: ["qr"] }}
+            />
+            <View style={styles.scannerOverlay}>
+              <View style={styles.scanFrame} />
+              <Text style={styles.scanHint}>Point at a UPI or Spedex QR code</Text>
+            </View>
+          </SafeAreaView>
+        </Modal>
 
         {Object.keys(groups).length === 0 ? (
           <View style={{ padding: 32, alignItems: "center", marginTop: 24 }}>
@@ -195,6 +258,20 @@ const styles = StyleSheet.create({
     color: colors.surfaceLowest,
     fontWeight: "700",
   },
+  searchRow: {
+    flexDirection: "row",
+    gap: spacing.md,
+    alignItems: "center",
+  },
+  scanButton: {
+    width: 56,
+    height: 56,
+    borderRadius: radii.md,
+    backgroundColor: colors.surfaceLow,
+    alignItems: "center",
+    justifyContent: "center",
+    ...shadows.card,
+  },
   searchWrap: {
     flexDirection: "row",
     alignItems: "center",
@@ -202,12 +279,60 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surfaceLow,
     borderRadius: radii.md,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
+    flex: 1,
+    height: 56,
   },
   searchInput: {
     flex: 1,
     color: colors.onSurface,
     fontSize: 15,
+  },
+  scannerContainer: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  scannerHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: spacing.xl,
+  },
+  scannerTitle: {
+    fontSize: 24,
+    fontWeight: "800",
+    color: colors.onSurface,
+  },
+  closeButton: {
+    padding: 4,
+  },
+  camera: {
+    flex: 1,
+  },
+  scannerOverlay: {
+    position: "absolute",
+    top: 150,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: "center",
+    gap: spacing.xl,
+  },
+  scanFrame: {
+    width: 250,
+    height: 250,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    borderRadius: 24,
+    backgroundColor: "rgba(0,0,0,0.1)",
+  },
+  scanHint: {
+    color: colors.onSurface,
+    backgroundColor: colors.surfaceLow,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: radii.pill,
+    fontWeight: "700",
+    overflow: "hidden",
   },
   groupSection: {
     gap: spacing.md,

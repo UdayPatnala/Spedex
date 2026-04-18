@@ -33,4 +33,10 @@ public class AuthController {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.ok(userService.findByEmail(email));
     }
+
+    @PutMapping("/profile")
+    public ResponseEntity<SpedexUserDto> updateProfile(@RequestBody SpedexUserDto request) {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(userService.updateProfile(email, request));
+    }
 }

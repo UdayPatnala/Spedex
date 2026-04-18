@@ -35,12 +35,24 @@ public class DashboardService {
         User user = userRepository.findByEmail(email).orElseThrow();
         SpedexUserDto userDto = userService.mapToDto(user);
 
+        List<com.spedex.model.Transaction> transactions = transactionRepository.findByUserId(user.getId());
+        double monthlyTotal = transactions.stream()
+                .filter(t -> t.getDirection().equals("expense"))
+                .mapToDouble(com.spedex.model.Transaction::getAmount)
+                .sum();
+
+        List<com.spedex.model.Budget> budgets = budgetRepository.findByUserId(user.getId());
+        double monthlyBudget = budgets.stream()
+                .mapToDouble(com.spedex.model.Budget::getLimitAmount)
+                .sum();
+        if (monthlyBudget == 0) monthlyBudget = 1.0; // Avoid division by zero
+
         Map<String, Object> overview = new HashMap<>();
         overview.put("user", userDto);
-        overview.put("monthly_total", 4250.0); // Mocking for now, in a real app query DB
-        overview.put("monthly_budget", 15000.0);
-        overview.put("budget_used_ratio", 4250.0 / 15000.0);
-        overview.put("budget_copy", "You’ve spent 28% of your monthly budget. You're on track!");
+        overview.put("monthly_total", monthlyTotal);
+        overview.put("monthly_budget", monthlyBudget);
+        overview.put("budget_used_ratio", monthlyTotal / monthlyBudget);
+        overview.put("budget_copy", monthlyTotal > monthlyBudget ? "Warning: You have exceeded your budget!" : "You've spent " + (int)((monthlyTotal / monthlyBudget) * 100) + "% of your monthly budget.");
         
         List<Vendor> quickPay = vendorRepository.findByUserId(user.getId()).stream()
                 .filter(v -> v.getIsQuickPay())
@@ -48,11 +60,11 @@ public class DashboardService {
                 .collect(Collectors.toList());
         overview.put("quick_pay", quickPay);
         
-        overview.put("recent_transactions", new ArrayList<>());
-        overview.put("reminders", new ArrayList<>());
-        overview.put("weekly_spending", Arrays.asList(1200, 1500, 800, 750));
-        overview.put("peak_day_label", "Wednesday");
-        overview.put("weekly_average", 1062.5);
+        overview.put("recent_transactions", transactions.stream().limit(5).collect(Collectors.toList()));
+        overview.put("reminders", reminderRepository.findByUserId(user.getId()));
+        overview.put("weekly_spending", Arrays.asList(0, 0, 0, 0)); // To be implemented with date filtering
+        overview.put("peak_day_label", "N/A");
+        overview.put("weekly_average", monthlyTotal / 4.0);
         overview.put("security_message", "Your wallet is secured with multi-factor UPI authentication.");
 
         return overview;
@@ -73,25 +85,33 @@ public class DashboardService {
 
     public Map<String, Object> getBudgets(String email) {
         User user = userRepository.findByEmail(email).orElseThrow();
+        List<com.spedex.model.Budget> budgets = budgetRepository.findByUserId(user.getId());
+        double totalBudget = budgets.stream().mapToDouble(com.spedex.model.Budget::getLimitAmount).sum();
         
         Map<String, Object> response = new HashMap<>();
-        response.put("remaining_budget", 10750.0);
-        response.put("budgets", new ArrayList<>());
-        response.put("reminders", new ArrayList<>());
-        response.put("savings_tip", "Switching your coffee subscription to a weekly plan could save you ₹400/month.");
+        response.put("remaining_budget", totalBudget);
+        response.put("budgets", budgets);
+        response.put("reminders", reminderRepository.findByUserId(user.getId()));
+        response.put("savings_tip", budgets.isEmpty() ? "Set a budget to start tracking your savings!" : "Switching your coffee subscription to a weekly plan could save you ₹400/month.");
         return response;
     }
 
     public Map<String, Object> getAnalytics(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        List<com.spedex.model.Transaction> transactions = transactionRepository.findByUserId(user.getId());
+        double totalSpent = transactions.stream()
+                .filter(t -> t.getDirection().equals("expense"))
+                .mapToDouble(com.spedex.model.Transaction::getAmount).sum();
+
         Map<String, Object> response = new HashMap<>();
-        response.put("total_spent", 4250.0);
-        response.put("smart_insight", "Your spending is 15% lower than last month. Great job!");
+        response.put("total_spent", totalSpent);
+        response.put("smart_insight", totalSpent == 0 ? "You haven't spent anything yet this month. Keep it up!" : "Your spending is tracked in real-time.");
         response.put("category_breakdown", new ArrayList<>());
         response.put("weekly_spend", new ArrayList<>());
-        response.put("highest_sector", Map.of("title", "Dining", "subtitle", "₹1,800 spent", "accent", "rose", "icon", "restaurant"));
-        response.put("busiest_day", Map.of("title", "Wednesday", "subtitle", "4 transactions", "accent", "mint", "icon", "event_busy"));
-        response.put("weekday_ratio", 70);
-        response.put("weekend_ratio", 30);
+        response.put("highest_sector", Map.of("title", "Dining", "subtitle", "₹0 spent", "accent", "rose", "icon", "restaurant"));
+        response.put("busiest_day", Map.of("title", "N/A", "subtitle", "0 transactions", "accent", "mint", "icon", "event_busy"));
+        response.put("weekday_ratio", 50);
+        response.put("weekend_ratio", 50);
         return response;
     }
 }

@@ -60,6 +60,17 @@ public class UserService {
         return mapToDto(user);
     }
 
+    public SpedexUserDto updateProfile(String email, SpedexUserDto profileUpdates) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        
+        if (profileUpdates.name != null) user.setName(profileUpdates.name);
+        if (profileUpdates.profilePictureUrl != null) user.setProfilePictureUrl(profileUpdates.profilePictureUrl);
+        
+        user = userRepository.save(user);
+        return mapToDto(user);
+    }
+
     public SpedexUserDto mapToDto(User user) {
         SpedexUserDto dto = new SpedexUserDto();
         dto.id = user.getId();
@@ -67,6 +78,7 @@ public class UserService {
         dto.email = user.getEmail();
         dto.plan = user.getPlan();
         dto.avatarInitials = user.getAvatarInitials();
+        dto.profilePictureUrl = user.getProfilePictureUrl();
         dto.memberSince = user.getMemberSince().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         return dto;
     }

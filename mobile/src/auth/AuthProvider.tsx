@@ -13,6 +13,7 @@ type AuthContextValue = {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -101,6 +102,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await AsyncStorage.removeItem(STORAGE_KEY);
         setToken(null);
         setUser(null);
+      },
+      async refreshUser() {
+        const currentUser = await spedexApi.getCurrentUser();
+        setUser(currentUser);
+        // Also update stored user in AsyncStorage
+        const raw = await AsyncStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          parsed.user = currentUser;
+          await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+        }
       },
     }),
     [ready, token, user],
