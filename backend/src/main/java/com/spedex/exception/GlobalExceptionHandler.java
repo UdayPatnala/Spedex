@@ -1,5 +1,7 @@
 package com.spedex.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -11,19 +13,29 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException e) {
-        Map<String, String> error = new HashMap<>();
-        error.put("detail", e.getMessage());
+        logger.error("Unhandled RuntimeException", e);
         
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        if (e.getMessage().toLowerCase().contains("not found") || 
-            e.getMessage().toLowerCase().contains("invalid")) {
-            status = HttpStatus.UNAUTHORIZED;
-        } else if (e.getMessage().toLowerCase().contains("exists")) {
-            status = HttpStatus.BAD_REQUEST;
+        String message = "An unexpected error occurred";
+
+        if (e.getMessage() != null) {
+            String lowerCaseMsg = e.getMessage().toLowerCase();
+            if (lowerCaseMsg.contains("not found") || lowerCaseMsg.contains("invalid")) {
+                status = HttpStatus.UNAUTHORIZED;
+                message = "Authentication failed or resource not found";
+            } else if (lowerCaseMsg.contains("exists")) {
+                status = HttpStatus.BAD_REQUEST;
+                message = "Invalid request or resource already exists";
+            }
         }
         
+        Map<String, String> error = new HashMap<>();
+        error.put("detail", message);
+
         return new ResponseEntity<>(error, status);
     }
 }
