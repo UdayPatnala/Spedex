@@ -1,0 +1,3 @@
+🎯 **What:** Added a missing test suite for `PaymentConfirmScreen.tsx` to handle the specific edge case where `Linking.openURL` throws an error and triggers the failure alert logic. Initialized proper Jest and React Native Testing Library configuration for the `mobile` workspace.
+📊 **Coverage:** Tests the error catching mechanism when native UPI linking fails, confirming that the fallback `Alert.alert` is launched with the proper messages.
+✨ **Result:** Improved test coverage, adding safety nets around transaction deep linking failure states to allow confident UI refactoring.
