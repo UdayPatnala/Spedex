@@ -1,25 +1,29 @@
 :root {
   color-scheme: light;
-  --primary: #c21874;
-  --primary-strong: #8f0e52;
-  --primary-soft: #ffe6f2;
-  --background: #fff8fb;
-  --surface: rgba(255, 255, 255, 0.9);
+  --primary: #cf3082; /* 2000 Rupee (Magenta) */
+  --primary-strong: #96225e;
+  --primary-soft: #fbeaf4;
+  --background: #fdfdfd;
+  --surface: rgba(255, 255, 255, 0.95);
   --surface-strong: #ffffff;
-  --surface-low: #fff0f7;
-  --surface-container: #ffd6e8;
-  --surface-highest: #f8cade;
-  --text: #251622;
-  --muted: #7e5d71;
-  --rose: #ffd2e7;
-  --rose-text: #98135a;
-  --mint: #d8fff2;
-  --mint-text: #0e7a58;
-  --amber: #ffe6c2;
-  --amber-text: #8f5200;
-  --lavender: #f0dfff;
-  --lavender-text: #69428d;
-  --shadow: 0 28px 60px rgba(194, 24, 116, 0.12);
+  --surface-low: #f5f5f7;
+  --surface-container: #eaeef2;
+  --surface-highest: #dfe3eb;
+  --text: #2c2929;
+  --muted: #726e6d;
+  --rose: #fbeaf4;
+  --rose-text: #96225e;
+  --mint: #e2f8fe;
+  --mint-text: #2a7d91; /* 50 Rupee (Fluorescent Blue) */
+  --amber: #fef0e3;
+  --amber-text: #a85716; /* 20 Rupee (Orange variant) */
+  --lavender: #ece9f5;
+  --lavender-text: #483866; /* 100 Rupee (Lavender/Purple) */
+  --stone: #f0f0f0;
+  --stone-text: #595959; /* 500 Rupee (Stone Grey) */
+  --brown: #f5ece7;
+  --brown-text: #45240f; /* 10 Rupee (Chocolate Brown) */
+  --shadow: 0 28px 60px rgba(103, 53, 22, 0.08);
 }
 
 * {
@@ -35,9 +39,9 @@ body,
 body {
   margin: 0;
   background:
-    radial-gradient(circle at top left, rgba(255, 121, 184, 0.24), transparent 34%),
-    radial-gradient(circle at top right, rgba(255, 208, 230, 0.7), transparent 28%),
-    linear-gradient(180deg, #fff9fc 0%, #fff4fa 100%);
+    radial-gradient(circle at top left, rgba(207, 48, 130, 0.12), transparent 34%),
+    radial-gradient(circle at top right, rgba(104, 81, 145, 0.12), transparent 28%),
+    linear-gradient(180deg, #ffffff 0%, #f8f8fb 100%);
   color: var(--text);
   font-family: "Sora", sans-serif;
 }
