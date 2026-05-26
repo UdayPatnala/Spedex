@@ -23,22 +23,25 @@ const upiApps = [
 ];
 
 export function PaymentConfirmScreen({ navigation, route }: any) {
-  const vendor: Vendor = route.params?.vendor;
+  const vendor: Vendor | undefined = route.params?.vendor;
   const [selectedApp, setSelectedApp] = useState(upiApps[0]);
   const [submitting, setSubmitting] = useState(false);
   const [pendingTxnId, setPendingTxnId] = useState<number | null>(null);
-  const amount = route.params?.amount ?? vendor.default_amount;
+  const amount = route.params?.amount ?? vendor?.default_amount ?? 0;
+  const payeeName = route.params?.payeeName ?? vendor?.name ?? "Spedex Payee";
+  const upiHandle = route.params?.upiHandle ?? vendor?.upi_handle ?? selectedApp.handle;
+  const categoryIcon = route.params?.icon ?? vendor?.icon ?? "payments";
 
-  const iconName = useMemo(() => iconFor(vendor.icon), [vendor.icon]);
+  const iconName = useMemo(() => iconFor(categoryIcon), [categoryIcon]);
 
   const handlePayment = async () => {
     try {
       setSubmitting(true);
       const prepared = await spedexApi.preparePayment({
-        vendor_id: vendor.id,
+        vendor_id: vendor?.id,
         amount,
-        upi_handle: vendor.upi_handle || selectedApp.handle,
-        payee_name: vendor.name,
+        upi_handle: upiHandle,
+        payee_name: payeeName,
       });
       setPendingTxnId(prepared.transaction.id);
       await Linking.openURL(prepared.upi_url);
@@ -96,7 +99,7 @@ export function PaymentConfirmScreen({ navigation, route }: any) {
             <View>
               <Text style={styles.overline}>Paying To</Text>
               <View style={styles.payeeRow}>
-                <Text style={styles.payee}>{vendor.name}</Text>
+                <Text style={styles.payee}>{payeeName}</Text>
                 <MaterialIcons name="check-circle" size={18} color={colors.secondary} />
               </View>
             </View>

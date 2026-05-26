@@ -12,6 +12,7 @@ import { BudgetScreen } from "../screens/BudgetScreen";
 import { HomeScreen } from "../screens/HomeScreen";
 import { PaymentConfirmScreen } from "../screens/PaymentConfirmScreen";
 import { PaymentsScreen } from "../screens/PaymentsScreen";
+import { RemindersScreen } from "../screens/RemindersScreen";
 import { SettingsScreen } from "../screens/SettingsScreen";
 import { colors } from "../theme/tokens";
 import type { Vendor } from "../types";
@@ -19,7 +20,16 @@ import type { Vendor } from "../types";
 export type RootStackParamList = {
   Auth: undefined;
   MainTabs: undefined;
-  PaymentConfirm: { vendor?: Vendor; amount?: number } | undefined;
+  PaymentConfirm:
+    | {
+        vendor?: Vendor;
+        amount?: number;
+        payeeName?: string;
+        upiHandle?: string;
+        category?: string;
+        icon?: string;
+      }
+    | undefined;
 };
 
 export type MainTabParamList = {
@@ -27,6 +37,7 @@ export type MainTabParamList = {
   Payments: undefined;
   Analytics: undefined;
   Budget: undefined;
+  Reminders: undefined;
   Settings: undefined;
 };
 
@@ -70,6 +81,7 @@ function MainTabs() {
             Payments: "account-balance-wallet",
             Analytics: "show-chart",
             Budget: "event-note",
+            Reminders: "notifications-active",
             Settings: "settings",
           };
           return (
@@ -95,6 +107,7 @@ function MainTabs() {
       <Tab.Screen name="Payments" component={PaymentsScreen} />
       <Tab.Screen name="Analytics" component={AnalyticsScreen} />
       <Tab.Screen name="Budget" component={BudgetScreen} />
+      <Tab.Screen name="Reminders" component={RemindersScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
   );

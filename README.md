@@ -6,6 +6,7 @@ Spedex is a fintech workspace for tracking how fast money moves and where it goe
 
 - `backend/`: Spring Boot API (Java 17) with H2 default storage and JWT auth
 - `mobile/`: Expo React Native app for the mobile Spedex experience
+- `mobile_native_android/`: native Android/Kotlin version merged from the local mobile zip and `Spedex-2.0`
 - `dashboard_app/`: React dashboard for desktop spending operations
 
 ## Quick Start
@@ -68,6 +69,10 @@ Set these environment variables in the Vercel dashboard:
 - `GET /api/mobile/budgets`
 - `GET /api/mobile/vendors`
 - `GET /api/mobile/analytics`
+- `GET /api/mobile/reminders`
+- `POST /api/mobile/reminders`
+- `PUT /api/mobile/reminders/{id}`
+- `DELETE /api/mobile/reminders/{id}`
 - `GET /api/dashboard/overview`
 - `POST /api/payments/prepare`
 - `POST /api/payments/{transaction_id}/complete`

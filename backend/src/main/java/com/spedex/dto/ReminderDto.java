@@ -6,6 +6,8 @@ public class ReminderDto {
     public Long id;
     public String title;
     public String subtitle;
+    @JsonProperty("upi_handle")
+    public String upiHandle;
     public Double amount;
     @JsonProperty("due_date")
     public String dueDate;

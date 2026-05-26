@@ -30,6 +30,8 @@ export function PaymentsScreen({ navigation }: any) {
   const [vendorName, setVendorName] = useState("");
   const [vendorUpi, setVendorUpi] = useState("");
   const [vendorAmount, setVendorAmount] = useState("");
+  const [vendorCategory, setVendorCategory] = useState("Miscellaneous");
+  const [isFromScan, setIsFromScan] = useState(false);
 
   useEffect(() => {
     spedexApi.getVendorDirectory().then(setData).catch(console.error);
@@ -40,6 +42,8 @@ export function PaymentsScreen({ navigation }: any) {
     setVendorName("");
     setVendorUpi("");
     setVendorAmount("");
+    setVendorCategory("Miscellaneous");
+    setIsFromScan(false);
   };
 
   const closeEditor = () => {
@@ -62,6 +66,8 @@ export function PaymentsScreen({ navigation }: any) {
     setVendorName(vendor.name);
     setVendorUpi(vendor.upi_handle);
     setVendorAmount(vendor.default_amount ? String(vendor.default_amount) : "");
+    setVendorCategory(vendor.category || "Miscellaneous");
+    setIsFromScan(false);
     setIsEditorVisible(true);
   };
 
@@ -75,10 +81,28 @@ export function PaymentsScreen({ navigation }: any) {
       const am = url.searchParams.get("am");
 
       if (pa) {
+        // Check if vendor already exists in local data groups
+        if (data?.groups) {
+          const allVendors = Object.values(data.groups).flat();
+          const existingVendor = allVendors.find(
+            (v) => v.upi_handle.toLowerCase() === pa.toLowerCase()
+          );
+          if (existingVendor) {
+            const qrAmount = am ? parseFloat(am) : existingVendor.default_amount;
+            navigation.getParent()?.navigate("PaymentConfirm", {
+              vendor: existingVendor,
+              amount: qrAmount,
+            });
+            return;
+          }
+        }
+
         setEditingVendorId(null);
         setVendorName(pn || "Unknown Merchant");
         setVendorUpi(pa);
         setVendorAmount(am ?? "");
+        setVendorCategory("Miscellaneous");
+        setIsFromScan(true);
         setIsEditorVisible(true);
         return;
       }
@@ -114,21 +138,36 @@ export function PaymentsScreen({ navigation }: any) {
     }
 
     try {
+      let savedVendor: Vendor;
       if (editingVendorId) {
-        await spedexApi.editVendor(editingVendorId, {
+        const response = await spedexApi.editVendor(editingVendorId, {
           name: vendorName.trim(),
           upi_handle: vendorUpi.trim(),
+          category: vendorCategory,
           default_amount: vendorAmount.trim() ? parseFloat(vendorAmount) : 0,
         });
+        savedVendor = response.vendor;
       } else {
-        await spedexApi.addVendor({
+        const response = await spedexApi.addVendor({
           name: vendorName.trim(),
           upi_handle: vendorUpi.trim(),
+          category: vendorCategory,
           default_amount: vendorAmount.trim() ? parseFloat(vendorAmount) : 0,
         });
+        savedVendor = response.vendor;
       }
       closeEditor();
-      reloadVendors();
+      
+      // Reload directory data
+      const updatedData = await spedexApi.getVendorDirectory();
+      setData(updatedData);
+
+      if (isFromScan) {
+        navigation.getParent()?.navigate("PaymentConfirm", {
+          vendor: savedVendor,
+          amount: savedVendor.default_amount,
+        });
+      }
     } catch {
       Alert.alert("Unable to save vendor", "Please check the details and try again.");
     }
@@ -279,6 +318,31 @@ export function PaymentsScreen({ navigation }: any) {
                 value={vendorAmount}
                 onChangeText={setVendorAmount}
               />
+              <Text style={styles.modalLabel}>Category</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
+                {["Dining", "Groceries", "Transport", "Bills", "Shopping", "Miscellaneous"].map((cat) => {
+                  const isSelected = cat === vendorCategory;
+                  return (
+                    <Pressable
+                      key={cat}
+                      onPress={() => setVendorCategory(cat)}
+                      style={[
+                        styles.categoryChip,
+                        isSelected && styles.categoryChipSelected,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.categoryChipText,
+                          isSelected && styles.categoryChipTextSelected,
+                        ]}
+                      >
+                        {cat}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
               <Pressable style={styles.primaryButton} onPress={saveVendor}>
                 <Text style={styles.primaryButtonText}>{editingVendorId ? "Save Changes" : "Save Vendor"}</Text>
               </Pressable>
@@ -588,6 +652,39 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.md,
     fontSize: 16,
+  },
+  modalLabel: {
+    color: colors.onSurface,
+    fontWeight: "700",
+    fontSize: 14,
+    marginTop: spacing.xs,
+    textTransform: "uppercase",
+    letterSpacing: 1.2,
+  },
+  categoryRow: {
+    gap: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  categoryChip: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: radii.pill,
+    backgroundColor: colors.surfaceLow,
+    borderWidth: 1,
+    borderColor: colors.surfaceContainer,
+  },
+  categoryChipSelected: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  categoryChipText: {
+    color: colors.onSurfaceVariant,
+    fontWeight: "600",
+    fontSize: 13,
+  },
+  categoryChipTextSelected: {
+    color: colors.surfaceLowest,
+    fontWeight: "700",
   },
   primaryButton: {
     marginTop: spacing.sm,

@@ -53,6 +53,7 @@ export type Reminder = {
   id: number;
   title: string;
   subtitle: string;
+  upi_handle?: string | null;
   amount: number;
   due_date: string;
   autopay_enabled: boolean;
@@ -114,4 +115,17 @@ export type PaymentIntentResponse = {
   transaction: Transaction;
   upi_url: string;
   redirect_message: string;
+};
+
+export type RemindersScreenData = {
+  user: SpedexUser;
+  reminders: Reminder[];
+  scheduled_count: number;
+  autopay_enabled_count: number;
+  next_due_message: string;
+};
+
+export type ReminderMutationResponse = {
+  status: string;
+  reminder: Reminder;
 };

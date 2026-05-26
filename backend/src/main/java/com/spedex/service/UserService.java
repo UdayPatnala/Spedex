@@ -143,6 +143,7 @@ public class UserService {
         dto.id = reminder.getId();
         dto.title = reminder.getTitle();
         dto.subtitle = reminder.getSubtitle();
+        dto.upiHandle = reminder.getUpiHandle();
         dto.amount = reminder.getAmount();
         dto.dueDate = reminder.getDueDate() == null
                 ? null

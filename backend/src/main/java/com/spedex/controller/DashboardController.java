@@ -56,4 +56,28 @@ public class DashboardController {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return ResponseEntity.ok(dashboardService.getAnalytics(email));
     }
+
+    @GetMapping("/mobile/reminders")
+    public ResponseEntity<Map<String, Object>> reminders() {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(dashboardService.getReminders(email));
+    }
+
+    @PostMapping("/mobile/reminders")
+    public ResponseEntity<Map<String, Object>> addReminder(@RequestBody Map<String, Object> payload) {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(dashboardService.addReminder(email, payload));
+    }
+
+    @PutMapping("/mobile/reminders/{id}")
+    public ResponseEntity<Map<String, Object>> updateReminder(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(dashboardService.updateReminder(email, id, payload));
+    }
+
+    @DeleteMapping("/mobile/reminders/{id}")
+    public ResponseEntity<Map<String, Object>> deleteReminder(@PathVariable Long id) {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return ResponseEntity.ok(dashboardService.deleteReminder(email, id));
+    }
 }

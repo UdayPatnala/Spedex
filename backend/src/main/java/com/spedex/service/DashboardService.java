@@ -3,6 +3,7 @@ package com.spedex.service;
 import com.spedex.dto.SpedexUserDto;
 import com.spedex.dto.VendorDto;
 import com.spedex.model.Budget;
+import com.spedex.model.Reminder;
 import com.spedex.model.Transaction;
 import com.spedex.model.User;
 import com.spedex.model.Vendor;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -280,6 +282,78 @@ public class DashboardService {
         return response;
     }
 
+    public Map<String, Object> getReminders(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        List<Reminder> reminders = reminderRepository.findByUserId(user.getId()).stream()
+                .sorted(Comparator.comparing(Reminder::getDueDate, Comparator.nullsLast(Comparator.naturalOrder())))
+                .collect(Collectors.toList());
+
+        long scheduledCount = reminders.stream()
+                .filter(reminder -> !"paid".equalsIgnoreCase(reminder.getStatus()))
+                .count();
+        long autopayCount = reminders.stream()
+                .filter(reminder -> Boolean.TRUE.equals(reminder.getAutopayEnabled()))
+                .count();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("user", userService.mapToDto(user));
+        response.put("reminders", reminders.stream().map(userService::mapToDto).collect(Collectors.toList()));
+        response.put("scheduled_count", scheduledCount);
+        response.put("autopay_enabled_count", autopayCount);
+        response.put(
+                "next_due_message",
+                reminders.stream()
+                        .filter(reminder -> reminder.getDueDate() != null && !"paid".equalsIgnoreCase(reminder.getStatus()))
+                        .findFirst()
+                        .map(reminder -> "Next due: " + reminder.getTitle() + " on " + reminder.getDueDate().toLocalDate())
+                        .orElse("No upcoming reminders. Add one to stay ahead of recurring payments.")
+        );
+        return response;
+    }
+
+    public Map<String, Object> addReminder(String email, Map<String, Object> payload) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        Reminder reminder = new Reminder();
+        reminder.setUser(user);
+        applyReminderUpdates(reminder, payload, true);
+        Reminder savedReminder = reminderRepository.save(reminder);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("reminder", userService.mapToDto(savedReminder));
+        return response;
+    }
+
+    public Map<String, Object> updateReminder(String email, Long id, Map<String, Object> payload) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        Reminder reminder = reminderRepository.findById(id).orElseThrow();
+        if (!reminder.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        applyReminderUpdates(reminder, payload, false);
+        Reminder savedReminder = reminderRepository.save(reminder);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("reminder", userService.mapToDto(savedReminder));
+        return response;
+    }
+
+    public Map<String, Object> deleteReminder(String email, Long id) {
+        User user = userRepository.findByEmail(email).orElseThrow();
+        Reminder reminder = reminderRepository.findById(id).orElseThrow();
+        if (!reminder.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        reminderRepository.delete(reminder);
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", "success");
+        response.put("deleted_id", id);
+        return response;
+    }
+
     private List<Transaction> expenseTransactions(List<Transaction> transactions) {
         return transactions.stream()
                 .filter(t -> "expense".equals(t.getDirection()))
@@ -432,6 +506,88 @@ public class DashboardService {
             throw new RuntimeException("Invalid vendor payment details");
         }
         return phoneNumber.contains("@") ? phoneNumber : phoneNumber + "@upi";
+    }
+
+    private void applyReminderUpdates(Reminder reminder, Map<String, Object> payload, boolean isCreate) {
+        if (isCreate || payload.containsKey("title")) {
+            String title = String.valueOf(payload.getOrDefault("title", "")).trim();
+            if (title.isEmpty()) {
+                throw new RuntimeException("Missing reminder title");
+            }
+            reminder.setTitle(title);
+        }
+
+        if (isCreate || payload.containsKey("subtitle")) {
+            reminder.setSubtitle(stringValue(payload.get("subtitle")));
+        }
+
+        if (isCreate || payload.containsKey("upi_handle")) {
+            String upiHandle = stringValue(payload.get("upi_handle")).trim();
+            reminder.setUpiHandle(upiHandle.isEmpty() ? null : upiHandle);
+        }
+
+        if (isCreate || payload.containsKey("amount")) {
+            reminder.setAmount(parseObjectAmount(payload.get("amount")));
+        }
+
+        if (isCreate || payload.containsKey("due_date")) {
+            reminder.setDueDate(parseReminderDate(payload.get("due_date")));
+        }
+
+        if (payload.containsKey("autopay_enabled")) {
+            reminder.setAutopayEnabled(parseBoolean(payload.get("autopay_enabled")));
+        } else if (isCreate && reminder.getAutopayEnabled() == null) {
+            reminder.setAutopayEnabled(false);
+        }
+
+        if (payload.containsKey("status")) {
+            String status = stringValue(payload.get("status")).trim().toLowerCase();
+            reminder.setStatus(status.isEmpty() ? "scheduled" : status);
+        } else if (isCreate && (reminder.getStatus() == null || reminder.getStatus().isBlank())) {
+            reminder.setStatus("scheduled");
+        }
+    }
+
+    private String stringValue(Object value) {
+        return value == null ? "" : String.valueOf(value);
+    }
+
+    private Double parseObjectAmount(Object rawAmount) {
+        if (rawAmount == null) {
+            return 0.0;
+        }
+        if (rawAmount instanceof Number number) {
+            return number.doubleValue();
+        }
+        String amount = String.valueOf(rawAmount).trim();
+        if (amount.isEmpty()) {
+            return 0.0;
+        }
+        return Double.parseDouble(amount);
+    }
+
+    private Boolean parseBoolean(Object rawValue) {
+        if (rawValue instanceof Boolean booleanValue) {
+            return booleanValue;
+        }
+        return Boolean.parseBoolean(String.valueOf(rawValue));
+    }
+
+    private LocalDateTime parseReminderDate(Object rawValue) {
+        String value = stringValue(rawValue).trim();
+        if (value.isEmpty()) {
+            throw new RuntimeException("Missing due date");
+        }
+
+        try {
+            return LocalDateTime.parse(value);
+        } catch (DateTimeParseException ignored) {
+            try {
+                return LocalDate.parse(value).atStartOfDay();
+            } catch (DateTimeParseException ex) {
+                throw new RuntimeException("Invalid due date format");
+            }
+        }
     }
 
     private double parseAmount(String rawAmount) {

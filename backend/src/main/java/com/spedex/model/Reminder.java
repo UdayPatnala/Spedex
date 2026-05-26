@@ -16,6 +16,7 @@ public class Reminder {
 
     private String title;
     private String subtitle;
+    private String upiHandle;
     private Double amount;
     private LocalDateTime dueDate;
     private Boolean autopayEnabled = false;
@@ -30,6 +31,8 @@ public class Reminder {
     public void setTitle(String title) { this.title = title; }
     public String getSubtitle() { return subtitle; }
     public void setSubtitle(String subtitle) { this.subtitle = subtitle; }
+    public String getUpiHandle() { return upiHandle; }
+    public void setUpiHandle(String upiHandle) { this.upiHandle = upiHandle; }
     public Double getAmount() { return amount; }
     public void setAmount(Double amount) { this.amount = amount; }
     public LocalDateTime getDueDate() { return dueDate; }

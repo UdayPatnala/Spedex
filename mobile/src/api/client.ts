@@ -6,8 +6,10 @@ import type {
   AuthResponse,
   BudgetScreenData,
   HomeOverview,
-  SpedexUser,
   PaymentIntentResponse,
+  ReminderMutationResponse,
+  RemindersScreenData,
+  SpedexUser,
   Vendor,
   VendorDirectoryData,
 } from "../types";
@@ -72,6 +74,7 @@ export const spedexApi = {
   getBudgetScreen: () => request<BudgetScreenData>("/mobile/budgets"),
   getVendorDirectory: () => request<VendorDirectoryData>("/mobile/vendors"),
   getAnalytics: () => request<AnalyticsData>("/mobile/analytics"),
+  getReminders: () => request<RemindersScreenData>("/mobile/reminders"),
   preparePayment: (payload: { vendor_id?: number; amount: number; upi_handle?: string; payee_name?: string }) =>
     request<PaymentIntentResponse>("/payments/prepare", {
       method: "POST",
@@ -91,6 +94,20 @@ export const spedexApi = {
     request<{ status: string; vendor: Vendor }>(`/mobile/vendors/${id}`, {
       method: "PUT",
       body: JSON.stringify(payload),
+    }),
+  addReminder: (payload: { title: string; subtitle?: string; upi_handle?: string; amount: number; due_date: string; autopay_enabled?: boolean; status?: string }) =>
+    request<ReminderMutationResponse>("/mobile/reminders", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  updateReminder: (id: number, payload: { title?: string; subtitle?: string; upi_handle?: string; amount?: number; due_date?: string; autopay_enabled?: boolean; status?: string }) =>
+    request<ReminderMutationResponse>(`/mobile/reminders/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  deleteReminder: (id: number) =>
+    request<{ status: string; deleted_id: number }>(`/mobile/reminders/${id}`, {
+      method: "DELETE",
     }),
   updateProfile: (payload: { name?: string; profile_picture_url?: string }) =>
     request<SpedexUser>("/auth/profile", {

@@ -14,7 +14,7 @@ import { accentPalette, formatCurrency, iconFor } from "../theme/helpers";
 import { colors, radii, shadows, spacing } from "../theme/tokens";
 import type { BudgetScreenData } from "../types";
 
-export function BudgetScreen() {
+export function BudgetScreen({ navigation }: any) {
   const [data, setData] = useState<BudgetScreenData | null>(null);
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export function BudgetScreen() {
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Upcoming Reminders</Text>
-          <Text style={styles.sectionAction}>View Calendar</Text>
+          <Text style={styles.sectionAction} onPress={() => navigation.navigate("Reminders")}>View All</Text>
         </View>
 
         <View style={styles.reminderList}>
@@ -317,4 +317,3 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
 });
-
