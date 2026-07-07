@@ -1,4 +1,4 @@
-﻿# Spedex
+# Spedex
 
 Spedex is a fintech workspace for tracking how fast money moves and where it goes. The name blends "speed index" and "spending index" into one product for payments, budgets, and live spending insight.
 
@@ -80,3 +80,26 @@ Set these environment variables in the Vercel dashboard:
 ## Branding Notes
 
 Spedex keeps the indigo-first visual language while shifting the brand voice to "speed index" and "spending index" across the backend, dashboard, and mobile app.
+
+---
+
+## 🔌 AROH Ecosystem Integration Guide
+
+This repository is integrated into the central **AROH Platform Ecosystem** via `@aroh/asdk`.
+
+### SSO & Session Sync
+Authentication relies on the central AROH Platform identity. Local authentication stores and local storage sessions are bridged to the central Zustand state in `aroh-adapter.ts`.
+- **Single Sign-Out**: Active tabs watch the `aroh_logout_event` key in `localStorage`. When a logout occurs elsewhere in the ecosystem, the local session is immediately destroyed, and the user is redirected to the AROH login portal.
+
+### Credits & Ledger Interactions
+Operation costs, balances, and progress incentives are tracked via the Aros wallet.
+- **Entitlements**: Access is gated using the AROH Membership Tier (`basic` vs `pro`/`enterprise`).
+- **Ledger Records**: Debits (points/tokens charged) and credits (rewards earned) are directly posted to the AROH Ledger using `rewardUser()` transactions.
+
+### Running with AROH local links
+To run this application locally linked to your AROH SDK repository:
+1. Link the package locally:
+   ```bash
+   npm install ../AROH/packages/asdk
+   ```
+2. Import the adapter hooks from `./src/aroh-adapter.ts` to coordinate actions with the central store.
