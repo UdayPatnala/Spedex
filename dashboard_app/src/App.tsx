@@ -166,12 +166,12 @@ function Sidebar({
 function Topbar({
   query,
   onQueryChange,
-  overview,
+  user,
   onSignOut,
 }: {
   query: string;
   onQueryChange: (value: string) => void;
-  overview: DashboardOverview;
+  user: SpedexUser | null;
   onSignOut: () => void;
 }) {
   return (
@@ -191,17 +191,23 @@ function Topbar({
 
       <div className="topbar-actions">
         <span className="status-chip">UPI Ready</span>
-        <span className="status-chip soft">Member since {monthYear(overview.user.member_since)}</span>
-        <button className="signout-button" type="button" onClick={onSignOut}>
-          Sign out
-        </button>
-        <div className="profile-chip">
-          <div className="profile-meta">
-            <strong>{overview.user.name}</strong>
-            <small>{overview.user.plan}</small>
-          </div>
-          <div className="profile-avatar">{overview.user.avatar_initials}</div>
-        </div>
+        {user ? (
+          <>
+            <span className="status-chip soft">Member since {monthYear(user.member_since)}</span>
+            <button className="signout-button" type="button" onClick={onSignOut}>
+              Sign out
+            </button>
+            <div className="profile-chip">
+              <div className="profile-meta">
+                <strong>{user.name}</strong>
+                <small>{user.plan}</small>
+              </div>
+              <div className="profile-avatar">{user.avatar_initials}</div>
+            </div>
+          </>
+        ) : (
+          <span className="status-chip soft">Connecting...</span>
+        )}
       </div>
     </header>
   );
@@ -219,6 +225,7 @@ function AuthView({
   onSubmit,
   submitting,
   error,
+  warmingUp,
 }: {
   mode: AuthMode;
   onModeChange: (mode: AuthMode) => void;
@@ -231,6 +238,7 @@ function AuthView({
   onSubmit: () => void;
   submitting: boolean;
   error: string | null;
+  warmingUp: boolean;
 }) {
   return (
     <main className="auth-shell">
@@ -280,7 +288,12 @@ function AuthView({
           </button>
         </div>
 
-
+        {warmingUp && (
+          <div className="error-alert" style={{ marginTop: 16, background: "rgba(245, 158, 11, 0.1)", border: "1px solid rgba(245, 158, 11, 0.2)", color: "#f59e0b" }}>
+            <span className="material-symbols-outlined animate-spin" style={{ fontSize: "1.2rem" }}>sync</span>
+            <span>Waking up Spedex server backend...</span>
+          </div>
+        )}
       </section>
     </main>
   );
@@ -746,6 +759,7 @@ function TripsView() {
   const [showCustomCatInput, setShowCustomCatInput] = useState(false);
   const [customTags, setCustomTags] = useState<string[]>([]);
   const [submittingTx, setSubmittingTx] = useState(false);
+  const [showLogCashModal, setShowLogCashModal] = useState(false);
 
   const fetchTrips = async () => {
     try {
@@ -931,9 +945,14 @@ function TripsView() {
               </div>
 
               {tripDetails.status === "ACTIVE" && (
-                <button onClick={handleEndTrip} disabled={loading} className="cta-button danger">
-                  <span className="material-symbols-outlined">power_settings_new</span> End Trip
-                </button>
+                <div style={{ display: "flex", gap: 12 }}>
+                  <button onClick={() => setShowLogCashModal(true)} className="cta-button primary">
+                    <span className="material-symbols-outlined">payments</span> Log Cash Expense
+                  </button>
+                  <button onClick={handleEndTrip} disabled={loading} className="cta-button danger">
+                    <span className="material-symbols-outlined">power_settings_new</span> End Trip
+                  </button>
+                </div>
               )}
             </div>
 
@@ -954,99 +973,6 @@ function TripsView() {
 
             <div className="trip-content-grid">
               <div className="trip-left card">
-                {tripDetails.status === "ACTIVE" && (
-                  <div className="manual-tx-section" style={{ marginBottom: 24 }}>
-                    <h3 className="section-title text-sm" style={{ marginBottom: 12 }}>Log Cash Transaction</h3>
-                    <form onSubmit={handleAddTransaction} className="manual-tx-form">
-                      <div className="form-row">
-                        <div className="form-group flex-1">
-                          <label className="eyebrow">Amount (₹)</label>
-                          <input
-                            type="number"
-                            step="0.01"
-                            placeholder="0.00"
-                            value={cashAmount}
-                            onChange={(e) => setCashAmount(e.target.value)}
-                            className="text-input"
-                            required
-                          />
-                        </div>
-                        <div className="form-group flex-2">
-                          <label className="eyebrow">Description</label>
-                          <input
-                            type="text"
-                            placeholder="e.g. Auto Fare, Street Food"
-                            value={cashDesc}
-                            onChange={(e) => setCashDesc(e.target.value)}
-                            className="text-input"
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      <div className="form-group">
-                        <label className="eyebrow">Category Tag</label>
-                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                          {!showCustomCatInput ? (
-                            <select
-                              value={cashCategory}
-                              onChange={(e) => setCashCategory(e.target.value)}
-                              className="select-input"
-                            >
-                              <option value="Dining">Dining</option>
-                              <option value="Groceries">Groceries</option>
-                              <option value="Transport">Transport</option>
-                              <option value="Bills">Bills</option>
-                              <option value="Shopping">Shopping</option>
-                              <option value="Health">Health</option>
-                              <option value="Rent">Rent</option>
-                              <option value="Subscriptions">Subscriptions</option>
-                              {customTags.map((tag) => (
-                                <option key={tag} value={tag}>
-                                  {tag}
-                                </option>
-                              ))}
-                            </select>
-                          ) : (
-                            <div className="custom-tag-input-group flex-1" style={{ display: "flex", gap: 8 }}>
-                              <input
-                                type="text"
-                                placeholder="Custom Tag Name"
-                                value={customCategory}
-                                onChange={(e) => setCustomCategory(e.target.value)}
-                                className="text-input"
-                              />
-                              <button
-                                type="button"
-                                onClick={handleAddCustomTag}
-                                className="cta-button secondary"
-                                style={{ padding: "8px 12px" }}
-                              >
-                                Add
-                              </button>
-                            </div>
-                          )}
-
-                          <button
-                            type="button"
-                            onClick={() => setShowCustomCatInput(!showCustomCatInput)}
-                            className="cta-button icon-button"
-                            title="Add Custom Category Tag"
-                          >
-                            <span className="material-symbols-outlined">
-                              {showCustomCatInput ? "close" : "add"}
-                            </span>
-                          </button>
-                        </div>
-                      </div>
-
-                      <button type="submit" disabled={submittingTx} className="cta-button primary block">
-                        {submittingTx ? "Logging..." : "Log Cash Payment"}
-                      </button>
-                    </form>
-                  </div>
-                )}
-
                 <h3 className="section-title text-sm" style={{ marginBottom: 12 }}>Trip Ledger Overview</h3>
                 <div className="trip-transactions-list scrollable">
                   {tripDetails.transactions.map((tx) => (
@@ -1113,6 +1039,111 @@ function TripsView() {
           </div>
         )}
       </section>
+
+      {showLogCashModal && (
+        <div className="modal-overlay" onClick={() => setShowLogCashModal(false)}>
+          <div className="qr-modal-card" onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: 420 }}>
+            <h3>Log Cash Transaction</h3>
+            <p className="subtle" style={{ marginBottom: 16 }}>Log a manual cash transaction to this active trip.</p>
+            <form onSubmit={async (e) => {
+              await handleAddTransaction(e);
+              setShowLogCashModal(false);
+            }} className="auth-form" style={{ width: "100%" }}>
+              <div style={{ display: "flex", gap: 10 }}>
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="Amount (₹)"
+                  value={cashAmount}
+                  onChange={(e) => setCashAmount(e.target.value)}
+                  style={{ flex: 1 }}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Description"
+                  value={cashDesc}
+                  onChange={(e) => setCashDesc(e.target.value)}
+                  style={{ flex: 2 }}
+                  required
+                />
+              </div>
+
+              <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: 6, textAlign: "left" }}>
+                <label className="eyebrow" style={{ paddingLeft: 4 }}>Category Tag</label>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  {!showCustomCatInput ? (
+                    <select
+                      value={cashCategory}
+                      onChange={(e) => setCashCategory(e.target.value)}
+                      className="select-input"
+                      style={{ flex: 1, padding: 12, borderRadius: 12, border: "0.5px solid var(--border-soft)", background: "white", outline: "none" }}
+                    >
+                      <option value="Dining">Dining</option>
+                      <option value="Groceries">Groceries</option>
+                      <option value="Transport">Transport</option>
+                      <option value="Bills">Bills</option>
+                      <option value="Shopping">Shopping</option>
+                      <option value="Health">Health</option>
+                      <option value="Rent">Rent</option>
+                      <option value="Subscriptions">Subscriptions</option>
+                      {customTags.map((tag) => (
+                        <option key={tag} value={tag}>
+                          {tag}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="custom-tag-input-group flex-1" style={{ display: "flex", gap: 8 }}>
+                      <input
+                        type="text"
+                        placeholder="Custom Tag Name"
+                        value={customCategory}
+                        onChange={(e) => setCustomCategory(e.target.value)}
+                        style={{ flex: 1, margin: 0 }}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddCustomTag}
+                        className="cta-button secondary"
+                        style={{ padding: "8px 12px", minWidth: "auto", border: "0.5px solid var(--border-soft)", borderRadius: 12 }}
+                      >
+                        Add
+                      </button>
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setShowCustomCatInput(!showCustomCatInput)}
+                    className="cta-button icon-button"
+                    title="Add Custom Category Tag"
+                    style={{ padding: 8 }}
+                  >
+                    <span className="material-symbols-outlined">
+                      {showCustomCatInput ? "close" : "add"}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+                <button
+                  type="button"
+                  onClick={() => setShowLogCashModal(false)}
+                  className="auth-submit"
+                  style={{ background: "var(--surface-low)", color: "var(--text-main)", border: "0.5px solid var(--border-soft)" }}
+                >
+                  Cancel
+                </button>
+                <button type="submit" disabled={submittingTx} className="auth-submit">
+                  {submittingTx ? "Logging..." : "Log Cash Payment"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1216,6 +1247,85 @@ function filterTransactions(transactions: Transaction[], query: string) {
   );
 }
 
+function SkeletonLoaderView({ view }: { view: ViewId }) {
+  if (view === "trips") {
+    return (
+      <div className="trips-shell">
+        <aside className="trips-sidebar card">
+          <div className="skeleton-title" style={{ width: "80%" }}><div className="skeleton-box" /></div>
+          <div className="skeleton-text" style={{ width: "60%", marginBottom: 20 }}><div className="skeleton-box" /></div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="skeleton-card" style={{ padding: 16 }}>
+                <div className="skeleton-title" style={{ width: "70%", height: 18 }}><div className="skeleton-box" /></div>
+                <div className="skeleton-text" style={{ width: "40%" }}><div className="skeleton-box" /></div>
+              </div>
+            ))}
+          </div>
+        </aside>
+        <section className="trips-main">
+          <div className="skeleton-card" style={{ padding: 24, marginBottom: 20 }}>
+            <div className="skeleton-title"><div className="skeleton-box" /></div>
+            <div className="skeleton-text" style={{ width: "30%" }}><div className="skeleton-box" /></div>
+          </div>
+          <div className="trip-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 20 }}>
+            {[1, 2, 3].map((n) => (
+              <div key={n} className="skeleton-card">
+                <div className="skeleton-text" style={{ width: "40%" }}><div className="skeleton-box" /></div>
+                <div className="skeleton-title" style={{ width: "80%", height: 28 }}><div className="skeleton-box" /></div>
+              </div>
+            ))}
+          </div>
+          <div className="trip-content-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 20 }}>
+            <div className="skeleton-card" style={{ height: 300 }}>
+              <div className="skeleton-title"><div className="skeleton-box" /></div>
+              <div className="skeleton-text"><div className="skeleton-box" /></div>
+              <div className="skeleton-text" style={{ width: "80%" }}><div className="skeleton-box" /></div>
+              <div className="skeleton-text" style={{ width: "90%" }}><div className="skeleton-box" /></div>
+            </div>
+            <div className="skeleton-card" style={{ height: 300 }}>
+              <div className="skeleton-title"><div className="skeleton-box" /></div>
+              <div className="skeleton-text"><div className="skeleton-box" /></div>
+              <div className="skeleton-text" style={{ width: "70%" }}><div className="skeleton-box" /></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  // General loader fallback for other views
+  return (
+    <div style={{ padding: 24 }}>
+      <div className="skeleton-card" style={{ marginBottom: 24, padding: 32 }}>
+        <div className="skeleton-title" style={{ width: "30%", height: 32 }}><div className="skeleton-box" /></div>
+        <div className="skeleton-text" style={{ width: "50%" }}><div className="skeleton-box" /></div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, marginBottom: 24 }}>
+        {[1, 2, 3].map((n) => (
+          <div key={n} className="skeleton-card" style={{ height: 120 }}>
+            <div className="skeleton-text" style={{ width: "40%" }}><div className="skeleton-box" /></div>
+            <div className="skeleton-title" style={{ width: "70%", height: 28 }}><div className="skeleton-box" /></div>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1.8fr 1.2fr", gap: 24 }}>
+        <div className="skeleton-card" style={{ height: 320 }}>
+          <div className="skeleton-title" style={{ width: "40%" }}><div className="skeleton-box" /></div>
+          <div className="skeleton-text"><div className="skeleton-box" /></div>
+          <div className="skeleton-text" style={{ width: "90%" }}><div className="skeleton-box" /></div>
+          <div className="skeleton-text" style={{ width: "85%" }}><div className="skeleton-box" /></div>
+        </div>
+        <div className="skeleton-card" style={{ height: 320 }}>
+          <div className="skeleton-title" style={{ width: "50%" }}><div className="skeleton-box" /></div>
+          <div className="skeleton-text"><div className="skeleton-box" /></div>
+          <div className="skeleton-text" style={{ width: "70%" }}><div className="skeleton-box" /></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [activeView, setActiveView] = useState<ViewId>("home");
   const [searchQuery, setSearchQuery] = useState("");
@@ -1247,8 +1357,11 @@ export default function App() {
 
       if (isProduction) {
         setWarmingUp(true);
-        await warmUpBackend();
-        setWarmingUp(false);
+        warmUpBackend().finally(() => {
+          if (mounted) {
+            setWarmingUp(false);
+          }
+        });
       }
 
       try {
@@ -1269,13 +1382,29 @@ export default function App() {
         }
 
         setAuthToken(parsed.token);
+        if (mounted) {
+          setSessionUser({
+            id: 0,
+            name: "Spedex User",
+            email: "",
+            plan: "Pro Member",
+            avatar_initials: "SU",
+            member_since: "2026-07-01T00:00:00"
+          });
+        }
         const currentUser = await getCurrentUser();
         if (mounted) {
           setSessionUser(currentUser);
         }
-      } catch {
-        setAuthToken(null);
-        window.localStorage.removeItem(STORAGE_KEY);
+      } catch (e: any) {
+        const isStartupError = e?.message && (
+          e.message.includes("Cannot reach the Spedex server") || 
+          e.message.includes("starting up")
+        );
+        if (!isStartupError) {
+          setAuthToken(null);
+          window.localStorage.removeItem(STORAGE_KEY);
+        }
       } finally {
         if (mounted) {
           setSessionReady(true);
@@ -1379,20 +1508,13 @@ export default function App() {
     }
   }
 
-  if (warmingUp || !sessionReady) {
+  if (!sessionReady) {
     return (
       <main className="auth-shell">
         <section className="auth-card" style={{ textAlign: "center" }}>
           <BrandLockup />
-          <p className="eyebrow">{warmingUp ? "Please wait" : "Loading"}</p>
-          <h2 className="page-title">
-            {warmingUp ? "Waking up server\u2026 (~15s)" : "Restoring your session"}
-          </h2>
-          {warmingUp && (
-            <p className="subtle" style={{ marginTop: 8 }}>
-              Render free tier sleeps after inactivity. This only happens once.
-            </p>
-          )}
+          <p className="eyebrow">Loading</p>
+          <h2 className="page-title">Restoring your session...</h2>
         </section>
       </main>
     );
@@ -1412,33 +1534,30 @@ export default function App() {
         onSubmit={handleAuthSubmit}
         submitting={authSubmitting}
         error={authError}
+        warmingUp={warmingUp}
       />
     );
   }
 
-  if (!overview || !vendors || !budget || !analytics) {
-    return (
-      <main className="auth-shell">
-        <section className="auth-card" style={{ textAlign: "center" }}>
-          <BrandLockup />
-          <p className="eyebrow">Loading</p>
-          <h2 className="page-title">Preparing your smart workspace…</h2>
-        </section>
-      </main>
-    );
-  }
+  let content = null;
+  const isDashboardLoading = !overview || !vendors || !budget || !analytics;
 
-  let content = <HomeView overview={overview} filteredTransactions={filteredTransactions} onAddVendor={() => setShowAddVendor(true)} />;
-  if (activeView === "payments") {
-    content = <PaymentsView vendors={vendors} onAddVendor={() => setShowAddVendor(true)} />;
-  } else if (activeView === "trips") {
-    content = <TripsView />;
-  } else if (activeView === "analytics") {
-    content = <AnalyticsView analytics={analytics} />;
-  } else if (activeView === "budget") {
-    content = <BudgetView budget={budget} />;
-  } else if (activeView === "settings") {
-    content = <SettingsView overview={overview} onRefresh={handleRefresh} />;
+  if (!isDashboardLoading) {
+    if (activeView === "home") {
+      content = <HomeView overview={overview!} filteredTransactions={filteredTransactions} onAddVendor={() => setShowAddVendor(true)} />;
+    } else if (activeView === "payments") {
+      content = <PaymentsView vendors={vendors!} onAddVendor={() => setShowAddVendor(true)} />;
+    } else if (activeView === "trips") {
+      content = <TripsView />;
+    } else if (activeView === "analytics") {
+      content = <AnalyticsView analytics={analytics!} />;
+    } else if (activeView === "budget") {
+      content = <BudgetView budget={budget!} />;
+    } else if (activeView === "settings") {
+      content = <SettingsView overview={overview!} onRefresh={handleRefresh} />;
+    }
+  } else {
+    content = <SkeletonLoaderView view={activeView} />;
   }
 
   return (
@@ -1449,7 +1568,7 @@ export default function App() {
         <Topbar
           query={searchQuery}
           onQueryChange={(value) => startTransition(() => setSearchQuery(value))}
-          overview={overview}
+          user={sessionUser}
           onSignOut={handleSignOut}
         />
         {content}

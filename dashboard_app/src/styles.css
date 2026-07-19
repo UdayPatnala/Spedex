@@ -1166,3 +1166,72 @@ input::placeholder {
   font-size: 0.9rem;
 }
 
+/* Skeleton Shimmer Loading styles */
+.skeleton-box {
+  display: inline-block;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-effect 1.6s infinite linear;
+  border-radius: 8px;
+}
+
+@keyframes shimmer-effect {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton-card {
+  padding: 24px;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 0.5px solid var(--border-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton-text {
+  height: 14px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  position: relative;
+}
+
+
+.skeleton-title {
+  height: 22px;
+  width: 50%;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  position: relative;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin {
+  animation: spin 1.5s linear infinite;
+  display: inline-block;
+}
+
+
+
