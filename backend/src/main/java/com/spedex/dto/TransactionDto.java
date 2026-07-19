@@ -19,4 +19,6 @@ public class TransactionDto {
     public String occurredAt;
     @JsonProperty("vendor_name")
     public String vendorName;
+    @JsonProperty("trip_id")
+    public Long tripId;
 }

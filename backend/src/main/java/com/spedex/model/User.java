@@ -36,6 +36,9 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Transaction> transactions;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Trip> trips;
+
     // Getters and setters omitted for brevity – generate via IDE or Lombok if preferred
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -61,4 +64,6 @@ public class User {
     public void setReminders(List<Reminder> reminders) { this.reminders = reminders; }
     public List<Transaction> getTransactions() { return transactions; }
     public void setTransactions(List<Transaction> transactions) { this.transactions = transactions; }
+    public List<Trip> getTrips() { return trips; }
+    public void setTrips(List<Trip> trips) { this.trips = trips; }
 }

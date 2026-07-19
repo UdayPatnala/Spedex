@@ -18,6 +18,10 @@ public class Transaction {
     @JoinColumn(name = "vendor_id")
     private Vendor vendor; // nullable
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "trip_id")
+    private Trip trip;
+
     private String description;
     private String category;
     private Double amount;
@@ -53,4 +57,6 @@ public class Transaction {
     public void setExternalReference(String externalReference) { this.externalReference = externalReference; }
     public LocalDateTime getOccurredAt() { return occurredAt; }
     public void setOccurredAt(LocalDateTime occurredAt) { this.occurredAt = occurredAt; }
+    public Trip getTrip() { return trip; }
+    public void setTrip(Trip trip) { this.trip = trip; }
 }

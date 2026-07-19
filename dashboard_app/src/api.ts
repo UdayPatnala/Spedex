@@ -1,4 +1,4 @@
-﻿import type {
+import type {
   AnalyticsData,
   AuthResponse,
   BudgetScreenData,
@@ -7,6 +7,9 @@
   Vendor,
   VendorCreate,
   VendorDirectoryData,
+  Trip,
+  TripDetails,
+  Transaction,
 } from "./types";
 
 const RENDER_API = "https://spedex.onrender.com/api";
@@ -134,5 +137,33 @@ export async function warmUpBackend(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export function getTrips() {
+  return request<Trip[]>("/trips");
+}
+
+export function startTrip(name: string) {
+  return request<Trip>("/trips", {
+    method: "POST",
+    body: JSON.stringify({ name }),
+  });
+}
+
+export function getTripDetails(id: number) {
+  return request<TripDetails>(`/trips/${id}`);
+}
+
+export function completeTrip(id: number) {
+  return request<Trip>(`/trips/${id}/complete`, {
+    method: "POST",
+  });
+}
+
+export function addManualTransaction(id: number, payload: { amount: number; description: string; category: string }) {
+  return request<Transaction>(`/trips/${id}/transactions`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 }
 

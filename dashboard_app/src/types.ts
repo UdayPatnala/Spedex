@@ -101,3 +101,30 @@ export type AnalyticsData = {
   weekday_ratio: number;
   weekend_ratio: number;
 };
+
+export type Trip = {
+  id: number;
+  name: string;
+  status: "ACTIVE" | "COMPLETED";
+  created_at: string;
+  completed_at: string | null;
+};
+
+export type CategoryBreakdown = {
+  category: string;
+  amount: number;
+  percentage: number;
+};
+
+export type TripDetails = {
+  id: number;
+  name: string;
+  status: "ACTIVE" | "COMPLETED";
+  created_at: string;
+  completed_at: string | null;
+  total_spend: number;
+  cash_spend: number;
+  card_online_spend: number;
+  category_breakdown: CategoryBreakdown[];
+  transactions: Transaction[];
+};

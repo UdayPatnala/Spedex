@@ -66,4 +66,28 @@ class GlobalExceptionHandlerTest {
         assertNotNull(response.getBody());
         assertEquals("An unexpected error occurred", response.getBody().get("detail"));
     }
+
+    @Test
+    void handleRuntimeException_TripNotFound_ReturnsNotFound() {
+        String message = "Trip not found";
+        RuntimeException exception = new RuntimeException(message);
+
+        ResponseEntity<Map<String, String>> response = globalExceptionHandler.handleRuntimeException(exception);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(message, response.getBody().get("detail"));
+    }
+
+    @Test
+    void handleRuntimeException_TransactionNotFound_ReturnsNotFound() {
+        String message = "Transaction not found";
+        RuntimeException exception = new RuntimeException(message);
+
+        ResponseEntity<Map<String, String>> response = globalExceptionHandler.handleRuntimeException(exception);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals(message, response.getBody().get("detail"));
+    }
 }

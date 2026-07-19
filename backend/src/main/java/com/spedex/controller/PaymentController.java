@@ -8,6 +8,8 @@ import com.spedex.repository.TransactionRepository;
 import com.spedex.repository.UserRepository;
 import com.spedex.repository.VendorRepository;
 import com.spedex.service.UserService;
+import com.spedex.repository.TripRepository;
+import com.spedex.model.TripStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +34,9 @@ public class PaymentController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private TripRepository tripRepository;
 
     @PostMapping("/prepare")
     public ResponseEntity<Map<String, Object>> preparePayment(@RequestBody Map<String, Object> payload) {
@@ -58,6 +63,11 @@ public class PaymentController {
         transaction.setAccountLabel("Primary UPI");
         transaction.setStatus("pending");
         transaction.setOccurredAt(LocalDateTime.now());
+
+        // Auto-link to active trip if one exists
+        tripRepository.findByUserAndStatus(user, TripStatus.ACTIVE)
+                .ifPresent(transaction::setTrip);
+
         transaction = transactionRepository.save(transaction);
 
         TransactionDto transactionDto = userService.mapToDto(transaction);

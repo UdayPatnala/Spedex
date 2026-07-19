@@ -121,6 +121,7 @@ public class UserService {
                 ? null
                 : transaction.getOccurredAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
         dto.vendorName = transaction.getVendor() == null ? null : transaction.getVendor().getName();
+        dto.tripId = transaction.getTrip() == null ? null : transaction.getTrip().getId();
         return dto;
     }
 

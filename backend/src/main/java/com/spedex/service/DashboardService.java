@@ -169,10 +169,11 @@ public class DashboardService {
 
     public Map<String, Object> editVendor(String email, Long id, Map<String, String> payload) {
         User user = userRepository.findByEmail(email).orElseThrow();
-        Vendor vendor = vendorRepository.findById(id).orElseThrow();
+        Vendor vendor = vendorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
         if (!vendor.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized");
+            throw new RuntimeException("Access denied");
         }
 
         if (payload.containsKey("name") && payload.get("name") != null) {
@@ -326,9 +327,10 @@ public class DashboardService {
 
     public Map<String, Object> updateReminder(String email, Long id, Map<String, Object> payload) {
         User user = userRepository.findByEmail(email).orElseThrow();
-        Reminder reminder = reminderRepository.findById(id).orElseThrow();
+        Reminder reminder = reminderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reminder not found"));
         if (!reminder.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized");
+            throw new RuntimeException("Access denied");
         }
 
         applyReminderUpdates(reminder, payload, false);
@@ -342,9 +344,10 @@ public class DashboardService {
 
     public Map<String, Object> deleteReminder(String email, Long id) {
         User user = userRepository.findByEmail(email).orElseThrow();
-        Reminder reminder = reminderRepository.findById(id).orElseThrow();
+        Reminder reminder = reminderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Reminder not found"));
         if (!reminder.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized");
+            throw new RuntimeException("Access denied");
         }
 
         reminderRepository.delete(reminder);

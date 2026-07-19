@@ -40,12 +40,18 @@ public class GlobalExceptionHandler {
             if (lowerCaseMsg.contains("unauthorized") || lowerCaseMsg.contains("credentials")) {
                 status = HttpStatus.UNAUTHORIZED;
                 message = "Authentication failed";
-            } else if (lowerCaseMsg.contains("not found") || lowerCaseMsg.contains("invalid password")) {
+            } else if (lowerCaseMsg.contains("user not found") || lowerCaseMsg.contains("invalid password")) {
                 // Treat "user not found" and "invalid password" both as 401 so
                 // the frontend shows a clear auth-failure message instead of a
                 // generic 404 "resource not found" hint.
                 status = HttpStatus.UNAUTHORIZED;
                 message = "Incorrect email or password.";
+            } else if (lowerCaseMsg.contains("trip not found") || lowerCaseMsg.contains("transaction not found")) {
+                status = HttpStatus.NOT_FOUND;
+                message = e.getMessage();
+            } else if (lowerCaseMsg.contains("access denied") || lowerCaseMsg.contains("forbidden")) {
+                status = HttpStatus.FORBIDDEN;
+                message = "Access denied";
             } else if (lowerCaseMsg.contains("exists")) {
                 status = HttpStatus.CONFLICT;
                 message = "An account with this email already exists.";
