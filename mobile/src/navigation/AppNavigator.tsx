@@ -14,6 +14,7 @@ import { PaymentConfirmScreen } from "../screens/PaymentConfirmScreen";
 import { PaymentsScreen } from "../screens/PaymentsScreen";
 import { RemindersScreen } from "../screens/RemindersScreen";
 import { SettingsScreen } from "../screens/SettingsScreen";
+import { TripsScreen } from "../screens/TripsScreen";
 import { colors } from "../theme/tokens";
 import type { Vendor } from "../types";
 
@@ -34,6 +35,7 @@ export type RootStackParamList = {
 
 export type MainTabParamList = {
   Home: undefined;
+  Trips: undefined;
   Payments: undefined;
   Analytics: undefined;
   Budget: undefined;
@@ -55,12 +57,12 @@ function MainTabs() {
         tabBarActiveBackgroundColor: colors.surfaceLow,
         tabBarStyle: {
           position: "absolute",
-          left: 16,
-          right: 16,
-          bottom: 16,
-          height: 74,
-          borderRadius: 28,
-          backgroundColor: "rgba(255,255,255,0.94)",
+          left: 12,
+          right: 12,
+          bottom: 12,
+          height: 68,
+          borderRadius: 24,
+          backgroundColor: "rgba(255,255,255,0.96)",
           borderTopWidth: 0,
           elevation: 0,
           shadowColor: "#1a1b22",
@@ -69,15 +71,16 @@ function MainTabs() {
           shadowOffset: { width: 0, height: 8 },
         },
         tabBarLabelStyle: {
-          fontSize: 10,
+          fontSize: 9,
           fontWeight: "700",
-          letterSpacing: 1.2,
+          letterSpacing: 0.8,
           textTransform: "uppercase",
-          marginBottom: 8,
+          marginBottom: 6,
         },
         tabBarIcon: ({ color, focused }) => {
           const iconByRoute: Record<string, keyof typeof MaterialIcons.glyphMap> = {
             Home: "home",
+            Trips: "flight-takeoff",
             Payments: "account-balance-wallet",
             Analytics: "show-chart",
             Budget: "event-note",
@@ -87,23 +90,24 @@ function MainTabs() {
           return (
             <MaterialIcons
               name={iconByRoute[route.name]}
-              size={24}
+              size={22}
               color={color}
               style={{
-                marginTop: 8,
+                marginTop: 6,
                 opacity: focused ? 1 : 0.85,
               }}
             />
           );
         },
         tabBarItemStyle: {
-          marginTop: 10,
-          marginBottom: 10,
-          borderRadius: 20,
+          marginTop: 6,
+          marginBottom: 6,
+          borderRadius: 16,
         },
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Trips" component={TripsScreen} />
       <Tab.Screen name="Payments" component={PaymentsScreen} />
       <Tab.Screen name="Analytics" component={AnalyticsScreen} />
       <Tab.Screen name="Budget" component={BudgetScreen} />

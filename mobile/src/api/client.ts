@@ -10,6 +10,8 @@ import type {
   ReminderMutationResponse,
   RemindersScreenData,
   SpedexUser,
+  Trip,
+  TripDetails,
   Vendor,
   VendorDirectoryData,
 } from "../types";
@@ -112,6 +114,25 @@ export const spedexApi = {
   updateProfile: (payload: { name?: string; profile_picture_url?: string }) =>
     request<SpedexUser>("/auth/profile", {
       method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  getTrips: () => request<Trip[]>("/trips"),
+  startTrip: (name: string) =>
+    request<Trip>("/trips", {
+      method: "POST",
+      body: JSON.stringify({ name }),
+    }),
+  getTripDetails: (id: number) => request<TripDetails>(`/trips/${id}`),
+  completeTrip: (id: number) =>
+    request<Trip>(`/trips/${id}/complete`, {
+      method: "POST",
+    }),
+  addTripTransaction: (
+    tripId: number,
+    payload: { amount: number; description?: string; category?: string }
+  ) =>
+    request<Transaction>(`/trips/${tripId}/transactions`, {
+      method: "POST",
       body: JSON.stringify(payload),
     }),
 };

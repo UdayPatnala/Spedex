@@ -67,6 +67,7 @@ export type HomeOverview = {
   on_track_copy: string;
   quick_pay: Vendor[];
   recent_transactions: Transaction[];
+  active_trip?: Trip | null;
 };
 
 export type BudgetScreenData = {
@@ -83,8 +84,9 @@ export type VendorDirectoryData = {
 
 export type CategoryBreakdown = {
   category: string;
+  amount?: number;
   percentage: number;
-  accent: string;
+  accent?: string;
 };
 
 export type WeeklySpendPoint = {
@@ -128,4 +130,25 @@ export type RemindersScreenData = {
 export type ReminderMutationResponse = {
   status: string;
   reminder: Reminder;
+};
+
+export type Trip = {
+  id: number;
+  name: string;
+  status: "ACTIVE" | "COMPLETED";
+  created_at: string;
+  completed_at: string | null;
+};
+
+export type TripDetails = {
+  id: number;
+  name: string;
+  status: "ACTIVE" | "COMPLETED";
+  created_at: string;
+  completed_at: string | null;
+  total_spend: number;
+  cash_spend: number;
+  card_online_spend: number;
+  category_breakdown: CategoryBreakdown[];
+  transactions: Transaction[];
 };

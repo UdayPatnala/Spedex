@@ -62,6 +62,26 @@ export function HomeScreen({ navigation }: any) {
           <Text style={styles.noticeText}>{data.on_track_copy}</Text>
         </View>
 
+        {/* Trips Banner */}
+        <Pressable
+          onPress={() => navigation.navigate("Trips")}
+          style={({ pressed }) => [
+            styles.tripsBanner,
+            { opacity: pressed ? 0.9 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] },
+          ]}
+        >
+          <View style={styles.tripsBannerIcon}>
+            <MaterialIcons name="flight-takeoff" size={24} color="#FFF" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.tripsBannerTitle}>Trips Ledger & Expense Tracking</Text>
+            <Text style={styles.tripsBannerSub}>
+              {data.active_trip ? `Active: ${data.active_trip.name}` : "Track cash & online travel expenses"}
+            </Text>
+          </View>
+          <MaterialIcons name="chevron-right" size={24} color={colors.onSurfaceVariant} />
+        </Pressable>
+
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Quick Pay</Text>
           <Pressable onPress={() => navigation.navigate("Payments")}>
@@ -228,6 +248,35 @@ const styles = StyleSheet.create({
   },
   quickPayRow: {
     gap: spacing.md,
+  },
+  tripsBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    backgroundColor: "rgba(30, 41, 59, 0.8)",
+    padding: spacing.md,
+    borderRadius: radii.xl,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    marginVertical: spacing.sm,
+  },
+  tripsBannerIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#6366F1",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tripsBannerTitle: {
+    color: "#F8FAFC",
+    fontWeight: "700",
+    fontSize: 15,
+  },
+  tripsBannerSub: {
+    color: "#94A3B8",
+    fontSize: 12,
+    marginTop: 2,
   },
   quickPayCard: {
     width: 96,
