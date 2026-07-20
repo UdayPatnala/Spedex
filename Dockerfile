@@ -7,7 +7,7 @@ RUN mvn clean package -DskipTests
 
 # Run stage
 FROM eclipse-temurin:17-jre-jammy
-COPY --from=build /app/target/*.jar /app/app.jar
+COPY --from=build /app/target/spedex-backend-1.0.0.jar /app/app.jar
 WORKDIR /app
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
