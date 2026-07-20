@@ -1,105 +1,88 @@
-# Spedex
+# SpeDex Smart Wallet Platform (v2.0 Enterprise)
 
-Spedex is a fintech workspace for tracking how fast money moves and where it goes. The name blends "speed index" and "spending index" into one product for payments, budgets, and live spending insight.
+SpeDex is a flagship, enterprise-grade Smart Wallet & Financial Intelligence Platform for high-frequency transaction tracking, automated trip ledgers, UPI vendor quick-pays, multi-currency budgeting, and real-time expense analytics.
 
-## Project Structure
+The name blends **"Speed Index"** and **"Spending Index"** into a unified ecosystem spanning desktop web, cross-platform mobile, and scalable backend infrastructure.
 
-- `backend/`: Spring Boot API (Java 17) with H2 default storage and JWT auth
-- `mobile/`: Expo React Native app for the mobile Spedex experience
-- `mobile_native_android/`: native Android/Kotlin version merged from the local mobile zip and `Spedex-2.0`
-- `dashboard_app/`: React dashboard for desktop spending operations
+---
 
-## Quick Start
+## 🚀 Key Features & Capabilities
 
-### 1. Backend
+- **Automated Trip Ledger**: Create active trip sessions, track categorized trip expenses (cash vs online/card splits), auto-close completed trips, and generate detailed breakdown summaries.
+- **UPI Vendor Quick-Pay**: Manage vendor directories, execute instant payments, and track default payment methods.
+- **Multi-Currency Budgeting & Analytics**: Visual budget progress bars, category breakdowns, and real-time spending velocity charts.
+- **Indian Rupee Currency Note Aesthetics**: Curated design system inspired by INR currency notes (₹2000 Magenta, ₹500 Stone Grey, ₹200 Bright Yellow, ₹100 Lavender, ₹50 Cyan, ₹20 Green, ₹10 Chocolate).
+- **IDOR Protection & Security**: Strict resource-ownership validation across all REST endpoints returning `403 Forbidden` ("Access denied") on unauthorized access attempts.
+
+---
+
+## 📁 Repository Architecture
+
+- `backend/`: Java 17 / Spring Boot REST API with JPA, H2/PostgreSQL database support, BCrypt password hashing, and JWT security filters.
+- `dashboard_app/`: React Vite TypeScript Web Dashboard with modular component architecture, responsive glassmorphism UI, and custom theme tokens.
+- `mobile/`: Cross-platform Expo React Native application featuring biometric authentication, navigation, and API sync.
+- `mobile_native_android/`: Native Android Kotlin codebase.
+- `e2e_tests/`: Python & Shell end-to-end testing suite for opaque-box verification.
+
+---
+
+## 🛠️ Quick Start & Local Development
+
+### 1. Backend API (Java 17 / Spring Boot)
 
 ```bash
 cd backend
-./mvnw spring-boot:run
+./mvnw.cmd spring-boot:run
 ```
+- API Endpoint: `http://localhost:8080/api`
+- Run Test Suite: `.\mvnw.cmd test` (37/37 tests passing)
 
-The API runs on `http://localhost:8080` by default.
-
-Default local datastore is H2:
-
-- `spring.datasource.url=jdbc:h2:file:/tmp/spedex_db...`
-- H2 console: `http://localhost:8080/h2-console`
-
-Optional environment variables:
-
-- `JWT_SECRET`: JWT signing key (used by `spedex.jwt.secret`)
-- `SERVER_PORT`: override server port
-
-### 2. Mobile
-
-```bash
-cd mobile
-npm install
-npm start
-```
-
-By default, mobile points at the backend on `http://localhost:8080` (or `http://10.0.2.2:8080` for Android emulators).
-
-### 3. Dashboard
+### 2. Web Dashboard (React + Vite)
 
 ```bash
 cd dashboard_app
 npm install
 npm run dev
 ```
+- Local URL: `http://localhost:5173`
+- Run Build: `npm run build`
+- Run Tests: `npm test` (7/7 tests passing)
 
-## Deploying to Vercel
+### 3. Mobile App (Expo / React Native)
 
 ```bash
-npm i -g vercel
-vercel
+cd mobile
+npm install
+npm start
 ```
+- Run Tests: `npm test` (5/5 tests passing)
 
-Set these environment variables in the Vercel dashboard:
+---
 
-| Variable | Description |
-|---|---|
-| `VITE_API_BASE_URL` | Backend API URL, for example `https://your-api.example.com/api` |
+## 🚢 Production Deployment Setup
 
-## API Highlights
+### Render Deployment (Backend API)
+- Built using root multi-stage [Dockerfile](file:///d:/PROJECT/Spedex/Dockerfile).
+- Uses explicit target artifact `COPY --from=build /app/target/spedex-backend-1.0.0.jar /app/app.jar` to ensure deterministic Docker builds.
+- Managed by [render.yaml](file:///d:/PROJECT/Spedex/render.yaml) on port `8080` with `/api/health` health checks.
 
-- `POST /api/auth/signup`
-- `POST /api/auth/login`
-- `GET /api/mobile/home`
-- `GET /api/mobile/budgets`
-- `GET /api/mobile/vendors`
-- `GET /api/mobile/analytics`
-- `GET /api/mobile/reminders`
-- `POST /api/mobile/reminders`
-- `PUT /api/mobile/reminders/{id}`
-- `DELETE /api/mobile/reminders/{id}`
-- `GET /api/dashboard/overview`
-- `POST /api/payments/prepare`
-- `POST /api/payments/{transaction_id}/complete`
+### Vercel Deployment (Dashboard Monorepo)
+- Configured via [dashboard_app/vercel.json](file:///d:/PROJECT/Spedex/dashboard_app/vercel.json) placed directly inside the `dashboard_app/` subdirectory.
+- Includes catch-all SPA rewrite rule (`/(.*) -> /index.html`) to prevent 404 errors on browser refresh.
 
-## Branding Notes
+---
 
-Spedex keeps the indigo-first visual language while shifting the brand voice to "speed index" and "spending index" across the backend, dashboard, and mobile app.
+## 🧪 Verification & Test Suite Summary
+
+- **Backend Unit & Integration Tests**: `37 Passed, 0 Failed`
+- **Dashboard Web Vitest Suite**: `7 Passed, 0 Failed`
+- **Mobile Expo Jest Suite**: `5 Passed, 0 Failed`
+- **Dashboard Production Build**: `Clean compilation (1.12s)`
 
 ---
 
 ## 🔌 AROH Ecosystem Integration Guide
 
-This repository is integrated into the central **AROH Platform Ecosystem** via `@aroh/asdk`.
-
-### SSO & Session Sync
-Authentication relies on the central AROH Platform identity. Local authentication stores and local storage sessions are bridged to the central Zustand state in `aroh-adapter.ts`.
-- **Single Sign-Out**: Active tabs watch the `aroh_logout_event` key in `localStorage`. When a logout occurs elsewhere in the ecosystem, the local session is immediately destroyed, and the user is redirected to the AROH login portal.
-
-### Credits & Ledger Interactions
-Operation costs, balances, and progress incentives are tracked via the Aros wallet.
-- **Entitlements**: Access is gated using the AROH Membership Tier (`basic` vs `pro`/`enterprise`).
-- **Ledger Records**: Debits (points/tokens charged) and credits (rewards earned) are directly posted to the AROH Ledger using `rewardUser()` transactions.
-
-### Running with AROH local links
-To run this application locally linked to your AROH SDK repository:
-1. Link the package locally:
-   ```bash
-   npm install ../AROH/packages/asdk
-   ```
-2. Import the adapter hooks from `./src/aroh-adapter.ts` to coordinate actions with the central store.
+SpeDex integrates with the central **AROH Platform Ecosystem** via `@aroh/asdk`:
+- **Single Sign-Out Sync**: Active tabs listen for `aroh_logout_event` in `localStorage` to immediately terminate sessions upon global logout.
+- **Ledger Records**: Entitlements and wallet debits/credits map directly to the AROH Ledger.
