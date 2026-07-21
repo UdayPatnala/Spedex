@@ -229,6 +229,7 @@ function AuthView({
   submitting,
   error,
   warmingUp,
+  onBackToLanding,
 }: {
   mode: AuthMode;
   onModeChange: (mode: AuthMode) => void;
@@ -242,10 +243,31 @@ function AuthView({
   submitting: boolean;
   error: string | null;
   warmingUp: boolean;
+  onBackToLanding?: () => void;
 }) {
   return (
     <main className="auth-shell">
       <section className="auth-card">
+        {onBackToLanding && (
+          <button
+            onClick={onBackToLanding}
+            style={{
+              alignSelf: "flex-start",
+              background: "none",
+              border: "none",
+              color: "#38BDF8",
+              cursor: "pointer",
+              fontSize: "13px",
+              fontWeight: 700,
+              marginBottom: "12px",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+            }}
+          >
+            ← Back to Spedex Landing Page
+          </button>
+        )}
         <BrandLockup />
         <div className="auth-hero">
           <p className="eyebrow">User Portal</p>
@@ -1348,6 +1370,7 @@ export default function App() {
   const [showAddVendor, setShowAddVendor] = useState(false);
   const [showMobileSync, setShowMobileSync] = useState(true);
   const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
+  const [showAuthPortal, setShowAuthPortal] = useState(false);
 
   const deferredSearch = useDeferredValue(searchQuery);
 
@@ -1533,6 +1556,9 @@ export default function App() {
   }
 
   if (!sessionUser) {
+    if (!showAuthPortal) {
+      return <LandingPage onLaunchDashboard={() => setShowAuthPortal(true)} />;
+    }
     return (
       <AuthView
         mode={authMode}
@@ -1547,6 +1573,7 @@ export default function App() {
         submitting={authSubmitting}
         error={authError}
         warmingUp={warmingUp}
+        onBackToLanding={() => setShowAuthPortal(false)}
       />
     );
   }

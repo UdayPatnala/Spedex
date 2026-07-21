@@ -35,6 +35,13 @@ describe("App Authentication", () => {
     render(<App />);
 
     await waitFor(() => {
+      expect(screen.getByText(/Smart Financial Control for/i)).toBeInTheDocument();
+    });
+
+    const launchBtns = screen.getAllByRole("button", { name: /Launch Web App/i });
+    fireEvent.click(launchBtns[0]);
+
+    await waitFor(() => {
       expect(screen.getByText("Sign in to your personal wallet")).toBeInTheDocument();
     });
 
@@ -62,6 +69,13 @@ describe("App Authentication", () => {
     vi.mocked(api.login).mockRejectedValueOnce("String error");
 
     render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Smart Financial Control for/i)).toBeInTheDocument();
+    });
+
+    const launchBtns = screen.getAllByRole("button", { name: /Launch Web App/i });
+    fireEvent.click(launchBtns[0]);
 
     await waitFor(() => {
       expect(screen.getByText("Sign in to your personal wallet")).toBeInTheDocument();
