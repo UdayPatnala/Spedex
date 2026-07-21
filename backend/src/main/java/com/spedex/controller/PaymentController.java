@@ -41,7 +41,8 @@ public class PaymentController {
     @PostMapping("/prepare")
     public ResponseEntity<Map<String, Object>> preparePayment(@RequestBody Map<String, Object> payload) {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
         double amount = payload.get("amount") instanceof Number number ? number.doubleValue() : 0.0;
         String payeeName = String.valueOf(payload.getOrDefault("payee_name", "Unknown Vendor"));
         String upiHandle = String.valueOf(payload.getOrDefault("upi_handle", ""));
@@ -82,10 +83,12 @@ public class PaymentController {
     @PostMapping("/{transactionId}/complete")
     public ResponseEntity<Map<String, Object>> completePayment(@PathVariable Long transactionId, @RequestBody Map<String, String> payload) {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User user = userRepository.findByEmail(email).orElseThrow();
-        Transaction transaction = transactionRepository.findById(transactionId).orElseThrow();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transaction not found"));
         if (!transaction.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized");
+            throw new RuntimeException("Access denied");
         }
 
         String requestedStatus = payload.getOrDefault("status", "failed");

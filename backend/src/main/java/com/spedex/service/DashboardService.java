@@ -49,7 +49,7 @@ public class DashboardService {
     private UserService userService;
 
     public Map<String, Object> getOverview(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         SpedexUserDto userDto = userService.mapToDto(user);
         List<Transaction> transactions = transactionRepository.findByUserId(user.getId());
         List<Budget> budgets = budgetRepository.findByUserId(user.getId());
@@ -105,7 +105,7 @@ public class DashboardService {
     }
 
     public Map<String, Object> getMobileHome(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         List<Transaction> transactions = transactionRepository.findByUserId(user.getId());
         List<Budget> budgets = budgetRepository.findByUserId(user.getId());
         LocalDate today = LocalDate.now();
@@ -142,7 +142,7 @@ public class DashboardService {
     }
 
     public Map<String, Object> addVendor(String email, Map<String, String> payload) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
 
         String category = normalizeCategory(payload.get("category"));
         String name = payload.getOrDefault("name", "").trim();
@@ -168,7 +168,7 @@ public class DashboardService {
     }
 
     public Map<String, Object> editVendor(String email, Long id, Map<String, String> payload) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         Vendor vendor = vendorRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vendor not found"));
 
@@ -207,7 +207,7 @@ public class DashboardService {
     }
 
     public Map<String, Object> getVendors(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         List<VendorDto> vendors = vendorRepository.findByUserId(user.getId()).stream()
                 .map(userService::mapToDto)
                 .collect(Collectors.toList());
@@ -222,7 +222,7 @@ public class DashboardService {
     }
 
     public Map<String, Object> getBudgets(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         List<Budget> budgets = budgetRepository.findByUserId(user.getId());
         double totalBudget = budgets.stream().mapToDouble(Budget::getLimitAmount).sum();
 
@@ -245,7 +245,7 @@ public class DashboardService {
     }
 
     public Map<String, Object> getAnalytics(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         List<Transaction> transactions = transactionRepository.findByUserId(user.getId());
         List<Transaction> expenses = expenseTransactions(transactions);
         double totalSpent = expenses.stream().mapToDouble(Transaction::getAmount).sum();
@@ -284,7 +284,7 @@ public class DashboardService {
     }
 
     public Map<String, Object> getReminders(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         List<Reminder> reminders = reminderRepository.findByUserId(user.getId()).stream()
                 .sorted(Comparator.comparing(Reminder::getDueDate, Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
@@ -313,7 +313,7 @@ public class DashboardService {
     }
 
     public Map<String, Object> addReminder(String email, Map<String, Object> payload) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         Reminder reminder = new Reminder();
         reminder.setUser(user);
         applyReminderUpdates(reminder, payload, true);
@@ -326,7 +326,7 @@ public class DashboardService {
     }
 
     public Map<String, Object> updateReminder(String email, Long id, Map<String, Object> payload) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         Reminder reminder = reminderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reminder not found"));
         if (!reminder.getUser().getId().equals(user.getId())) {
@@ -343,7 +343,7 @@ public class DashboardService {
     }
 
     public Map<String, Object> deleteReminder(String email, Long id) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
         Reminder reminder = reminderRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reminder not found"));
         if (!reminder.getUser().getId().equals(user.getId())) {
