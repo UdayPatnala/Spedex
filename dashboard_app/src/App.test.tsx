@@ -35,11 +35,10 @@ describe("App Authentication", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Smart Financial Control for/i)).toBeInTheDocument();
+      expect(screen.getByText(/The Elegant Smart Wallet for/i)).toBeInTheDocument();
     });
 
-    const launchBtns = screen.getAllByRole("button", { name: /Launch Web App/i });
-    fireEvent.click(launchBtns[0]);
+fireEvent.click(screen.getByRole("button", { name: /Enter Workspace/i }));
 
     await waitFor(() => {
       expect(screen.getByText("Sign in to your personal wallet")).toBeInTheDocument();
@@ -71,11 +70,10 @@ describe("App Authentication", () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Smart Financial Control for/i)).toBeInTheDocument();
+      expect(screen.getByText(/The Elegant Smart Wallet for/i)).toBeInTheDocument();
     });
 
-    const launchBtns = screen.getAllByRole("button", { name: /Launch Web App/i });
-    fireEvent.click(launchBtns[0]);
+fireEvent.click(screen.getByRole("button", { name: /Enter Workspace/i }));
 
     await waitFor(() => {
       expect(screen.getByText("Sign in to your personal wallet")).toBeInTheDocument();

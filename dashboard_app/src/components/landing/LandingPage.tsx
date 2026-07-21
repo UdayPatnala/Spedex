@@ -2,17 +2,12 @@ import React, { useState } from 'react';
 
 export interface LandingPageProps {
   onLaunchDashboard: () => void;
-  onOpenMobileSync?: () => void;
 }
 
-export const LandingPage: React.FC<LandingPageProps> = ({
-  onLaunchDashboard,
-  onOpenMobileSync,
-}) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDashboard }) => {
   const [demoAmount, setDemoAmount] = useState('450');
   const [demoVendor, setDemoVendor] = useState('Swiggy');
   const [paidStatus, setPaidStatus] = useState(false);
-  const [activeFeatureIndex, setActiveFeatureIndex] = useState<number | null>(null);
 
   const handleSimulatePay = () => {
     setPaidStatus(true);
@@ -23,145 +18,121 @@ export const LandingPage: React.FC<LandingPageProps> = ({
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: '#090D16',
-        color: '#F8FAFC',
+        backgroundColor: '#F8FAFC',
+        color: '#0F172A',
         fontFamily: "'Sora', -apple-system, BlinkMacSystemFont, sans-serif",
         display: 'flex',
         flexDirection: 'column',
         overflowX: 'hidden',
-        position: 'relative',
       }}
     >
-      {/* Inline Keyframe Styles for Rich Effects & Micro-Animations */}
+      {/* Light Theme Inline Animation Styles */}
       <style>{`
-        @keyframes floatSlow {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          50% { transform: translateY(-12px) rotate(1deg); }
+        @keyframes subtleFadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes pulseGlow {
-          0%, 100% { opacity: 0.4; transform: scale(1); }
-          50% { opacity: 0.8; transform: scale(1.05); }
+        .animate-fade-up {
+          animation: subtleFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        @keyframes shimmerGradient {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
+        .light-card {
+          background: #FFFFFF;
+          border: 1px solid rgba(15, 23, 42, 0.08);
+          border-radius: 20px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+          transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, border-color 0.25s ease;
         }
-        @keyframes ripplePay {
-          0% { transform: scale(0.95); opacity: 0.7; }
-          50% { transform: scale(1.02); opacity: 1; }
-          100% { transform: scale(1); opacity: 1; }
+        .light-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.03);
+          border-color: rgba(207, 48, 130, 0.3);
         }
-        .animated-gradient-text {
-          background: linear-gradient(135deg, #FFFFFF 0%, #EC4899 35%, #F59E0B 70%, #06B6D4 100%);
-          background-size: 200% 200%;
-          animation: shimmerGradient 6s ease infinite;
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+        .btn-primary {
+          background: linear-gradient(135deg, #CF3082 0%, #96225E 100%);
+          color: #FFFFFF;
+          border: none;
+          border-radius: 12px;
+          padding: 12px 24px;
+          font-size: 14px;
+          font-weight: 700;
+          cursor: pointer;
+          box-shadow: 0 4px 14px rgba(207, 48, 130, 0.25);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .hover-card-glow {
-          transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
-        }
-        .hover-card-glow:hover {
-          transform: translateY(-8px) scale(1.01);
-          box-shadow: 0 20px 40px -15px rgba(236, 72, 153, 0.25), 0 0 20px rgba(139, 92, 246, 0.2);
-          border-color: rgba(236, 72, 153, 0.4) !important;
-        }
-        .btn-hover-effect {
-          transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, filter 0.2s ease;
-        }
-        .btn-hover-effect:hover {
+        .btn-primary:hover {
           transform: translateY(-2px);
-          filter: brightness(1.1);
-          box-shadow: 0 10px 25px -5px rgba(236, 72, 153, 0.4);
+          box-shadow: 0 8px 22px rgba(207, 48, 130, 0.35);
         }
-        .floating-element {
-          animation: floatSlow 5s ease-in-out infinite;
+        .btn-secondary {
+          background: #FFFFFF;
+          color: #0F172A;
+          border: 1px solid rgba(15, 23, 42, 0.12);
+          border-radius: 12px;
+          padding: 12px 24px;
+          font-size: 14px;
+          font-weight: 700;
+          cursor: pointer;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+        .btn-secondary:hover {
+          background: #F1F5F9;
+          border-color: rgba(15, 23, 42, 0.2);
+          transform: translateY(-2px);
         }
       `}</style>
 
-      {/* Ambient background glow spheres */}
-      <div
-        style={{
-          position: 'absolute',
-          top: '-150px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '800px',
-          height: '400px',
-          background: 'radial-gradient(circle, rgba(236, 72, 153, 0.18) 0%, rgba(139, 92, 246, 0.12) 40%, rgba(9, 13, 22, 0) 75%)',
-          filter: 'blur(70px)',
-          pointerEvents: 'none',
-          zIndex: 0,
-          animation: 'pulseGlow 8s ease-in-out infinite',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          top: '700px',
-          right: '-120px',
-          width: '550px',
-          height: '550px',
-          background: 'radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(16, 185, 129, 0.1) 50%, rgba(9, 13, 22, 0) 75%)',
-          filter: 'blur(80px)',
-          pointerEvents: 'none',
-          zIndex: 0,
-          animation: 'pulseGlow 10s ease-in-out infinite 2s',
-        }}
-      />
-
-      {/* Header Navigation */}
+      {/* Header Bar */}
       <header
         style={{
           position: 'sticky',
           top: 0,
           zIndex: 50,
-          backdropFilter: 'blur(24px)',
-          backgroundColor: 'rgba(9, 13, 22, 0.85)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          padding: '16px 32px',
+          backdropFilter: 'blur(20px)',
+          backgroundColor: 'rgba(255, 255, 255, 0.88)',
+          borderBottom: '1px solid rgba(15, 23, 42, 0.08)',
+          padding: '16px 36px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          transition: 'background-color 0.3s ease',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <img src="/spedex-mark.svg" alt="Spedex Logo" style={{ width: '34px', height: '34px', filter: 'drop-shadow(0 0 10px rgba(236, 72, 153, 0.5))' }} />
+          <img src="/spedex-mark.svg" alt="Spedex Logo" style={{ width: '34px', height: '34px' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '22px', fontWeight: 800, tracking: '-0.5px', background: 'linear-gradient(135deg, #FFF 30%, #EC4899 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+            <span style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.5px' }}>
               Spedex
             </span>
             <span
               style={{
                 fontSize: '10px',
-                fontWeight: 800,
-                backgroundColor: 'rgba(236, 72, 153, 0.18)',
-                color: '#EC4899',
-                border: '1px solid rgba(236, 72, 153, 0.4)',
-                padding: '3px 9px',
-                borderRadius: '12px',
-                letterSpacing: '0.6px',
-                boxShadow: '0 0 12px rgba(236, 72, 153, 0.25)',
+                fontWeight: 700,
+                backgroundColor: '#FBEAF4',
+                color: '#CF3082',
+                padding: '3px 8px',
+                borderRadius: '10px',
+                letterSpacing: '0.5px',
               }}
             >
-              v2.2 PRO
+              FINANCIAL SUITE
             </span>
           </div>
         </div>
 
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '28px' }}>
-          <a href="#features" style={{ color: '#94A3B8', textDecoration: 'none', fontSize: '14px', fontWeight: 600, transition: 'color 0.2s' }}>
+        <nav style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+          <a href="#features" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 600, transition: 'color 0.2s' }}>
             Features
           </a>
-          <a href="#trips" style={{ color: '#94A3B8', textDecoration: 'none', fontSize: '14px', fontWeight: 600, transition: 'color 0.2s' }}>
+          <a href="#trips" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 600, transition: 'color 0.2s' }}>
             Trips Ledger
           </a>
-          <a href="#upi" style={{ color: '#94A3B8', textDecoration: 'none', fontSize: '14px', fontWeight: 600, transition: 'color 0.2s' }}>
-            UPI Quick Pay
+          <a href="#upi" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 600, transition: 'color 0.2s' }}>
+            UPI Desk
           </a>
-          <a href="#interactive-demo" style={{ color: '#94A3B8', textDecoration: 'none', fontSize: '14px', fontWeight: 600, transition: 'color 0.2s' }}>
+          <a href="#demo" style={{ color: '#475569', textDecoration: 'none', fontSize: '14px', fontWeight: 600, transition: 'color 0.2s' }}>
             Live Demo
           </a>
         </nav>
@@ -170,105 +141,73 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           <a
             href="/downloads/spedex-release.apk"
             download="spedex-v2.2.0.apk"
-            className="btn-hover-effect"
-            style={{
-              backgroundColor: 'rgba(16, 185, 129, 0.14)',
-              color: '#10B981',
-              border: '1px solid rgba(16, 185, 129, 0.4)',
-              padding: '10px 18px',
-              borderRadius: '12px',
-              fontSize: '13px',
-              fontWeight: 700,
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
+            className="btn-secondary"
+            style={{ padding: '9px 16px', fontSize: '13px' }}
           >
             <span>📥</span>
-            <span>Download Mobile APK</span>
+            <span>Download App</span>
           </a>
-          <button
-            onClick={onLaunchDashboard}
-            className="btn-hover-effect"
-            style={{
-              background: 'linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%)',
-              color: '#FFF',
-              border: 'none',
-              padding: '10px 22px',
-              borderRadius: '12px',
-              fontSize: '13px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              boxShadow: '0 4px 20px rgba(236, 72, 153, 0.35)',
-            }}
-          >
-            Launch Web App →
+          <button onClick={onLaunchDashboard} className="btn-primary" style={{ padding: '9px 20px', fontSize: '13px' }}>
+            Enter Workspace →
           </button>
         </div>
       </header>
 
       {/* Hero Section */}
       <section
+        className="animate-fade-up"
         style={{
-          position: 'relative',
-          zIndex: 10,
-          padding: '90px 24px 70px 24px',
-          maxWidth: '1100px',
+          padding: '80px 24px 60px 24px',
+          maxWidth: '1000px',
           margin: '0 auto',
           textAlign: 'center',
         }}
       >
         <div
-          className="floating-element"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: '8px',
-            backgroundColor: 'rgba(255, 255, 255, 0.06)',
-            backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            padding: '7px 18px',
-            borderRadius: '24px',
+            backgroundColor: '#F1F5F9',
+            border: '1px solid rgba(15, 23, 42, 0.08)',
+            padding: '6px 16px',
+            borderRadius: '20px',
             fontSize: '12px',
             fontWeight: 700,
-            color: '#38BDF8',
-            marginBottom: '28px',
-            boxShadow: '0 8px 25px rgba(0,0,0,0.3)',
+            color: '#CF3082',
+            marginBottom: '24px',
           }}
         >
-          <span style={{ fontSize: '14px' }}>⚡</span>
-          <span>Next-Gen Financial Intelligence & Smart Wallet</span>
+          <span>✨ Premium Personal Financial Workspace</span>
         </div>
 
         <h1
           style={{
-            fontSize: '56px',
+            fontSize: '52px',
             fontWeight: 800,
-            lineHeight: 1.12,
-            letterSpacing: '-1.8px',
-            margin: '0 0 24px 0',
+            lineHeight: 1.15,
+            letterSpacing: '-1.5px',
+            color: '#0F172A',
+            margin: '0 0 20px 0',
           }}
         >
-          Smart Financial Control for <br />
-          <span className="animated-gradient-text">
-            Trips, UPI Quick-Pay & Analytics
-          </span>
+          The Elegant Smart Wallet for <br />
+          <span style={{ color: '#CF3082' }}>Modern Personal Finance</span>
         </h1>
 
         <p
           style={{
-            fontSize: '19px',
-            color: '#94A3B8',
-            maxWidth: '740px',
-            margin: '0 auto 40px auto',
-            lineHeight: 1.65,
+            fontSize: '18px',
+            color: '#475569',
+            maxWidth: '680px',
+            margin: '0 auto 36px auto',
+            lineHeight: 1.6,
           }}
         >
-          SpeDex brings seamless 1-tap UPI vendor payments, live cash trip ledgers, monthly budget guardrails, and real-time mobile-to-web synchronization into one sleek workspace.
+          Effortlessly track daily expenses, manage active travel ledgers, settle vendor UPI payments, and monitor monthly budgets—all in a refined, distraction-free environment.
         </p>
 
-        {/* Indian Rupee Note Currency Aesthetics Palette Strip */}
+        {/* Currency Palette Badges */}
         <div
           style={{
             display: 'flex',
@@ -276,20 +215,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             alignItems: 'center',
             gap: '10px',
             flexWrap: 'wrap',
-            marginBottom: '44px',
+            marginBottom: '40px',
           }}
         >
-          <span style={{ fontSize: '11px', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', letterSpacing: '1.2px', marginRight: '6px' }}>
-            INR Note Themes:
+          <span style={{ fontSize: '11px', fontWeight: 700, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: '1px', marginRight: '4px' }}>
+            Curated Themes:
           </span>
           {[
-            { name: '₹2000 Magenta', color: '#EC4899' },
-            { name: '₹500 Stone', color: '#94A3B8' },
-            { name: '₹200 Yellow', color: '#F59E0B' },
-            { name: '₹100 Lavender', color: '#8B5CF6' },
-            { name: '₹50 Cyan', color: '#06B6D4' },
-            { name: '₹20 Green', color: '#10B981' },
-            { name: '₹10 Chocolate', color: '#D97706' },
+            { name: '₹2000 Magenta', bg: '#FBEAF4', text: '#CF3082' },
+            { name: '₹500 Stone', bg: '#F1F5F9', text: '#475569' },
+            { name: '₹200 Yellow', bg: '#FEF3C7', text: '#D97706' },
+            { name: '₹100 Lavender', bg: '#EDE9FE', text: '#7C3AED' },
+            { name: '₹50 Cyan', bg: '#E0F2FE', text: '#0284C7' },
+            { name: '₹20 Green', bg: '#D1FAE5', text: '#059669' },
           ].map((theme) => (
             <div
               key={theme.name}
@@ -297,122 +235,67 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                border: `1px solid ${theme.color}45`,
+                backgroundColor: theme.bg,
                 padding: '5px 12px',
-                borderRadius: '18px',
+                borderRadius: '16px',
                 fontSize: '11px',
                 fontWeight: 700,
-                color: theme.color,
-                boxShadow: `0 0 12px ${theme.color}15`,
-                transition: 'transform 0.2s ease',
+                color: theme.text,
               }}
             >
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: theme.color, boxShadow: `0 0 8px ${theme.color}` }} />
+              <div style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: theme.text }} />
               <span>{theme.name}</span>
             </div>
           ))}
         </div>
 
         {/* Hero CTAs */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '18px', flexWrap: 'wrap' }}>
-          <button
-            onClick={onLaunchDashboard}
-            className="btn-hover-effect"
-            style={{
-              background: 'linear-gradient(135deg, #EC4899 0%, #8B5CF6 100%)',
-              color: '#FFF',
-              border: 'none',
-              padding: '16px 36px',
-              borderRadius: '16px',
-              fontSize: '16px',
-              fontWeight: 800,
-              cursor: 'pointer',
-              boxShadow: '0 10px 35px rgba(236, 72, 153, 0.4)',
-            }}
-          >
-            Launch Web App Now →
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          <button onClick={onLaunchDashboard} className="btn-primary" style={{ padding: '14px 32px', fontSize: '15px' }}>
+            Open Web Dashboard →
           </button>
-          <a
-            href="#interactive-demo"
-            className="btn-hover-effect"
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.06)',
-              color: '#F8FAFC',
-              border: '1px solid rgba(255, 255, 255, 0.14)',
-              padding: '16px 30px',
-              borderRadius: '16px',
-              fontSize: '16px',
-              fontWeight: 700,
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
-          >
-            <span>⚡ Try Live Demo</span>
+          <a href="#demo" className="btn-secondary" style={{ padding: '14px 28px', fontSize: '15px' }}>
+            <span>⚡ Interactive Demo</span>
           </a>
         </div>
       </section>
 
-      {/* Hero Showcase Mockup */}
+      {/* Clean Dashboard Preview Container */}
       <section
         style={{
-          position: 'relative',
-          zIndex: 10,
-          padding: '0 24px 90px 24px',
-          maxWidth: '1020px',
+          padding: '0 24px 80px 24px',
+          maxWidth: '960px',
           margin: '0 auto',
+          width: '100%',
         }}
       >
-        <div
-          className="hover-card-glow floating-element"
-          style={{
-            backgroundColor: 'rgba(15, 23, 42, 0.75)',
-            backdropFilter: 'blur(24px)',
-            borderRadius: '28px',
-            border: '1px solid rgba(255, 255, 255, 0.14)',
-            boxShadow: '0 30px 70px -15px rgba(0, 0, 0, 0.8), 0 0 50px rgba(236, 72, 153, 0.15)',
-            overflow: 'hidden',
-            padding: '28px',
-          }}
-        >
-          {/* Browser Bar */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '22px', paddingBottom: '16px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
-            <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#EF4444' }} />
-            <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#F59E0B' }} />
-            <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#10B981' }} />
-            <span style={{ marginLeft: '12px', fontSize: '12px', color: '#64748B', fontWeight: 600 }}>https://spe-dex.vercel.app/dashboard</span>
+        <div className="light-card" style={{ padding: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid rgba(15, 23, 42, 0.08)' }}>
+            <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#EF4444' }} />
+            <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#F59E0B' }} />
+            <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#10B981' }} />
+            <span style={{ marginLeft: '12px', fontSize: '12px', color: '#94A3B8', fontWeight: 600 }}>https://spe-dex.vercel.app/dashboard</span>
           </div>
 
-          {/* Cards Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-            <div style={{ backgroundColor: 'rgba(30, 41, 59, 0.65)', borderRadius: '18px', padding: '20px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <span style={{ fontSize: '12px', color: '#94A3B8', fontWeight: 700 }}>MONTHLY SPEND</span>
-                <span style={{ fontSize: '11px', color: '#10B981', fontWeight: 800 }}>● 68% of Budget</span>
-              </div>
-              <div style={{ fontSize: '30px', fontWeight: 800, color: '#FFF' }}>₹14,250</div>
-              <div style={{ height: '6px', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '3px', marginTop: '12px', overflow: 'hidden' }}>
-                <div style={{ width: '68%', height: '100%', backgroundColor: '#EC4899', borderRadius: '3px', boxShadow: '0 0 10px #EC4899' }} />
-              </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
+            <div style={{ backgroundColor: '#F8FAFC', padding: '20px', borderRadius: '16px', border: '1px solid rgba(15, 23, 42, 0.06)' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>MONTHLY OUTLOOK</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#CF3082', margin: '4px 0' }}>₹14,250</div>
+              <div style={{ fontSize: '12px', color: '#059669', fontWeight: 700 }}>68% of monthly limit used</div>
             </div>
 
-            <div style={{ backgroundColor: 'rgba(99, 102, 241, 0.14)', borderRadius: '18px', padding: '20px', border: '1px solid rgba(99, 102, 241, 0.35)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ fontSize: '11px', fontWeight: 800, color: '#818CF8', textTransform: 'uppercase' }}>ACTIVE TRIP LEDGER</span>
-                <span style={{ backgroundColor: '#10B981', color: '#FFF', fontSize: '9px', fontWeight: 800, padding: '2px 7px', borderRadius: '4px' }}>LIVE</span>
-              </div>
-              <div style={{ fontSize: '19px', fontWeight: 800, color: '#FFF', marginBottom: '4px' }}>✈️ Goa Beach Weekend</div>
-              <div style={{ fontSize: '12px', color: '#94A3B8' }}>Total: ₹8,400 | Cash Spent: ₹3,200</div>
+            <div style={{ backgroundColor: '#EDE9FE', padding: '20px', borderRadius: '16px', border: '1px solid rgba(124, 58, 237, 0.15)' }}>
+              <div style={{ fontSize: '11px', fontWeight: 800, color: '#7C3AED', textTransform: 'uppercase' }}>ACTIVE TRIP</div>
+              <div style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: '4px 0' }}>✈️ Goa Beach Weekend</div>
+              <div style={{ fontSize: '12px', color: '#475569' }}>Total: ₹8,400 | Cash Spent: ₹3,200</div>
             </div>
 
-            <div style={{ backgroundColor: 'rgba(30, 41, 59, 0.65)', borderRadius: '18px', padding: '20px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
-              <div style={{ fontSize: '12px', color: '#94A3B8', fontWeight: 700, marginBottom: '12px' }}>QUICK PAY VENDORS</div>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                {['Swiggy (₹350)', 'Uber (₹250)', 'Starbucks (₹450)'].map((vendor, idx) => (
-                  <div key={idx} style={{ flex: 1, backgroundColor: 'rgba(15, 23, 42, 0.85)', padding: '9px', borderRadius: '12px', textAlign: 'center', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#FFF' }}>{vendor}</div>
+            <div style={{ backgroundColor: '#F8FAFC', padding: '20px', borderRadius: '16px', border: '1px solid rgba(15, 23, 42, 0.06)' }}>
+              <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase', marginBottom: '8px' }}>QUICK VENDORS</div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {['Swiggy', 'Uber', 'Starbucks'].map((name, idx) => (
+                  <div key={idx} style={{ flex: 1, backgroundColor: '#FFFFFF', padding: '8px', borderRadius: '10px', textAlign: 'center', border: '1px solid rgba(15, 23, 42, 0.08)', fontSize: '11px', fontWeight: 700 }}>
+                    {name}
                   </div>
                 ))}
               </div>
@@ -425,180 +308,145 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <section
         id="features"
         style={{
-          position: 'relative',
-          zIndex: 10,
-          padding: '90px 24px',
-          maxWidth: '1100px',
+          padding: '70px 24px',
+          maxWidth: '1040px',
           margin: '0 auto',
         }}
       >
-        <div style={{ textAlign: 'center', marginBottom: '64px' }}>
-          <span style={{ fontSize: '12px', fontWeight: 800, color: '#EC4899', textTransform: 'uppercase', letterSpacing: '1.8px' }}>
-            Core Capabilities
+        <div style={{ textAlign: 'center', marginBottom: '50px' }}>
+          <span style={{ fontSize: '12px', fontWeight: 800, color: '#CF3082', textTransform: 'uppercase', letterSpacing: '1.2px' }}>
+            CORE CAPABILITIES
           </span>
-          <h2 style={{ fontSize: '38px', fontWeight: 800, color: '#FFF', marginTop: '10px', letterSpacing: '-0.8px' }}>
-            Built for Modern Financial Intelligence
+          <h2 style={{ fontSize: '34px', fontWeight: 800, color: '#0F172A', marginTop: '8px', letterSpacing: '-0.5px' }}>
+            Designed for Financial Clarity
           </h2>
-          <p style={{ fontSize: '16px', color: '#94A3B8', maxWidth: '620px', margin: '14px auto 0 auto' }}>
-            Everything you need to track spending, manage trip cash, and settle vendor payments instantly.
+          <p style={{ fontSize: '16px', color: '#475569', maxWidth: '560px', margin: '10px auto 0 auto' }}>
+            Clean, high-performance tools built specifically for modern daily spending and travel.
           </p>
         </div>
 
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-            gap: '24px',
-          }}
-        >
-          {[
-            { icon: '⚡', title: 'Instant UPI Quick Pay Desk', color: '#EC4899', desc: '1-tap payment initiation with dynamic QR code generation for frequent vendors like Swiggy, Uber, DMart, and local cafes.' },
-            { icon: '✈️', title: 'Dedicated Trips Ledger', color: '#8B5CF6', desc: 'Log cash and card expenses on vacation in real time. Track total trip spend, cash ratios, and category breakdowns effortlessly.' },
-            { icon: '🎯', title: 'Smart Budget Guardrails', color: '#06B6D4', desc: 'Set category limits across Dining, Transport, Rent, and Subscriptions. Receive automated warnings when approaching caps.' },
-            { icon: '📈', title: 'Real-Time Financial Analytics', color: '#10B981', desc: 'Visualize weekly spending curves, peak day metrics, monthly projections, and recurring bill reminder calendars.' },
-            { icon: '📱', title: 'Mobile & Web Live Sync', color: '#F59E0B', desc: 'Instant zero-latency state synchronization between Expo React Native mobile application and Web Dashboard.' },
-            { icon: '🛡️', title: 'Bank-Grade Security', color: '#D97706', desc: 'JWT authentication, IDOR resource protection, strict user-data isolation, and encrypted security tokens.' },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="hover-card-glow"
-              onMouseEnter={() => setActiveFeatureIndex(idx)}
-              onMouseLeave={() => setActiveFeatureIndex(null)}
-              style={{
-                backgroundColor: activeFeatureIndex === idx ? 'rgba(30, 41, 59, 0.75)' : 'rgba(15, 23, 42, 0.65)',
-                padding: '30px',
-                borderRadius: '22px',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                cursor: 'default',
-              }}
-            >
-              <div
-                style={{
-                  width: '46px',
-                  height: '46px',
-                  borderRadius: '14px',
-                  backgroundColor: `${item.color}20`,
-                  color: item.color,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '22px',
-                  marginBottom: '18px',
-                  boxShadow: `0 0 15px ${item.color}30`,
-                }}
-              >
-                {item.icon}
-              </div>
-              <h3 style={{ fontSize: '19px', fontWeight: 700, color: '#FFF', margin: '0 0 10px 0' }}>{item.title}</h3>
-              <p style={{ fontSize: '14px', color: '#94A3B8', lineHeight: 1.65, margin: 0 }}>{item.desc}</p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
+          <div className="light-card" style={{ padding: '28px' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '12px', backgroundColor: '#FBEAF4', color: '#CF3082', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', marginBottom: '16px' }}>
+              ⚡
             </div>
-          ))}
+            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A', margin: '0 0 8px 0' }}>Instant UPI Quick Pay</h3>
+            <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, margin: 0 }}>
+              1-tap payment initiation with auto-generated QR codes for your frequent daily merchants.
+            </p>
+          </div>
+
+          <div className="light-card" style={{ padding: '28px' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '12px', backgroundColor: '#EDE9FE', color: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', marginBottom: '16px' }}>
+              ✈️
+            </div>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A', margin: '0 0 8px 0' }}>Active Trips Ledger</h3>
+            <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, margin: 0 }}>
+              Dedicated cash and card expense tracker for vacations with category breakdown summaries.
+            </p>
+          </div>
+
+          <div className="light-card" style={{ padding: '28px' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '12px', backgroundColor: '#E0F2FE', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', marginBottom: '16px' }}>
+              🎯
+            </div>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A', margin: '0 0 8px 0' }}>Budget Guardrails</h3>
+            <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, margin: 0 }}>
+              Set monthly category limits across Dining, Rent, and Subscriptions with live pace indicators.
+            </p>
+          </div>
+
+          <div className="light-card" style={{ padding: '28px' }}>
+            <div style={{ width: '42px', height: '42px', borderRadius: '12px', backgroundColor: '#D1FAE5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', marginBottom: '16px' }}>
+              📈
+            </div>
+            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A', margin: '0 0 8px 0' }}>Financial Analytics</h3>
+            <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, margin: 0 }}>
+              Visualize weekly spending curves, peak day metrics, and upcoming subscription bill reminders.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* Interactive Quick Pay Demo Widget */}
       <section
-        id="interactive-demo"
+        id="demo"
         style={{
-          position: 'relative',
-          zIndex: 10,
-          padding: '60px 24px 90px 24px',
-          maxWidth: '920px',
+          padding: '50px 24px 80px 24px',
+          maxWidth: '840px',
           margin: '0 auto',
           width: '100%',
         }}
       >
-        <div
-          style={{
-            backgroundColor: 'rgba(15, 23, 42, 0.85)',
-            backdropFilter: 'blur(20px)',
-            padding: '40px',
-            borderRadius: '28px',
-            border: '1px solid rgba(255, 255, 255, 0.14)',
-            boxShadow: '0 25px 60px rgba(0,0,0,0.6), 0 0 40px rgba(16, 185, 129, 0.1)',
-            animation: paidStatus ? 'ripplePay 0.4s ease' : 'none',
-          }}
-        >
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 800, color: '#10B981', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
-              ● LIVE SIMULATION
-            </span>
-            <h3 style={{ fontSize: '26px', fontWeight: 800, color: '#FFF', margin: '6px 0 0 0' }}>
-              Simulate Instant UPI Quick Pay
-            </h3>
-          </div>
+        <div className="light-card" style={{ padding: '36px', textAlign: 'center' }}>
+          <span style={{ fontSize: '11px', fontWeight: 800, color: '#059669', textTransform: 'uppercase', letterSpacing: '1.2px' }}>
+            LIVE DEMONSTRATION
+          </span>
+          <h3 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: '6px 0 24px 0' }}>
+            Simulate Quick Payment
+          </h3>
 
-          <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', marginBottom: '24px' }}>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', marginBottom: '20px' }}>
             <div>
-              <label style={{ fontSize: '12px', color: '#94A3B8', display: 'block', marginBottom: '6px', fontWeight: 600 }}>Vendor Name</label>
+              <label style={{ fontSize: '12px', color: '#64748B', display: 'block', marginBottom: '4px', fontWeight: 600, textAlign: 'left' }}>Merchant</label>
               <input
                 type="text"
                 value={demoVendor}
                 onChange={(e) => setDemoVendor(e.target.value)}
-                style={{ backgroundColor: '#0F172A', border: '1px solid rgba(255,255,255,0.12)', color: '#FFF', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', width: '190px' }}
+                style={{ backgroundColor: '#F8FAFC', border: '1px solid rgba(15, 23, 42, 0.12)', color: '#0F172A', padding: '10px 14px', borderRadius: '10px', fontSize: '14px', width: '180px' }}
               />
             </div>
             <div>
-              <label style={{ fontSize: '12px', color: '#94A3B8', display: 'block', marginBottom: '6px', fontWeight: 600 }}>Amount (₹)</label>
+              <label style={{ fontSize: '12px', color: '#64748B', display: 'block', marginBottom: '4px', fontWeight: 600, textAlign: 'left' }}>Amount (₹)</label>
               <input
                 type="number"
                 value={demoAmount}
                 onChange={(e) => setDemoAmount(e.target.value)}
-                style={{ backgroundColor: '#0F172A', border: '1px solid rgba(255,255,255,0.12)', color: '#FFF', padding: '12px 16px', borderRadius: '12px', fontSize: '14px', width: '150px' }}
+                style={{ backgroundColor: '#F8FAFC', border: '1px solid rgba(15, 23, 42, 0.12)', color: '#0F172A', padding: '10px 14px', borderRadius: '10px', fontSize: '14px', width: '140px' }}
               />
             </div>
-            <div style={{ marginTop: '22px' }}>
+            <div style={{ marginTop: '18px' }}>
               <button
                 onClick={handleSimulatePay}
-                className="btn-hover-effect"
-                style={{
-                  backgroundColor: paidStatus ? '#10B981' : '#EC4899',
-                  color: '#FFF',
-                  border: 'none',
-                  padding: '13px 28px',
-                  borderRadius: '12px',
-                  fontSize: '14px',
-                  fontWeight: 800,
-                  cursor: 'pointer',
-                  boxShadow: paidStatus ? '0 0 20px #10B981' : '0 6px 20px rgba(236, 72, 153, 0.4)',
-                }}
+                className="btn-primary"
+                style={{ backgroundColor: paidStatus ? '#059669' : '#CF3082', padding: '11px 24px' }}
               >
-                {paidStatus ? '✓ Payment Processed!' : `Pay ₹${demoAmount} via UPI`}
+                {paidStatus ? '✓ Processed!' : `Pay ₹${demoAmount} via UPI`}
               </button>
             </div>
           </div>
 
           {paidStatus && (
-            <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.18)', color: '#10B981', border: '1px solid rgba(16, 185, 129, 0.4)', padding: '14px', borderRadius: '14px', textAlign: 'center', fontSize: '14px', fontWeight: 800, boxShadow: '0 0 20px rgba(16, 185, 129, 0.2)' }}>
-              🎉 Success! Payment of ₹{demoAmount} to {demoVendor} logged and synchronized with Dashboard.
+            <div style={{ backgroundColor: '#D1FAE5', color: '#059669', border: '1px solid rgba(5, 150, 105, 0.2)', padding: '12px', borderRadius: '12px', fontSize: '13px', fontWeight: 700 }}>
+              🎉 Payment of ₹{demoAmount} to {demoVendor} processed and synced!
             </div>
           )}
         </div>
       </section>
 
-      {/* Minimalist Footer */}
+      {/* Footer */}
       <footer
         style={{
           marginTop: 'auto',
-          backgroundColor: '#070A11',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          padding: '45px 32px',
+          backgroundColor: '#FFFFFF',
+          borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+          padding: '40px 32px',
           textAlign: 'center',
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-          <img src="/spedex-mark.svg" alt="Spedex Logo" style={{ width: '26px', height: '26px' }} />
-          <span style={{ fontSize: '17px', fontWeight: 800, color: '#FFF' }}>Spedex Smart Wallet Platform</span>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
+          <img src="/spedex-mark.svg" alt="Spedex Logo" style={{ width: '24px', height: '24px' }} />
+          <span style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A' }}>Spedex Smart Wallet</span>
         </div>
-        <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 18px 0' }}>
-          © 2026 SpeDex Inc. All rights reserved. ● Live on Vercel & Render.
+        <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 16px 0' }}>
+          © 2026 SpeDex Inc. All rights reserved. ● Enterprise Personal Financial Workspace.
         </p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '22px' }}>
-          <button onClick={onLaunchDashboard} style={{ background: 'none', border: 'none', color: '#38BDF8', cursor: 'pointer', fontSize: '13px', fontWeight: 700 }}>
-            Launch Web Dashboard
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
+          <button onClick={onLaunchDashboard} style={{ background: 'none', border: 'none', color: '#CF3082', cursor: 'pointer', fontSize: '13px', fontWeight: 700 }}>
+            Launch Web Workspace
           </button>
-          <a href="/downloads/spedex-release.apk" download="spedex-v2.2.0.apk" style={{ color: '#10B981', textDecoration: 'none', fontSize: '13px', fontWeight: 700 }}>
-            Download Mobile APK (Android)
+          <a href="/downloads/spedex-release.apk" download="spedex-v2.2.0.apk" style={{ color: '#059669', textDecoration: 'none', fontSize: '13px', fontWeight: 700 }}>
+            Download Android APK
           </a>
         </div>
       </footer>
