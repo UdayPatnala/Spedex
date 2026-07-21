@@ -6,6 +6,8 @@ export interface SidebarProps {
   activeTab: TabId;
   onTabChange: (tab: TabId) => void;
   activeTripName?: string | null;
+  showMobileSync?: boolean;
+  onToggleMobileSync?: () => void;
 }
 
 const NAV_ITEMS: Array<{ id: TabId; label: string; icon: string }> = [
@@ -22,6 +24,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onTabChange,
   activeTripName,
+  showMobileSync,
+  onToggleMobileSync,
 }) => {
   return (
     <aside
@@ -82,6 +86,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         );
       })}
+
+      {onToggleMobileSync && (
+        <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
+          <button
+            onClick={onToggleMobileSync}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '12px 14px',
+              borderRadius: '12px',
+              border: '1px solid rgba(16, 185, 129, 0.3)',
+              backgroundColor: showMobileSync ? 'rgba(16, 185, 129, 0.2)' : 'rgba(16, 185, 129, 0.08)',
+              color: '#10B981',
+              fontWeight: 700,
+              fontSize: '13px',
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <span>📱</span>
+            <span>{showMobileSync ? 'Hide Mobile Sync' : 'Live Mobile Sync'}</span>
+          </button>
+        </div>
+      )}
     </aside>
   );
 };

@@ -2,6 +2,7 @@ import { startTransition, useDeferredValue, useEffect, useMemo, useState } from 
 import QRCode from "react-qr-code";
 
 import { addVendor, getCurrentUser, loadDashboardBundle, login, setAuthToken, signUp, updateProfile, warmUpBackend, getTrips, startTrip, getTripDetails, completeTrip, addManualTransaction } from "./api";
+import { MobileSyncSimulator } from "./components/mobile/MobileSyncSimulator";
 import type {
   AnalyticsData,
   BudgetScreenData,
@@ -1343,6 +1344,8 @@ export default function App() {
   const [authSubmitting, setAuthSubmitting] = useState(false);
   const [warmingUp, setWarmingUp] = useState(false);
   const [showAddVendor, setShowAddVendor] = useState(false);
+  const [showMobileSync, setShowMobileSync] = useState(true);
+  const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
 
   const deferredSearch = useDeferredValue(searchQuery);
 
@@ -1485,6 +1488,13 @@ export default function App() {
     setVendors(bundle.vendors);
     setBudget(bundle.budget);
     setAnalytics(bundle.analytics);
+    try {
+      const trips = await getTrips();
+      const currentActive = (trips || []).find((t) => t.status === "ACTIVE");
+      setActiveTrip(currentActive || null);
+    } catch (e) {
+      // ignore
+    }
   }
 
   function handleSignOut() {
@@ -1561,10 +1571,10 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
+    <div className="app-shell" style={{ display: "flex", flexDirection: "row", width: "100%", height: "100vh", overflow: "hidden" }}>
       {showAddVendor && <AddVendorModal onClose={() => setShowAddVendor(false)} onSave={handleAddVendor} />}
       <Sidebar activeView={activeView} onSelect={(view) => startTransition(() => setActiveView(view))} />
-      <main className="main-pane">
+      <main className="main-pane" style={{ flex: 1, overflowY: "auto" }}>
         <Topbar
           query={searchQuery}
           onQueryChange={(value) => startTransition(() => setSearchQuery(value))}
@@ -1573,6 +1583,41 @@ export default function App() {
         />
         {content}
       </main>
+
+      {/* Real-time Synchronized Mobile Device Simulator Panel */}
+      {showMobileSync && (
+        <aside
+          style={{
+            padding: "20px",
+            backgroundColor: "rgba(15, 23, 42, 0.95)",
+            borderLeft: "1px solid rgba(255, 255, 255, 0.08)",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "12px",
+            boxShadow: "-10px 0 30px rgba(0,0,0,0.3)",
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center", padding: "0 8px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: "#10B981", textTransform: "uppercase", letterSpacing: "0.8px" }}>
+              ● Real-Time Mobile Sync
+            </span>
+            <button
+              onClick={() => setShowMobileSync(false)}
+              style={{ background: "none", border: "none", color: "#94A3B8", cursor: "pointer", fontSize: "14px" }}
+              title="Close Mobile Panel"
+            >
+              ✕
+            </button>
+          </div>
+          <MobileSyncSimulator
+            overviewData={overview}
+            activeTrip={activeTrip}
+            onRefreshData={handleRefresh}
+          />
+        </aside>
+      )}
     </div>
   );
 }
