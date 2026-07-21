@@ -7,14 +7,27 @@ vi.mock("./api", () => ({
   login: vi.fn(),
   signUp: vi.fn(),
   getCurrentUser: vi.fn(),
-  loadDashboardBundle: vi.fn(),
-  warmUpBackend: vi.fn(),
+  loadDashboardBundle: vi.fn().mockResolvedValue({
+    overview: {
+      user: { id: 1, name: "Demo User", email: "demo@gmail.com", plan: "Pro Member", avatar_initials: "DU", member_since: "2026-07-01T00:00:00" },
+      activeTrip: null,
+      summary: { totalBalance: 15400, monthlySpend: 4200, activeVendorsCount: 3 },
+      weekly_spending: [1200, 2400, 1800, 3100, 2900, 1500, 4200],
+      recent_transactions: [],
+      quick_pay: [],
+      reminders: []
+    },
+    vendors: [],
+    budget: { monthlyLimit: 20000, currentSpend: 4200, categoryLimits: [] },
+    analytics: { weeklyTrends: [], topCategories: [] }
+  }),
+  warmUpBackend: vi.fn().mockResolvedValue(true),
   setAuthToken: vi.fn(),
   addVendor: vi.fn(),
   updateProfile: vi.fn(),
 }));
 
-describe("App Authentication", () => {
+describe("App Workspace Direct Access (Login Page Removed)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     Object.defineProperty(window, "localStorage", {
@@ -26,69 +39,25 @@ describe("App Authentication", () => {
       },
       writable: true,
     });
-    vi.mocked(api.warmUpBackend).mockResolvedValue(false);
   });
 
-  it("handles Error authentication failures correctly", async () => {
-    vi.mocked(api.login).mockRejectedValueOnce(new Error("Invalid credentials"));
-
+  it("loads Dashboard Workspace directly without login prompt", async () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText(/The Elegant Smart Wallet for/i)).toBeInTheDocument();
+      expect(screen.getByText(/Recent Transactions/i)).toBeInTheDocument();
     });
 
-fireEvent.click(screen.getByRole("button", { name: /Enter Workspace/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText("Sign in to your personal wallet")).toBeInTheDocument();
-    });
-
-    fireEvent.change(screen.getByPlaceholderText("Email"), {
-      target: { value: "test@example.com" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("Password"), {
-      target: { value: "password123" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Enter Spedex/i }));
-
-    await waitFor(() => {
-      expect(api.login).toHaveBeenCalledWith({
-        email: "test@example.com",
-        password: "password123",
-      });
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText("Invalid credentials")).toBeInTheDocument();
-    });
+    expect(screen.queryByText(/Sign in to your personal wallet/i)).not.toBeInTheDocument();
   });
 
-  it("handles non-Error authentication failures correctly", async () => {
-    vi.mocked(api.login).mockRejectedValueOnce("String error");
-
+  it("navigates cleanly across workspace views", async () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText(/The Elegant Smart Wallet for/i)).toBeInTheDocument();
+      expect(screen.getByText(/Recent Transactions/i)).toBeInTheDocument();
     });
 
-fireEvent.click(screen.getByRole("button", { name: /Enter Workspace/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText("Sign in to your personal wallet")).toBeInTheDocument();
-    });
-
-    fireEvent.change(screen.getByPlaceholderText("Email"), {
-      target: { value: "test@example.com" },
-    });
-    fireEvent.change(screen.getByPlaceholderText("Password"), {
-      target: { value: "password123" },
-    });
-    fireEvent.click(screen.getByRole("button", { name: /Enter Spedex/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText("Unable to authenticate")).toBeInTheDocument();
-    });
+    expect(screen.getByText(/Quick Pay/i)).toBeInTheDocument();
   });
 });

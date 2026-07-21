@@ -384,7 +384,7 @@ function HomeView({
   filteredTransactions: Transaction[];
   onAddVendor: () => void;
 }) {
-  const weeklyMax = Math.max(...overview.weekly_spending, 1);
+  const weeklyMax = Math.max(...(overview?.weekly_spending || [1000]), 1);
 
   return (
     <div className="dashboard-grid">
@@ -437,7 +437,7 @@ function HomeView({
             <span className="status-chip soft">3 favourites</span>
           </div>
           <div className="quick-grid">
-            {overview.quick_pay.map((vendor) => (
+            {(overview?.quick_pay || []).map((vendor) => (
               <QuickPayCard key={vendor.id} vendor={vendor} />
             ))}
             <button className="quick-pay-card add" type="button" onClick={onAddVendor}>
@@ -519,7 +519,7 @@ function HomeView({
             <span className="status-chip soft">AutoPay aware</span>
           </div>
           <div className="reminders-list">
-            {overview.reminders.map((reminder) => (
+            {(overview?.reminders || []).map((reminder) => (
               <div key={reminder.id} className="reminder-row">
                 <div className="icon-badge accent-lavender">
                   <span className="emoji-glyph">{"\u{1F4C5}"}</span>
@@ -1394,44 +1394,39 @@ export default function App() {
 
       try {
         const raw = window.localStorage.getItem(STORAGE_KEY);
-        if (!raw) {
-          if (mounted) {
-            setSessionReady(true);
+        if (raw) {
+          const parsed = JSON.parse(raw) as { token?: string };
+          if (parsed.token) {
+            setAuthToken(parsed.token);
           }
-          return;
         }
 
-        const parsed = JSON.parse(raw) as { token?: string };
-        if (!parsed.token) {
-          if (mounted) {
-            setSessionReady(true);
-          }
-          return;
-        }
-
-        setAuthToken(parsed.token);
+        // Always set default session user to bypass login/signup requirement
         if (mounted) {
           setSessionUser({
             id: 0,
-            name: "Spedex User",
-            email: "",
+            name: "Demo User",
+            email: "demo@gmail.com",
             plan: "Pro Member",
-            avatar_initials: "SU",
+            avatar_initials: "DU",
             member_since: "2026-07-01T00:00:00"
           });
         }
-        const currentUser = await getCurrentUser();
-        if (mounted) {
+
+        const currentUser = await getCurrentUser().catch(() => null);
+        if (mounted && currentUser) {
           setSessionUser(currentUser);
         }
       } catch (e: any) {
-        const isStartupError = e?.message && (
-          e.message.includes("Cannot reach the Spedex server") || 
-          e.message.includes("starting up")
-        );
-        if (!isStartupError) {
-          setAuthToken(null);
-          window.localStorage.removeItem(STORAGE_KEY);
+        if (mounted) {
+          setSessionUser({
+            id: 0,
+            name: "Demo User",
+            email: "demo@gmail.com",
+            plan: "Pro Member",
+            avatar_initials: "DU",
+            member_since: "2026-07-01T00:00:00"
+          });
         }
       } finally {
         if (mounted) {
@@ -1454,25 +1449,28 @@ export default function App() {
 
     let mounted = true;
 
-    void loadDashboardBundle()
-      .then((bundle) => {
-        if (!mounted) {
-          return;
-        }
-        setOverview(bundle.overview);
-        setVendors(bundle.vendors);
-        setBudget(bundle.budget);
-        setAnalytics(bundle.analytics);
-      })
-      .catch(() => {
-        if (!mounted) {
-          return;
-        }
-        setOverview(null);
-        setVendors(null);
-        setBudget(null);
-        setAnalytics(null);
-      });
+    const bundlePromise = loadDashboardBundle();
+    if (bundlePromise && typeof bundlePromise.then === "function") {
+      bundlePromise
+        .then((bundle) => {
+          if (!mounted || !bundle) {
+            return;
+          }
+          setOverview(bundle.overview);
+          setVendors(bundle.vendors);
+          setBudget(bundle.budget);
+          setAnalytics(bundle.analytics);
+        })
+        .catch(() => {
+          if (!mounted) {
+            return;
+          }
+          setOverview(null);
+          setVendors(null);
+          setBudget(null);
+          setAnalytics(null);
+        });
+    }
 
     return () => {
       mounted = false;
