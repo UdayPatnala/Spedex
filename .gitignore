@@ -14,3 +14,4 @@ coverage/
 *.log
 .vercel/
 tmp/
+recovery-codes.txt
