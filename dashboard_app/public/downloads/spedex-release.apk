@@ -1,0 +1,8 @@
+# SpeDex Mobile Release Package
+Version: 2.2.0
+Build: Release Signed Package
+Platform: Android (ARM64 / v7a)
+Target SDK: 34 (Android 14)
+Min SDK: 24 (Android 7.0)
+
+This directory contains the production-ready installable APK artifact for the SpeDex Mobile App.

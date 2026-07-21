@@ -167,24 +167,27 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </nav>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {onOpenMobileSync && (
-            <button
-              onClick={onOpenMobileSync}
-              className="btn-hover-effect"
-              style={{
-                backgroundColor: 'rgba(16, 185, 129, 0.12)',
-                color: '#10B981',
-                border: '1px solid rgba(16, 185, 129, 0.35)',
-                padding: '10px 18px',
-                borderRadius: '12px',
-                fontSize: '13px',
-                fontWeight: 700,
-                cursor: 'pointer',
-              }}
-            >
-              📱 Live Mobile Sync
-            </button>
-          )}
+          <a
+            href="/downloads/spedex-release.apk"
+            download="spedex-v2.2.0.apk"
+            className="btn-hover-effect"
+            style={{
+              backgroundColor: 'rgba(16, 185, 129, 0.14)',
+              color: '#10B981',
+              border: '1px solid rgba(16, 185, 129, 0.4)',
+              padding: '10px 18px',
+              borderRadius: '12px',
+              fontSize: '13px',
+              fontWeight: 700,
+              textDecoration: 'none',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <span>📥</span>
+            <span>Download Mobile APK</span>
+          </a>
           <button
             onClick={onLaunchDashboard}
             className="btn-hover-effect"
@@ -592,13 +595,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '22px' }}>
           <button onClick={onLaunchDashboard} style={{ background: 'none', border: 'none', color: '#38BDF8', cursor: 'pointer', fontSize: '13px', fontWeight: 700 }}>
-            Launch Web App
+            Launch Web Dashboard
           </button>
-          {onOpenMobileSync && (
-            <button onClick={onOpenMobileSync} style={{ background: 'none', border: 'none', color: '#10B981', cursor: 'pointer', fontSize: '13px', fontWeight: 700 }}>
-              Live Mobile Simulator
-            </button>
-          )}
+          <a href="/downloads/spedex-release.apk" download="spedex-v2.2.0.apk" style={{ color: '#10B981', textDecoration: 'none', fontSize: '13px', fontWeight: 700 }}>
+            Download Mobile APK (Android)
+          </a>
         </div>
       </footer>
     </div>

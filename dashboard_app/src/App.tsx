@@ -1556,7 +1556,7 @@ export default function App() {
 
   if (!isDashboardLoading) {
     if (activeView === "landing") {
-      content = <LandingPage onLaunchDashboard={() => setActiveView("home")} onOpenMobileSync={() => setShowMobileSync(true)} />;
+      content = <LandingPage onLaunchDashboard={() => setActiveView("home")} />;
     } else if (activeView === "home") {
       content = <HomeView overview={overview!} filteredTransactions={filteredTransactions} onAddVendor={() => setShowAddVendor(true)} />;
     } else if (activeView === "payments") {
@@ -1587,41 +1587,6 @@ export default function App() {
         />
         {content}
       </main>
-
-      {/* Real-time Synchronized Mobile Device Simulator Panel */}
-      {showMobileSync && (
-        <aside
-          style={{
-            padding: "20px",
-            backgroundColor: "rgba(15, 23, 42, 0.95)",
-            borderLeft: "1px solid rgba(255, 255, 255, 0.08)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "12px",
-            boxShadow: "-10px 0 30px rgba(0,0,0,0.3)",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", width: "100%", alignItems: "center", padding: "0 8px" }}>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: "#10B981", textTransform: "uppercase", letterSpacing: "0.8px" }}>
-              ● Real-Time Mobile Sync
-            </span>
-            <button
-              onClick={() => setShowMobileSync(false)}
-              style={{ background: "none", border: "none", color: "#94A3B8", cursor: "pointer", fontSize: "14px" }}
-              title="Close Mobile Panel"
-            >
-              ✕
-            </button>
-          </div>
-          <MobileSyncSimulator
-            overviewData={overview}
-            activeTrip={activeTrip}
-            onRefreshData={handleRefresh}
-          />
-        </aside>
-      )}
     </div>
   );
 }
