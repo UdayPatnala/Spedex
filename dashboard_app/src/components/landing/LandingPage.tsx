@@ -26,8 +26,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDashboard }) =
         overflowX: 'hidden',
       }}
     >
-      {/* Light Theme Inline Animation Styles */}
+      {/* Light Theme & Typography Synchronization Styles */}
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Sora:wght@400;500;600;700;800&display=swap');
+        
+        .font-serif {
+          font-family: 'Cormorant Garamond', serif;
+        }
+        .font-sans {
+          font-family: 'Sora', sans-serif;
+        }
         @keyframes subtleFadeUp {
           from { opacity: 0; transform: translateY(16px); }
           to { opacity: 1; transform: translateY(0); }
@@ -103,10 +111,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDashboard }) =
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <img src="/spedex-mark.svg" alt="Spedex Logo" style={{ width: '34px', height: '34px' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '22px', fontWeight: 800, color: '#0F172A', letterSpacing: '-0.5px' }}>
+            <span className="font-serif" style={{ fontSize: '26px', fontWeight: 700, color: '#0F172A', letterSpacing: '-0.5px' }}>
               Spedex
             </span>
             <span
+              className="font-sans"
               style={{
                 fontSize: '10px',
                 fontWeight: 700,
@@ -182,20 +191,22 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDashboard }) =
         </div>
 
         <h1
+          className="font-serif"
           style={{
-            fontSize: '52px',
-            fontWeight: 800,
-            lineHeight: 1.15,
-            letterSpacing: '-1.5px',
+            fontSize: '58px',
+            fontWeight: 700,
+            lineHeight: 1.12,
+            letterSpacing: '-1px',
             color: '#0F172A',
             margin: '0 0 20px 0',
           }}
         >
           The Elegant Smart Wallet for <br />
-          <span style={{ color: '#CF3082' }}>Modern Personal Finance</span>
+          <span style={{ color: '#CF3082', fontStyle: 'normal' }}>Modern Personal Finance</span>
         </h1>
 
         <p
+          className="font-sans"
           style={{
             fontSize: '18px',
             color: '#475569',
@@ -280,13 +291,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDashboard }) =
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
             <div style={{ backgroundColor: '#F8FAFC', padding: '20px', borderRadius: '16px', border: '1px solid rgba(15, 23, 42, 0.06)' }}>
               <div style={{ fontSize: '11px', fontWeight: 700, color: '#64748B', textTransform: 'uppercase' }}>MONTHLY OUTLOOK</div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#CF3082', margin: '4px 0' }}>₹14,250</div>
+              <div className="font-serif" style={{ fontSize: '32px', fontWeight: 700, color: '#CF3082', margin: '4px 0' }}>₹14,250</div>
               <div style={{ fontSize: '12px', color: '#059669', fontWeight: 700 }}>68% of monthly limit used</div>
             </div>
 
             <div style={{ backgroundColor: '#EDE9FE', padding: '20px', borderRadius: '16px', border: '1px solid rgba(124, 58, 237, 0.15)' }}>
               <div style={{ fontSize: '11px', fontWeight: 800, color: '#7C3AED', textTransform: 'uppercase' }}>ACTIVE TRIP</div>
-              <div style={{ fontSize: '18px', fontWeight: 800, color: '#0F172A', margin: '4px 0' }}>✈️ Goa Beach Weekend</div>
+              <div className="font-serif" style={{ fontSize: '22px', fontWeight: 700, color: '#0F172A', margin: '4px 0' }}>✈️ Goa Beach Weekend</div>
               <div style={{ fontSize: '12px', color: '#475569' }}>Total: ₹8,400 | Cash Spent: ₹3,200</div>
             </div>
 
@@ -317,7 +328,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDashboard }) =
           <span style={{ fontSize: '12px', fontWeight: 800, color: '#CF3082', textTransform: 'uppercase', letterSpacing: '1.2px' }}>
             CORE CAPABILITIES
           </span>
-          <h2 style={{ fontSize: '34px', fontWeight: 800, color: '#0F172A', marginTop: '8px', letterSpacing: '-0.5px' }}>
+          <h2 className="font-serif" style={{ fontSize: '40px', fontWeight: 700, color: '#0F172A', marginTop: '8px', letterSpacing: '-0.5px' }}>
             Designed for Financial Clarity
           </h2>
           <p style={{ fontSize: '16px', color: '#475569', maxWidth: '560px', margin: '10px auto 0 auto' }}>
@@ -330,7 +341,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDashboard }) =
             <div style={{ width: '42px', height: '42px', borderRadius: '12px', backgroundColor: '#FBEAF4', color: '#CF3082', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', marginBottom: '16px' }}>
               ⚡
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A', margin: '0 0 8px 0' }}>Instant UPI Quick Pay</h3>
+            <h3 className="font-serif" style={{ fontSize: '22px', fontWeight: 700, color: '#0F172A', margin: '0 0 8px 0' }}>Instant UPI Quick Pay</h3>
             <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, margin: 0 }}>
               1-tap payment initiation with auto-generated QR codes for your frequent daily merchants.
             </p>
@@ -340,7 +351,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDashboard }) =
             <div style={{ width: '42px', height: '42px', borderRadius: '12px', backgroundColor: '#EDE9FE', color: '#7C3AED', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', marginBottom: '16px' }}>
               ✈️
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A', margin: '0 0 8px 0' }}>Active Trips Ledger</h3>
+            <h3 className="font-serif" style={{ fontSize: '22px', fontWeight: 700, color: '#0F172A', margin: '0 0 8px 0' }}>Active Trips Ledger</h3>
             <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, margin: 0 }}>
               Dedicated cash and card expense tracker for vacations with category breakdown summaries.
             </p>
@@ -350,7 +361,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDashboard }) =
             <div style={{ width: '42px', height: '42px', borderRadius: '12px', backgroundColor: '#E0F2FE', color: '#0284C7', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', marginBottom: '16px' }}>
               🎯
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A', margin: '0 0 8px 0' }}>Budget Guardrails</h3>
+            <h3 className="font-serif" style={{ fontSize: '22px', fontWeight: 700, color: '#0F172A', margin: '0 0 8px 0' }}>Budget Guardrails</h3>
             <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, margin: 0 }}>
               Set monthly category limits across Dining, Rent, and Subscriptions with live pace indicators.
             </p>
@@ -360,7 +371,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDashboard }) =
             <div style={{ width: '42px', height: '42px', borderRadius: '12px', backgroundColor: '#D1FAE5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', marginBottom: '16px' }}>
               📈
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: 700, color: '#0F172A', margin: '0 0 8px 0' }}>Financial Analytics</h3>
+            <h3 className="font-serif" style={{ fontSize: '22px', fontWeight: 700, color: '#0F172A', margin: '0 0 8px 0' }}>Financial Analytics</h3>
             <p style={{ fontSize: '14px', color: '#475569', lineHeight: 1.6, margin: 0 }}>
               Visualize weekly spending curves, peak day metrics, and upcoming subscription bill reminders.
             </p>
@@ -382,7 +393,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDashboard }) =
           <span style={{ fontSize: '11px', fontWeight: 800, color: '#059669', textTransform: 'uppercase', letterSpacing: '1.2px' }}>
             LIVE DEMONSTRATION
           </span>
-          <h3 style={{ fontSize: '24px', fontWeight: 800, color: '#0F172A', margin: '6px 0 24px 0' }}>
+          <h3 className="font-serif" style={{ fontSize: '28px', fontWeight: 700, color: '#0F172A', margin: '6px 0 24px 0' }}>
             Simulate Quick Payment
           </h3>
 
@@ -436,7 +447,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDashboard }) =
       >
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '10px', marginBottom: '12px' }}>
           <img src="/spedex-mark.svg" alt="Spedex Logo" style={{ width: '24px', height: '24px' }} />
-          <span style={{ fontSize: '16px', fontWeight: 800, color: '#0F172A' }}>Spedex Smart Wallet</span>
+          <span className="font-serif" style={{ fontSize: '20px', fontWeight: 700, color: '#0F172A' }}>Spedex Smart Wallet</span>
         </div>
         <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 16px 0' }}>
           © 2026 SpeDex Inc. All rights reserved. ● Enterprise Personal Financial Workspace.
