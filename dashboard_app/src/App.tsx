@@ -3,6 +3,7 @@ import QRCode from "react-qr-code";
 
 import { addVendor, getCurrentUser, loadDashboardBundle, login, setAuthToken, signUp, updateProfile, warmUpBackend, getTrips, startTrip, getTripDetails, completeTrip, addManualTransaction } from "./api";
 import { MobileSyncSimulator } from "./components/mobile/MobileSyncSimulator";
+import { LandingPage } from "./components/landing/LandingPage";
 import type {
   AnalyticsData,
   BudgetScreenData,
@@ -14,7 +15,7 @@ import type {
   TripDetails,
 } from "./types";
 
-type ViewId = "home" | "payments" | "analytics" | "budget" | "settings" | "trips";
+type ViewId = "landing" | "home" | "payments" | "analytics" | "budget" | "settings" | "trips";
 type AuthMode = "login" | "signup";
 
 const STORAGE_KEY = "spedex.dashboard.session";
@@ -26,6 +27,7 @@ const navItems: Array<{ id: ViewId; label: string; icon: string }> = [
   { id: "analytics", label: "Signals", icon: "insights" },
   { id: "budget", label: "Budgets", icon: "calendar_month" },
   { id: "settings", label: "Profile", icon: "settings" },
+  { id: "landing", label: "Landing Page", icon: "public" },
 ];
 
 const categoryMeta: Record<string, { emoji: string; icon: string }> = {
@@ -1553,7 +1555,9 @@ export default function App() {
   const isDashboardLoading = !overview || !vendors || !budget || !analytics;
 
   if (!isDashboardLoading) {
-    if (activeView === "home") {
+    if (activeView === "landing") {
+      content = <LandingPage onLaunchDashboard={() => setActiveView("home")} onOpenMobileSync={() => setShowMobileSync(true)} />;
+    } else if (activeView === "home") {
       content = <HomeView overview={overview!} filteredTransactions={filteredTransactions} onAddVendor={() => setShowAddVendor(true)} />;
     } else if (activeView === "payments") {
       content = <PaymentsView vendors={vendors!} onAddVendor={() => setShowAddVendor(true)} />;

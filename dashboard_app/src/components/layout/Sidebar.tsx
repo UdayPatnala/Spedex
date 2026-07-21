@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type TabId = 'overview' | 'trips' | 'vendors' | 'budget' | 'analytics' | 'reminders' | 'settings';
+export type TabId = 'landing' | 'overview' | 'trips' | 'vendors' | 'budget' | 'analytics' | 'reminders' | 'settings';
 
 export interface SidebarProps {
   activeTab: TabId;
@@ -18,6 +18,7 @@ const NAV_ITEMS: Array<{ id: TabId; label: string; icon: string }> = [
   { id: 'analytics', label: 'Analytics', icon: '📈' },
   { id: 'reminders', label: 'Reminders', icon: '🔔' },
   { id: 'settings', label: 'Settings', icon: '⚙️' },
+  { id: 'landing', label: 'Landing Page', icon: '🌐' },
 ];
 
 export const Sidebar: React.FC<SidebarProps> = ({
