@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 24,
     fontWeight: "800",
-    color: colors.onBackground,
+    color: colors.onSurface,
   },
   headerSubtitle: {
     fontSize: 13,
@@ -496,7 +496,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: "700",
-    color: colors.onBackground,
+    color: colors.onSurface,
     marginBottom: 10,
   },
   breakdownRow: {

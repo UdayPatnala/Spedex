@@ -11,6 +11,7 @@ import type {
   Transaction,
   Vendor,
   VendorDirectoryData,
+  SpedexUser,
   Trip,
   TripDetails,
 } from "./types";
@@ -1004,7 +1005,7 @@ function TripsView() {
                     <div key={tx.id} className="transaction-row">
                       <div className="icon-badge">
                         <span className="emoji-glyph">
-                          {tx.paymentMethod === "CASH" ? "💵" : "📱"}
+                          {tx.payment_method === "CASH" ? "💵" : "📱"}
                         </span>
                       </div>
                       <div className="flex-1">
@@ -1016,7 +1017,7 @@ function TripsView() {
                         </div>
                         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
                           <span className="subtle">{categoryLabel(tx.category)}</span>
-                          <span className="subtle">{formatDate(tx.occurredAt)}</span>
+                          <span className="subtle">{formatDate(tx.occurred_at)}</span>
                         </div>
                       </div>
                     </div>
@@ -1033,7 +1034,7 @@ function TripsView() {
               <div className="trip-right card">
                 <h3 className="section-title text-sm" style={{ marginBottom: 12 }}>Category Breakdown</h3>
                 <div className="trip-category-list">
-                  {tripDetails.categoryBreakdown.map((item) => (
+                  {tripDetails.category_breakdown.map((item) => (
                     <div key={item.category} className="category-progress-item">
                       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
                         <span>{categoryLabel(item.category)}</span>
@@ -1045,7 +1046,7 @@ function TripsView() {
                     </div>
                   ))}
 
-                  {tripDetails.categoryBreakdown.length === 0 && (
+                  {tripDetails.category_breakdown.length === 0 && (
                     <p className="subtle text-center" style={{ padding: "20px 0" }}>
                       No category metrics available.
                     </p>
@@ -1612,6 +1613,16 @@ export default function App() {
         />
         {content}
       </main>
+      {showMobileSync && (
+        <aside style={{ padding: "20px", display: "flex", alignItems: "center", justifyContent: "center", borderLeft: "1px solid rgba(255,255,255,0.08)", backgroundColor: "#0b0f19" }}>
+          <MobileSyncSimulator
+            overviewData={overview}
+            activeTrip={activeTrip}
+            onRefreshData={handleRefresh}
+            budgetData={budget}
+          />
+        </aside>
+      )}
     </div>
   );
 }

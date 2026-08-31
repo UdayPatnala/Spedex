@@ -5,7 +5,7 @@ import unittest
 import urllib.error
 import urllib.request
 
-API_BASE = "http://localhost:8080/api"
+API_BASE = "http://127.0.0.1:8080/api"
 
 def make_request(path, method="GET", headers=None, body=None):
     url = f"{API_BASE}{path}"

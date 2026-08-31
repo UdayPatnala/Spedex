@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import type { DashboardOverview, Trip, TripDetails } from '../../types';
-import { getTrips, getTripDetails, startTrip, addManualTransaction, completeTrip } from '../../api';
+import type { DashboardOverview, Trip, TripDetails, BudgetScreenData } from '../../types';
+import { getTrips, getTripDetails, startTrip, addManualTransaction, completeTrip, preparePayment, completePayment, updateReminder } from '../../api';
 
 export interface MobileSyncSimulatorProps {
   overviewData: DashboardOverview | null;
   activeTrip: Trip | null;
   onRefreshData: () => void;
+  budgetData?: BudgetScreenData | null;
 }
 
 export const MobileSyncSimulator: React.FC<MobileSyncSimulatorProps> = ({
   overviewData,
   activeTrip,
   onRefreshData,
+  budgetData,
 }) => {
   const [activeTab, setActiveTab] = useState<'home' | 'trips' | 'payments' | 'budget' | 'reminders'>('home');
   const [tripDetails, setTripDetails] = useState<TripDetails | null>(null);
@@ -40,6 +42,42 @@ export const MobileSyncSimulator: React.FC<MobileSyncSimulatorProps> = ({
     setSyncStatus(msg);
     onRefreshData();
     setTimeout(() => setSyncStatus('Live Sync Active'), 3000);
+  };
+
+  const handleQuickPay = async (vendor: any) => {
+    setActionLoading(true);
+    try {
+      const prepared = await preparePayment({
+        vendor_id: vendor.id,
+        amount: vendor.default_amount,
+        upi_handle: vendor.upi_handle,
+        payee_name: vendor.name,
+      });
+      await completePayment(prepared.transaction.id, 'success');
+      triggerRealtimeSync(`Paid ₹${vendor.default_amount} to ${vendor.name}`);
+    } catch (e: any) {
+      alert(e.message || 'Failed to complete payment');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handlePayReminder = async (reminder: any) => {
+    setActionLoading(true);
+    try {
+      const prepared = await preparePayment({
+        amount: reminder.amount,
+        payee_name: reminder.title,
+        upi_handle: 'reminder.pay@upi',
+      });
+      await completePayment(prepared.transaction.id, 'success');
+      await updateReminder(reminder.id, { status: 'PAID' });
+      triggerRealtimeSync(`Paid reminder: ${reminder.title}`);
+    } catch (e: any) {
+      alert(e.message || 'Failed to pay reminder');
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const handleStartTrip = async () => {
@@ -264,11 +302,78 @@ export const MobileSyncSimulator: React.FC<MobileSyncSimulatorProps> = ({
                     <div style={{ fontSize: '12px', fontWeight: 700, color: '#FFF' }}>{v.name}</div>
                     <div style={{ fontSize: '10px', color: '#94A3B8' }}>{v.upi_handle}</div>
                   </div>
-                  <button onClick={() => triggerRealtimeSync(`Paid ₹${v.default_amount} to ${v.name}`)} style={{ backgroundColor: '#10B981', color: '#FFF', border: 'none', padding: '5px 10px', borderRadius: '6px', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>
+                  <button onClick={() => handleQuickPay(v)} style={{ backgroundColor: '#10B981', color: '#FFF', border: 'none', padding: '5px 10px', borderRadius: '6px', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}>
                     Pay ₹{v.default_amount}
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+        {activeTab === 'budget' && (
+          <div>
+            <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#F8FAFC', marginBottom: '12px' }}>Weekly Index</h3>
+            <div style={{ backgroundColor: 'rgba(30, 41, 59, 0.8)', padding: '14px', borderRadius: '16px', border: '1px solid rgba(255, 255, 255, 0.08)', marginBottom: '14px' }}>
+              <span style={{ fontSize: '10px', color: '#94A3B8' }}>Remaining Budget</span>
+              <h2 style={{ margin: '2px 0', fontSize: '20px', fontWeight: 800, color: '#10B981' }}>
+                ₹{budgetData ? Math.round(budgetData.remaining_budget).toLocaleString() : 0}
+              </h2>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {budgetData?.budgets?.map((b) => (
+                <div key={b.id} style={{ backgroundColor: 'rgba(30, 41, 59, 0.4)', padding: '10px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#FFF' }}>{b.category}</span>
+                    <span style={{ fontSize: '10px', color: '#94A3B8' }}>₹{b.spent} / ₹{b.limit_amount}</span>
+                  </div>
+                  <div style={{ height: '4px', backgroundColor: 'rgba(255, 255, 255, 0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${Math.min((b.progress || 0) * 100, 100)}%`, backgroundColor: '#38BDF8', borderRadius: '2px' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {budgetData?.savings_tip && (
+              <div style={{ marginTop: '14px', backgroundColor: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', padding: '10px', borderRadius: '10px', fontSize: '10px', color: '#F59E0B' }}>
+                💡 Tip: {budgetData.savings_tip}
+              </div>
+            )}
+          </div>
+        )}
+        {activeTab === 'reminders' && (
+          <div>
+            <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 800, color: '#F8FAFC', marginBottom: '12px' }}>Upcoming Reminders</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {(overviewData?.reminders || []).length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '20px', color: '#64748B', fontSize: '12px' }}>
+                  No upcoming reminders.
+                </div>
+              ) : (
+                overviewData?.reminders.map((r) => {
+                  const isPaid = r.status.toLowerCase() === 'paid' || r.status.toLowerCase() === 'completed';
+                  return (
+                    <div key={r.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(30, 41, 59, 0.6)', padding: '10px', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                      <div>
+                        <div style={{ fontSize: '12px', fontWeight: 700, color: '#FFF' }}>{r.title}</div>
+                        <div style={{ fontSize: '10px', color: '#94A3B8' }}>Due: {new Date(r.due_date).toLocaleDateString()}</div>
+                        <div style={{ fontSize: '10px', color: '#38BDF8' }}>Amount: ₹{r.amount}</div>
+                      </div>
+                      {isPaid ? (
+                        <span style={{ fontSize: '10px', fontWeight: 700, color: '#10B981', backgroundColor: 'rgba(16,185,129,0.1)', padding: '4px 8px', borderRadius: '6px' }}>Paid</span>
+                      ) : (
+                        <button
+                          onClick={() => handlePayReminder(r)}
+                          disabled={actionLoading}
+                          style={{ backgroundColor: '#6366F1', color: '#FFF', border: 'none', padding: '5px 10px', borderRadius: '6px', fontSize: '10px', fontWeight: 700, cursor: 'pointer' }}
+                        >
+                          Pay
+                        </button>
+                      )}
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         )}
@@ -355,6 +460,14 @@ export const MobileSyncSimulator: React.FC<MobileSyncSimulatorProps> = ({
         <button onClick={() => setActiveTab('payments')} style={{ background: 'none', border: 'none', color: activeTab === 'payments' ? '#38BDF8' : '#64748B', fontSize: '10px', fontWeight: 700, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <span>⚡</span>
           <span>Pay</span>
+        </button>
+        <button onClick={() => setActiveTab('budget')} style={{ background: 'none', border: 'none', color: activeTab === 'budget' ? '#38BDF8' : '#64748B', fontSize: '10px', fontWeight: 700, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <span>📅</span>
+          <span>Budget</span>
+        </button>
+        <button onClick={() => setActiveTab('reminders')} style={{ background: 'none', border: 'none', color: activeTab === 'reminders' ? '#38BDF8' : '#64748B', fontSize: '10px', fontWeight: 700, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <span>🔔</span>
+          <span>Alerts</span>
         </button>
       </div>
     </div>

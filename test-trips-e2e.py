@@ -29,7 +29,7 @@ def main():
     )
 
     # Wait for the backend health check to succeed
-    health_url = "http://localhost:8080/api/health"
+    health_url = "http://127.0.0.1:8080/api/health"
     if not wait_for_backend(health_url):
         print("Error: Mock backend failed to start in time.")
         backend_proc.terminate()

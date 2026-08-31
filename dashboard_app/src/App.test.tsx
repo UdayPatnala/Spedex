@@ -1,4 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import App from "./App";
 import * as api from "./api";
@@ -58,6 +59,6 @@ describe("App Workspace Direct Access (Login Page Removed)", () => {
       expect(screen.getByText(/Recent Transactions/i)).toBeInTheDocument();
     });
 
-    expect(screen.getByText(/Quick Pay/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Quick Pay/i).length).toBeGreaterThan(0);
   });
 });

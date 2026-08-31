@@ -10,6 +10,7 @@ import type {
   ReminderMutationResponse,
   RemindersScreenData,
   SpedexUser,
+  Transaction,
   Trip,
   TripDetails,
   Vendor,

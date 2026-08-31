@@ -10,6 +10,7 @@ import type {
   Trip,
   TripDetails,
   Transaction,
+  Reminder,
 } from "./types";
 
 const RENDER_API = "https://spedex.onrender.com/api";
@@ -166,4 +167,39 @@ export function addManualTransaction(id: number, payload: { amount: number; desc
     body: JSON.stringify(payload),
   });
 }
+
+export function preparePayment(payload: { vendor_id?: number; amount: number; upi_handle?: string; payee_name?: string }) {
+  return request<{ transaction: Transaction; upi_url: string; redirect_message: string }>("/payments/prepare", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function completePayment(transactionId: number, status: string) {
+  return request<any>(`/payments/${transactionId}/complete`, {
+    method: "POST",
+    body: JSON.stringify({ status }),
+  });
+}
+
+export function addReminder(payload: { title: string; subtitle?: string; upi_handle?: string; amount: number; due_date: string; autopay_enabled?: boolean }) {
+  return request<{ status: string; reminder: Reminder }>("/mobile/reminders", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updateReminder(id: number, payload: { title?: string; subtitle?: string; upi_handle?: string; amount?: number; due_date?: string; autopay_enabled?: boolean; status?: string }) {
+  return request<{ status: string; reminder: Reminder }>(`/mobile/reminders/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteReminder(id: number) {
+  return request<{ status: string; deleted_id: number }>(`/mobile/reminders/${id}`, {
+    method: "DELETE",
+  });
+}
+
 
