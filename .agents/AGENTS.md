@@ -1,204 +1,226 @@
-# UNIVERSAL PRODUCT-FIRST ENGINEERING SYSTEM: SPEDEX
+# UNIVERSAL PRODUCT REVERSE-ENGINEERING + ENGINEERING SYSTEM: SPEDEX
 
-## Master Operational Philosophy: Product Intent Recovery First
+## Master Operational Paradigm: The Three Realities
 
 ```text
-                 PREVIOUS CHATS & DISCUSSIONS
-                              │
-               ┌──────────────┼──────────────┐
-               ↓              ↓              ↓
-             MOTIVE         VISION       DECISIONS
-               │              │              │
-               └──────────────┼──────────────┘
-                              ↓
-                      PRODUCT DEFINITION
-                              │
-                  ┌───────────┼───────────┐
-                  ↓           ↓           ↓
-               WHAT IT      WHAT IT      WHAT IT
-               MUST BE      CAN BE       MUST NOT BE
-                  │           │           │
-                  └───────────┼───────────┘
-                              ↓
-                      CURRENT PROJECT
-                              │
-                      ┌───────┴───────┐
-                      ↓               ↓
-                  GIT HISTORY      FILES/CODE
-                      │               │
-                      └───────┬───────┘
-                              ↓
-                        GAP ANALYSIS
-                              ↓
-                  MISSING / CORRECT / EXTRA
-                              ↓
-                        DECISION MAKING
-                              ↓
-                        IMPLEMENTATION
+1. WHAT WE INTENDED
+   ↓
+   motive / vision / conversations / decisions
+
+2. WHAT WE ACTUALLY BUILT
+   ↓
+   reverse engineering / code / files / runtime / deployment / git
+
+3. WHAT WE SHOULD DO NEXT
+   ↓
+   gap analysis / correction / simplification / implementation
 ```
 
+---
+
+## Architectural Evolution Reconstruction Model
+
+```text
+              ┌──────────────────────┐
+              │   ALL CONVERSATIONS  │
+              └──────────┬───────────┘
+                         ↓
+              ┌──────────────────────┐
+              │ MOTIVE + VISION      │
+              │ PURPOSE + IDENTITY   │
+              └──────────┬───────────┘
+                         ↓
+              ┌──────────────────────┐
+              │ PREVIOUS DECISIONS   │
+              └──────────┬───────────┘
+                         │
+                         │
+     ┌───────────────────┴───────────────────┐
+     │                                       │
+     ↓                                       ↓
+┌───────────────┐                    ┌────────────────┐
+│ REVERSE       │                    │ GIT + HISTORY  │
+│ ENGINEER      │◄──────────────────►│ RECONSTRUCTION │
+│ CURRENT CODE  │                    └────────────────┘
+└───────┬───────┘
+        ↓
+┌─────────────────────────────┐
+│ CURRENT PRODUCT MODEL       │
+│                             │
+│ what exists                 │
+│ what works                  │
+│ what doesn't                │
+│ how it works                │
+│ why it probably works       │
+│ architecture               │
+│ UX                          │
+│ data                        │
+│ deployment                  │
+└─────────────┬───────────────┘
+              ↓
+       ┌──────────────┐
+       │ RECONCILE    │
+       └──────┬───────┘
+              ↓
+ ┌─────────────────────────────┐
+ │ INTENDED   ↔   ACTUAL       │
+ │                             │
+ │ missing                     │
+ │ incorrect                   │
+ │ overbuilt                   │
+ │ broken                      │
+ │ drifted                     │
+ │ risky                       │
+ └─────────────┬───────────────┘
+               ↓
+        RESEARCH + DECISION
+               ↓
+          SAFE VERSION
+               ↓
+         IMPLEMENTATION
+               ↓
+          VERIFICATION
+               ↓
+        HISTORY UPDATE
+```
+
+> **THE FOUR FOUNDATIONAL AXIOMS**:
+> 1. **Conversation history** tells us what was wanted.
+> 2. **Reverse engineering** tells us what actually exists.
+> 3. **Git** tells us how it got there.
+> 4. **Comparison & reconciliation** tells us what needs to happen next.
+>
 > **NON-NEGOTIABLE RULE**:
 > **Never let the current codebase overwrite the project's historical product intent. Reconcile the code with the intent.**
->
-> The code is only one representation of the product—it may be incomplete, outdated, overbuilt, or drifted. The product intent accumulated across conversations, motives, decisions, and lessons is the foundational truth.
 
 ---
 
-## Core Product-First Hierarchy
+## Absolute Order of Operations (0–29)
 
-```text
-CONVERSATIONS / DISCUSSIONS
-        ↓
-MOTIVE
-        ↓
-VISION
-        ↓
-PURPOSE
-        ↓
-PRODUCT IDENTITY
-        ↓
-INTENDED USER EXPERIENCE
-        ↓
-AGREED FEATURES + BEHAVIOR
-        ↓
-CONSTRAINTS + "DO NOT" DECISIONS
-        ↓
-CURRENT IMPLEMENTATION
-        ↓
-GIT / VERSION HISTORY
-        ↓
-RESEARCH
-        ↓
-ENGINEERING DECISIONS
-        ↓
-IMPLEMENTATION
-        ↓
-VERIFICATION
-        ↓
-UPDATED PRODUCT
-```
+### 0. Absolute Order of Operations
+`NEVER START BY CODING.`
+`A. RECOVER PRODUCT INTENT → B. REVERSE ENGINEER CURRENT PRODUCT → C. RECONCILE INTENT VS IMPLEMENTATION → D. IDENTIFY GAPS/EXCESS/RISKS/DRIFT → E. RESEARCH → F. MAKE DECISIONS → G. PLAN → H. PRESERVE SAFE VERSION → I. IMPLEMENT → J. VERIFY → K. AUDIT → L. UPDATE HISTORY → M. PRESERVE NEW KNOWN-GOOD VERSION`.
 
----
+### 1. Product Intent Recovery
+Recover original motive, product purpose, vision, intended users, intended visual language, agreed/rejected/deferred features, previous architecture decisions, and explicit prohibitions.
 
-## Four-Layer Project Memory Architecture
+### 2. Reverse Engineer What Has Actually Been Built
+Inspect before changing:
+- **2.1 Project Structure**: Directories, packages, modules, configurations, assets, scripts.
+- **2.2 Technology Stack**: Actual runtime dependencies vs manifest claims.
+- **2.3 Application Architecture**: Entry points, routing, server/client boundaries, state flow.
+- **2.4 User Experience Flow**: Trace real user journeys (start $\rightarrow$ action $\rightarrow$ UI $\rightarrow$ state $\rightarrow$ API $\rightarrow$ data $\rightarrow$ result).
+- **2.5 UI Reverse Engineering**: Component hierarchy, typography, colors, responsive behavior, dead/fake/placeholder UI.
+- **2.6 Data Model**: Schemas, entities, relationships, persistence, lifecycle, deletions.
+- **2.7 Dependency Graph**: Usage, dead dependencies, bloat, security risks.
+- **2.8 Performance Model**: Bundles, waterfalls, re-renders, memory, timers.
 
-Cross-check all four layers before initiating and after completing any task:
+### 3. Git-Based Reverse Engineering
+Use Git as a historical reconstruction engine. Trace how the project evolved, what was added/removed/reverted, and where regressions originated.
 
-```text
-LAYER 1 — PRODUCT INTENT & CONVERSATIONAL MEMORY
-Previous chats | Motive | Vision | Purpose | Intended UX | Agreed features | Rejected/deferred ideas | Prohibitions
-        ↓
-LAYER 2 — ENGINEERING MEMORY
-docs/VERSION_HISTORY.md | docs/EXECUTION_HISTORY.md | docs/ARCHITECTURE.md | docs/PROJECT_STATUS.md | Lessons | Decisions
-        ↓
-LAYER 3 — HISTORICAL SOURCE OF TRUTH
-Git commits | Complete git log | Branches | Tags | Prior reverts | Abandoned approaches | Known-good baselines
-        ↓
-LAYER 4 — ACTUAL RUNTIME STATE
-Working tree | Current code | Dependencies | Build configuration | Test suites | Deployment | Runtime behavior
-```
+### 4. Documentation Reverse Engineering
+Compare `README.md`, `VERSION_HISTORY.md`, `EXECUTION_HISTORY.md`, `ARCHITECTURE.md`, `PROJECT_STATUS.md` against actual code. Identify documented-but-not-implemented and implemented-but-not-documented drift.
 
----
+### 5. Build the Current-State Model
+Categorize reality: What exists, what works, what partially works, what is broken, what is dead, what is fragile, what is over-engineered.
 
-## Product Intent Invariants: SpeDex
+### 6. Reconcile Three States
+- **State A vs State B** $\rightarrow$ Product Drift Analysis.
+- **State B vs State C** $\rightarrow$ Implementation Impact Analysis.
+- **State A vs State C** $\rightarrow$ Product Alignment Analysis.
 
-### 1. Product Motive & Vision
-- **Why SpeDex Exists**: To deliver high-frequency personal expense tracking, automated multi-session trip ledgers, and financial velocity analytics without invasive telemetry or custodial security liabilities.
-- **Fintech Philosophy**: Non-custodial utility. SpeDex never acts as a bank or custodial intermediary; it provides personal financial intelligence and friction-free tracking.
+### 7. Product Drift Analysis
+Audit for feature creep, generic UI, lost functionality, wrong terminology, or temporary code made permanent.
 
-### 2. Product Identity & Design Language
-- **Indian Rupee (INR) Aesthetic**: Curated banknote palette (Deep Emerald Note Green `#0d2818`/`#164223`, Accent Gold `#d4af37`, Warm Sand Base `#fdfbf7`).
-- **Typography**: `Cormorant Garamond` (classic elegance, currency heritage for headings) + `Sora` (crisp modern clarity for data, numbers, tables, and controls).
-- **Anti-Vibe-Code Mandate**: Zero dead buttons, placeholder copy, fake metrics, or unlinked controls. Real rupee symbols (`₹`) and authentic velocity analytics.
+### 8. Gap Analysis
+Determine: Missing, Incorrect, Unnecessary, Broken, Risky, and Unknown areas.
 
-### 3. Legal & Regulatory Non-Negotiables
-- **DPDP Act 2023 & DPDP Rules 2025 Compliance**:
-  - Minors (<18 years): Verifiable parental consent mandatory; behavioral tracking and targeted profiling permanently disabled.
-  - Consent Management: Granular opt-in/opt-out across functional, analytics, and marketing categories.
-  - User Rights: Full machine-readable data export (`GET /api/privacy/export`), irreversible account erasure (`POST /api/privacy/erase`), and grievance redressal SLA tracking.
+### 9. Feature Forensics
+Why does it exist? When was it introduced? What problem does it solve? What files implement it? Does it match the vision? Should it remain?
 
-### 4. Security & Tenant Isolation
-- **IDOR Prevention**: All queries strictly filtered by authenticated `user_id`. Unauthorized cross-tenant access returns `403 Forbidden`.
-- **Zero Credential Storage**: Never store banking passwords, UPI MPINs, or debit/credit card credentials.
-- **Stateless Authentication**: Passwords hashed with BCrypt; all client requests authenticated via JWT Bearer tokens.
+### 10. Research
+Research only after intent and implementation are understood. Answer: What is possible? What is appropriate? What fits *this* product?
 
-### 5. Mandatory 4-Part Verification Standard
-Before declaring any task, feature, or refactor complete:
-1. **Backend**: `./mvnw.cmd test` in `backend/` (49/49 tests passing).
-2. **Dashboard**: `npm test -- --run` and `npm run build` in `dashboard_app/` (9/9 tests passing, 0 build/type errors).
-3. **Mobile**: `npm test` and `npx tsc --noEmit` in `mobile/` (7/7 tests passing, 0 type errors).
-4. **Root E2E**: `python test-trips-e2e.py` (77/77 tests passing).
+### 11. Decision Making
+Motive + Vision + Intent + Current Implementation + Constraints $\rightarrow$ Simplest intent-aligned path.
 
----
+### 12. Simple Working Model First
+Build a working baseline first, verify it, preserve it, and only then optimize.
 
-## Universal Product-First Engineering Protocols (1–23)
+### 13. Safe Version Protocol
+Preserve recoverable checkpoints (`git commit`, branch, tag) before any risky modification.
 
-### 1. Product Intent is the Primary Context
-Reconstruct the project's intended identity from all available previous conversations and project discussions before modifying code. Extract motive, vision, intended feel, terminology, accepted tradeoffs, and explicit prohibitions.
+### 14. Implementation
+Incremental, targeted changes. Prefer surgical refactoring over speculative rewrites.
 
-### 2. Build a Product Intent Model
-Construct an internal model: Motive, Purpose, Vision, Identity, Principles, User Experience, Functional Model, Visual Model, Technical Model, Constraint Model, and Future Model.
+### 15. If Direct Solution Fails
+Diagnose why. Find alternative architectures, platform-native capabilities, compatibility layers, or approximations.
 
-### 3. Conversations Are Not Just Reference Material
-Search conversations to discover features discussed but not yet implemented, features intentionally removed, design references, and reasons for architectural decisions. Never assume "not present in code = not required" or "present in code = intended."
+### 16. Free-First Constraint
+Zero-budget baseline. Leverage open-source, local tooling, native browser/platform capabilities.
 
-### 4. Distinguish Intent from Implementation
-For every feature, compare intended vs current state. If implementation conflicts with product vision, do not blindly preserve the code; investigate and restore alignment with intent.
+### 17. Engineering Quality
+Evaluate correctness, algorithmic complexity, maintainability, accessibility, testability, and security.
 
-### 5. Product Drift Audit
-Regularly audit whether the project has drifted into generic UI, feature creep, excessive complexity, or unaligned architecture. Trace drift origins and recommend corrective simplification.
+### 18. UI / Product Authenticity
+Enforce SpeDex currency note aesthetic (`Cormorant Garamond` + `Sora`, emerald `#0d2818` / gold `#d4af37` / warm sand `#fdfbf7`). No generic AI templates or decorative noise.
 
-### 6. Missing vs Over-Applied
-Continuously evaluate both directions: What is missing (critical states, error handling, accessibility, performance, intent)? What is over-applied (excessive decoration, unneeded dependencies, premature abstraction, redundant features)?
+### 19. Security + Privacy
+DPDP Act 2023 compliance. Minor protection (<18), zero credential storage, BCrypt password hashing, and strict IDOR tenant isolation (`403 Forbidden`).
 
-### 7. Preserve the Product's Uniqueness
-Never normalize the project into a generic SaaS template. Design and interaction patterns must naturally express this specific product's motive.
+### 20. Testing + Verification Standard
+1. Backend: `./mvnw.cmd test` (49/49 passing).
+2. Dashboard: `npm test -- --run` & `npm run build` (9/9 passing, 0 build errors).
+3. Mobile: `npm test` & `npx tsc --noEmit` (7/7 passing, 0 type errors).
+4. Root E2E: `python test-trips-e2e.py` (77/77 passing).
 
-### 8. Previous Agreements Have Weight
-Explicit past decisions (required, rejected, deferred, prohibited) must not be silently reversed without explicit user direction or newly discovered technical blockers.
+### 21. Cloud & Hosting Verification
+Inspect build commands, output configurations, environment variables, and runtime logs for Vercel/Render.
 
-### 9. Motive Over Feature Count
-A feature is justified only if it strengthens the product's reason for existing. If removing a feature makes the product clearer, simpler, and more aligned, recommend removal.
+### 22. Git Safety
+Clean status checks, meaningful commit messages, no accidental files, zero committed secrets.
 
-### 10. Vision-Preserving Engineering
-Technical decisions (frameworks, libraries, schemas, caching, storage) must serve the product vision. Do not adopt technology for novelty and then force the product to fit it.
+### 23. Model / Token Efficiency
+Targeted searches, focused file reads, structural audits. Correctness over raw speed.
 
-### 11. Research the Product, Not Just the Technology
-Answer both: "What is the best technical approach?" and "Is this actually the right thing for this product?" Technical excellence applied to the wrong product requirement is waste.
+### 24. Multi-Session Continuity
+Preserve complete state, history logs, and rollback baselines across sessions.
 
-### 12. Vision-First Decision Process
-1. Recover motive and vision $\rightarrow$ 2. Recover past agreements $\rightarrow$ 3. Understand task $\rightarrow$ 4. Inspect current code and git history $\rightarrow$ 5. Identify gaps and drift $\rightarrow$ 6. Select simplest intent-aligned approach $\rightarrow$ 7. Create safe checkpoint $\rightarrow$ 8. Implement $\rightarrow$ 9. Verify $\rightarrow$ 10. Audit against vision $\rightarrow$ 11. Record history $\rightarrow$ 12. Preserve known-good state.
+### 25. Version & Execution History
+Maintain `docs/VERSION_HISTORY.md` and `docs/EXECUTION_HISTORY.md` as permanent, immutable ledgers.
 
-### 13. Before Every Feature
-Ask: Why does it exist? What user problem does it solve? Was it agreed or rejected? Does it fit the vision? What is the simplest correct implementation? How can it be reversed?
+### 26. Final Forensic Audit
+Multi-dimensional review: Product Intent, Code Quality, Architecture, UI/UX, Security, Privacy, Performance, Testing, Deployment, Git, Documentation.
 
-### 14. Before Every Bug Fix
-Ask: What should the product do? What does it do now? Did an older implementation work correctly? Is this a symptom of architectural drift? Will the fix preserve intended UX?
+### 27. Continuous Discovery & Classification
+Classify findings: P0 (Critical/Security/Data Loss), P1 (Correctness/UX/Perf), P2 (Valuable Improvement), P3 (Polish), P4 (Future Roadmap).
 
-### 15. Before Every UI Change
-Recover visual vision, UX hierarchy, and previous design decisions. Improve UI only when it strengthens alignment with the product's intended experience.
+### 28. Final Execution Loop
+`RECOVER CONVERSATIONS → RECOVER MOTIVE → RECOVER VISION → RECOVER DECISIONS → REVERSE ENGINEER CURRENT PRODUCT → INSPECT CODE/ARCHITECTURE → INSPECT RUNTIME/UX/DATA/DEPLOYMENT → INSPECT COMPLETE GIT HISTORY → INSPECT VERSION/EXECUTION HISTORY → COMPARE INTENDED VS ACTUAL → IDENTIFY DRIFT → IDENTIFY GAPS → RESEARCH → DECIDE → PLAN → PRESERVE SAFE VERSION → BUILD SIMPLE WORKING MODEL → VERIFY → REFINE → TEST → SECURITY/PRIVACY CHECK → PERF CHECK → UX CHECK → DEPLOYMENT CHECK → GIT DIFF CHECK → UPDATE HISTORY → PRESERVE KNOWN-GOOD → FINAL PRODUCT-VISION CHECK → FINISH`.
 
-### 16. Before Every Architectural Change
-Understand why the current architecture exists and what problem the new architecture solves. Ensure simplicity, maintainability, and clear rollback paths.
-
-### 17. Complete Project Memory Synthesis
-Cross-check all four sources: Previous Conversations, Project Documentation/History, Git History, and Runtime Implementation. Discrepancies between sources reveal critical engineering facts.
-
-### 18. Safe Version / Recovery Baseline
-Before any risky modification, ensure a recoverable Git checkpoint exists. Implement the simplest working solution first, verify it, preserve it, and only then optimize.
-
-### 19. "Make It Better" Does Not Mean "Add More"
-Evaluate all four paths: Add, Remove, Simplify, Restructure. The most impactful improvement is frequently simplification or removal of unnecessary complexity.
-
-### 20. Final Product-Intent Check
-Before declaring completion, ask: "If someone who participated in all original discussions inspected this result, would they recognize it as the product we intended?" Technical correctness and product alignment are both mandatory.
-
-### 21. Universal Execution Pipeline
-`PRODUCT CONTEXT → MOTIVE → VISION → PURPOSE → IDENTITY → PREVIOUS DECISIONS → CURRENT STATE → GIT HISTORY → DOCUMENTATION → GAPS → OVER-APPLICATION → RESEARCH → OPTIONS → DECISION → SAFE VERSION → SIMPLE WORKING IMPLEMENTATION → TEST → DEBUG → REFINE → SECURITY → PRIVACY → PERFORMANCE → ACCESSIBILITY → UX/UI → DEPLOYMENT → GIT VERIFICATION → PRODUCT-VISION COMPARISON → HISTORY UPDATE → PRESERVE KNOWN-GOOD VERSION → FINISH`.
-
-### 22. Most Important Rule
-**The product's motive and vision must survive every technical change.** Never allow a library, framework, refactor, optimization, or workaround to silently change what the product is supposed to be.
-
-### 23. Final Operating Principle
-Do not think: "What code should I write?"
-Think: "What was this product intended to become? What is preventing it from reaching that state? What is the safest, simplest, most efficient way to close that gap?"
+### 29. Non-Negotiable Core Principles
+1. Understand the motive before the feature.
+2. Understand the vision before the implementation.
+3. Reverse engineer the existing product before changing it.
+4. Treat conversations as accumulated product knowledge.
+5. Treat Git as historical evidence.
+6. Treat code as evidence of actual implementation, not proof of intent.
+7. Reconcile intent, history, and implementation.
+8. Search before creating.
+9. Preserve known-good versions.
+10. Build simple working versions before advanced ones.
+11. Fix root causes.
+12. Prefer reversible changes.
+13. Do not overwrite unrelated work.
+14. Do not invent product facts.
+15. Do not fabricate completion.
+16. Do not over-engineer.
+17. Do not feature-bloat.
+18. Do not introduce costs without approval.
+19. Use model/tool resources efficiently.
+20. Large work may continue across sessions.
+21. Maintain project history after every meaningful task.
+22. Always leave the project in a recoverable state.
+23. When direct implementation fails, investigate alternatives.
+24. Preserve product identity through every technical change.
+25. The ultimate question is: *"Does the resulting product move closer to the product we originally intended, while becoming more correct, maintainable, secure, efficient, and usable?"*
