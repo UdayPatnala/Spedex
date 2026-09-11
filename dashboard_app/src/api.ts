@@ -202,4 +202,52 @@ export function deleteReminder(id: number) {
   });
 }
 
+export function getLegalDocument(docType: import("./types").LegalDocType) {
+  return request<import("./types").LegalDocument>(`/privacy/legal/${docType}`);
+}
+
+export function getPrivacySettings() {
+  return request<import("./types").PrivacySettings>("/privacy/settings");
+}
+
+export function updatePrivacyConsents(payload: { analyticsConsent?: boolean; marketingConsent?: boolean }) {
+  return request<import("./types").PrivacySettings>("/privacy/consent", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function requestGuardianConsent(payload: { guardianName: string; guardianEmail: string }) {
+  return request<{ success: boolean; message: string; guardianEmail: string; verificationToken: string }>(
+    "/privacy/guardian-consent/request",
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }
+  );
+}
+
+export function exportUserData() {
+  return request<import("./types").UserDataExport>("/privacy/export");
+}
+
+export function submitGrievance(payload: { category: string; description: string }) {
+  return request<import("./types").PrivacyGrievance>("/privacy/grievance", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function getGrievances() {
+  return request<import("./types").PrivacyGrievance[]>("/privacy/grievance");
+}
+
+export function eraseUserData(payload: { confirmationText: string }) {
+  return request<{ success: boolean; message: string }>("/privacy/erase", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+
 

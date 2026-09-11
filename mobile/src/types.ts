@@ -6,12 +6,50 @@ export type SpedexUser = {
   avatar_initials: string;
   member_since: string;
   profile_picture_url?: string | null;
+  is_minor?: boolean;
+  age?: number;
+  guardian_email?: string | null;
+  guardian_name?: string | null;
+  guardian_consent_status?: string;
+  analytics_consent?: boolean;
+  marketing_consent?: boolean;
+  is_erased?: boolean;
 };
 
 export type AuthResponse = {
   access_token: string;
   token_type: "bearer";
   user: SpedexUser;
+};
+
+export type PrivacySettings = {
+  user_id: number;
+  is_minor: boolean;
+  age: number;
+  guardian_email: string | null;
+  guardian_name: string | null;
+  guardian_consent_status: "NOT_REQUIRED" | "PENDING" | "VERIFIED" | "REJECTED";
+  analytics_consent: boolean;
+  marketing_consent: boolean;
+  is_erased: boolean;
+  updated_at: string;
+};
+
+export type PrivacyGrievance = {
+  id: number;
+  ticket_number: string;
+  subject: string;
+  description: string;
+  status: "OPEN" | "IN_REVIEW" | "RESOLVED" | "REJECTED";
+  resolution_notes: string | null;
+  created_at: string;
+  resolved_at: string | null;
+};
+
+export type LegalDocument = {
+  id: string;
+  title: string;
+  content: string;
 };
 
 export type Vendor = {

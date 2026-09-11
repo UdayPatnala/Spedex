@@ -129,3 +129,63 @@ export type TripDetails = {
   category_breakdown: CategoryBreakdown[];
   transactions: Transaction[];
 };
+
+export type PrivacySettings = {
+  analyticsConsent: boolean;
+  marketingConsent: boolean;
+  isMinor: boolean;
+  age: number;
+  guardianEmail?: string | null;
+  guardianName?: string | null;
+  guardianConsentStatus: "NOT_REQUIRED" | "PENDING" | "VERIFIED" | "REJECTED";
+  dataRetentionDays: number;
+  canExport: boolean;
+  canRequestErasure: boolean;
+};
+
+export type ConsentRecord = {
+  id: number;
+  consentType: string;
+  action: string;
+  timestamp: string;
+  policyVersion: string;
+  details?: string;
+};
+
+export type PrivacyGrievance = {
+  ticketId: string;
+  category: string;
+  description: string;
+  status: "OPEN" | "UNDER_REVIEW" | "RESOLVED" | "REJECTED";
+  createdAt: string;
+  redressedAt?: string | null;
+  responseMessage?: string | null;
+};
+
+export type UserDataExport = {
+  exportTimestamp: string;
+  userData: SpedexUser;
+  privacySettings: PrivacySettings;
+  trips: Trip[];
+  consentHistory: ConsentRecord[];
+  grievanceHistory: PrivacyGrievance[];
+  complianceNotice: string;
+};
+
+export type LegalDocType =
+  | "terms"
+  | "privacy"
+  | "consent"
+  | "cookies"
+  | "child-privacy"
+  | "data-retention"
+  | "grievance"
+  | "third-parties";
+
+export type LegalDocument = {
+  docType: LegalDocType;
+  title: string;
+  content: string;
+  lastUpdated: string;
+};
+

@@ -24,6 +24,17 @@ public class User {
     private String profilePictureUrl;
     private LocalDateTime memberSince = LocalDateTime.now();
 
+    // DPDP Act 2023 Compliance Fields
+    private Boolean isMinor = false;
+    private Integer age = 18;
+    private String guardianEmail;
+    private String guardianName;
+    private String guardianConsentStatus = "NOT_REQUIRED"; // "NOT_REQUIRED", "PENDING", "VERIFIED", "REJECTED"
+    private Boolean analyticsConsent = false;
+    private Boolean marketingConsent = false;
+    private Boolean isErased = false;
+    private LocalDateTime erasedAt;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vendor> vendors;
 
@@ -39,7 +50,14 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Trip> trips;
 
-    // Getters and setters omitted for brevity – generate via IDE or Lombok if preferred
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ConsentRecord> consentRecords;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PrivacyGrievance> privacyGrievances;
+
+    public User() {}
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getName() { return name; }
@@ -56,6 +74,26 @@ public class User {
     public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
     public LocalDateTime getMemberSince() { return memberSince; }
     public void setMemberSince(LocalDateTime memberSince) { this.memberSince = memberSince; }
+
+    public Boolean getIsMinor() { return isMinor != null && isMinor; }
+    public void setIsMinor(Boolean isMinor) { this.isMinor = isMinor; }
+    public Integer getAge() { return age != null ? age : 18; }
+    public void setAge(Integer age) { this.age = age; }
+    public String getGuardianEmail() { return guardianEmail; }
+    public void setGuardianEmail(String guardianEmail) { this.guardianEmail = guardianEmail; }
+    public String getGuardianName() { return guardianName; }
+    public void setGuardianName(String guardianName) { this.guardianName = guardianName; }
+    public String getGuardianConsentStatus() { return guardianConsentStatus != null ? guardianConsentStatus : "NOT_REQUIRED"; }
+    public void setGuardianConsentStatus(String guardianConsentStatus) { this.guardianConsentStatus = guardianConsentStatus; }
+    public Boolean getAnalyticsConsent() { return analyticsConsent != null && analyticsConsent; }
+    public void setAnalyticsConsent(Boolean analyticsConsent) { this.analyticsConsent = analyticsConsent; }
+    public Boolean getMarketingConsent() { return marketingConsent != null && marketingConsent; }
+    public void setMarketingConsent(Boolean marketingConsent) { this.marketingConsent = marketingConsent; }
+    public Boolean getIsErased() { return isErased != null && isErased; }
+    public void setIsErased(Boolean isErased) { this.isErased = isErased; }
+    public LocalDateTime getErasedAt() { return erasedAt; }
+    public void setErasedAt(LocalDateTime erasedAt) { this.erasedAt = erasedAt; }
+
     public List<Vendor> getVendors() { return vendors; }
     public void setVendors(List<Vendor> vendors) { this.vendors = vendors; }
     public List<Budget> getBudgets() { return budgets; }
@@ -66,4 +104,8 @@ public class User {
     public void setTransactions(List<Transaction> transactions) { this.transactions = transactions; }
     public List<Trip> getTrips() { return trips; }
     public void setTrips(List<Trip> trips) { this.trips = trips; }
+    public List<ConsentRecord> getConsentRecords() { return consentRecords; }
+    public void setConsentRecords(List<ConsentRecord> consentRecords) { this.consentRecords = consentRecords; }
+    public List<PrivacyGrievance> getPrivacyGrievances() { return privacyGrievances; }
+    public void setPrivacyGrievances(List<PrivacyGrievance> privacyGrievances) { this.privacyGrievances = privacyGrievances; }
 }

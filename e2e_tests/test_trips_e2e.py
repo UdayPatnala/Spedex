@@ -1018,5 +1018,150 @@ class SpedexTripsE2ETestCase(unittest.TestCase):
         self.assertEqual(bd[1]["category"], "Food")
         self.assertEqual(bd[1]["percentage"], 40.0)
 
+    # ==========================================
+    # TIER 5: DPDP ACT 2023 & RULES 2025 COMPLIANCE
+    # ==========================================
+
+    def test_tier5_dpdp_01_legal_documents(self):
+        # Public access to mandatory legal markdown documents
+        docs = ["terms", "privacy", "consent", "cookies", "child-privacy", "data-retention", "grievance", "third-parties"]
+        for doc in docs:
+            status, res = make_request(f"/privacy/legal/{doc}", "GET")
+            self.assertEqual(status, 200, f"Failed for {doc}")
+            self.assertEqual(res["docType"], doc)
+            self.assertTrue(len(res["title"]) > 0)
+            self.assertTrue(len(res["content"]) > 0)
+
+        # Non-existent doc
+        status, res = make_request("/privacy/legal/unknown-doc", "GET")
+        self.assertEqual(status, 404)
+
+    def test_tier5_dpdp_02_privacy_settings_and_consent(self):
+        # Retrieve default privacy settings
+        status, settings = make_request("/privacy/settings", "GET", headers=self.headers)
+        self.assertEqual(status, 200)
+        self.assertFalse(settings["isMinor"])
+        self.assertFalse(settings["analyticsConsent"])
+        self.assertFalse(settings["marketingConsent"])
+        self.assertEqual(settings["dataRetentionDays"], 180)
+
+        # Update consent preferences
+        status, updated = make_request("/privacy/consent", "POST", headers=self.headers, body={
+            "analyticsConsent": True,
+            "marketingConsent": False
+        })
+        self.assertEqual(status, 200)
+        self.assertTrue(updated["analyticsConsent"])
+        self.assertFalse(updated["marketingConsent"])
+
+        # Re-fetch settings
+        status, re_fetch = make_request("/privacy/settings", "GET", headers=self.headers)
+        self.assertEqual(status, 200)
+        self.assertTrue(re_fetch["analyticsConsent"])
+
+    def test_tier5_dpdp_03_minor_onboarding_and_guardian_consent(self):
+        # Register a minor user (age 15)
+        minor_email = f"minor_{random.randint(10000, 99999)}@example.com"
+        status, res = make_request("/auth/signup", "POST", body={
+            "name": "Aarav Minor",
+            "email": minor_email,
+            "password": "password123",
+            "isMinor": True,
+            "age": 15,
+            "guardianName": "Rajesh Minor",
+            "guardianEmail": "rajesh.guardian@example.com",
+            "analyticsConsent": True, # Should be forced to False for minors
+            "marketingConsent": True  # Should be forced to False for minors
+        })
+        self.assertEqual(status, 200)
+        minor_token = res["access_token"]
+        minor_headers = {"Authorization": f"Bearer {minor_token}"}
+
+        # Check user profile and privacy settings
+        status, profile = make_request("/auth/me", "GET", headers=minor_headers)
+        self.assertEqual(status, 200)
+        self.assertTrue(profile["is_minor"])
+        self.assertEqual(profile["age"], 15)
+        self.assertEqual(profile["guardian_consent_status"], "PENDING")
+        self.assertFalse(profile["analytics_consent"])
+        self.assertFalse(profile["marketing_consent"])
+
+        # Request guardian verification token
+        status, req_res = make_request("/privacy/guardian-consent/request", "POST", headers=minor_headers, body={
+            "guardianName": "Rajesh Minor",
+            "guardianEmail": "rajesh.guardian@example.com"
+        })
+        self.assertEqual(status, 200)
+        self.assertTrue(req_res["success"])
+        v_token = req_res["verificationToken"]
+
+        # Verify via public guardian link
+        status, verify_res = make_request(f"/privacy/guardian-consent/verify?token={v_token}", "GET")
+        self.assertEqual(status, 200)
+        self.assertTrue(verify_res["success"])
+
+        # Verify status is now VERIFIED
+        status, updated_settings = make_request("/privacy/settings", "GET", headers=minor_headers)
+        self.assertEqual(status, 200)
+        self.assertEqual(updated_settings["guardianConsentStatus"], "VERIFIED")
+
+    def test_tier5_dpdp_04_data_export(self):
+        # Create some user activity (trip + transaction)
+        status, trip = make_request("/trips", "POST", headers=self.headers, body={"name": "Export Test Trip"})
+        self.assertEqual(status, 201)
+        trip_id = trip["id"]
+        make_request(f"/trips/{trip_id}/transactions", "POST", headers=self.headers, body={
+            "amount": 250.0, "description": "Export item", "category": "Food"
+        })
+
+        # Request full personal data export (DPDP Act Section 11)
+        status, export_data = make_request("/privacy/export", "GET", headers=self.headers)
+        self.assertEqual(status, 200)
+        self.assertIn("userData", export_data)
+        self.assertEqual(export_data["userData"]["email"], self.email)
+        self.assertIn("trips", export_data)
+        self.assertTrue(len(export_data["trips"]) >= 1)
+        self.assertIn("consentHistory", export_data)
+        self.assertTrue(len(export_data["consentHistory"]) >= 1)
+        self.assertIn("complianceNotice", export_data)
+
+    def test_tier5_dpdp_05_grievance_redressal(self):
+        # File a privacy grievance (DPDP Act Section 13)
+        status, grv = make_request("/privacy/grievance", "POST", headers=self.headers, body={
+            "category": "CONSENT_REVOCATION",
+            "description": "Please ensure all marketing analytics cookies are purged."
+        })
+        self.assertEqual(status, 200)
+        self.assertTrue(grv["ticketId"].startswith("GRV-"))
+        self.assertEqual(grv["category"], "CONSENT_REVOCATION")
+        self.assertEqual(grv["status"], "OPEN")
+
+        # Fetch grievances list
+        status, grv_list = make_request("/privacy/grievance", "GET", headers=self.headers)
+        self.assertEqual(status, 200)
+        self.assertTrue(len(grv_list) >= 1)
+        self.assertEqual(grv_list[0]["ticketId"], grv["ticketId"])
+
+    def test_tier5_dpdp_06_right_to_erasure(self):
+        # Attempt erasure with invalid confirmation string
+        status, err_res = make_request("/privacy/erase", "POST", headers=self.headers, body={
+            "confirmationText": "wrong text"
+        })
+        self.assertEqual(status, 400)
+
+        # Successful erasure with exact required confirmation string
+        status, erase_res = make_request("/privacy/erase", "POST", headers=self.headers, body={
+            "confirmationText": "DELETE MY DATA"
+        })
+        self.assertEqual(status, 200)
+        self.assertTrue(erase_res["success"])
+
+        # Subsequent authenticated requests with old token must be rejected (401 Unauthorized)
+        status, _ = make_request("/auth/me", "GET", headers=self.headers)
+        self.assertEqual(status, 401)
+        status, _ = make_request("/privacy/settings", "GET", headers=self.headers)
+        self.assertEqual(status, 401)
+
 if __name__ == "__main__":
     unittest.main()
+

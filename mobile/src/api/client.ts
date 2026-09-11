@@ -136,4 +136,38 @@ export const spedexApi = {
       method: "POST",
       body: JSON.stringify(payload),
     }),
+  getPrivacySettings: () => request<import("../types").PrivacySettings>("/privacy/settings"),
+  updatePrivacyConsent: (payload: {
+    analytics_consent?: boolean;
+    marketing_consent?: boolean;
+    purpose?: string;
+    source?: string;
+  }) =>
+    request<{ status: string; settings: import("../types").PrivacySettings }>("/privacy/consent", {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  requestGuardianConsent: (payload: {
+    guardian_name: string;
+    guardian_email: string;
+    age: number;
+  }) =>
+    request<{ status: string; message: string }>("/privacy/guardian-consent/request", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  exportUserData: () => request<any>("/privacy/export"),
+  requestErasure: (reason?: string) =>
+    request<{ status: string; message: string; erased_at: string }>("/privacy/erasure", {
+      method: "POST",
+      body: JSON.stringify({ reason }),
+    }),
+  submitGrievance: (payload: { subject: string; description: string }) =>
+    request<{ status: string; grievance: import("../types").PrivacyGrievance }>("/privacy/grievances", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  getUserGrievances: () => request<import("../types").PrivacyGrievance[]>("/privacy/grievances"),
+  getLegalDocument: (documentId: string) =>
+    request<import("../types").LegalDocument>(`/privacy/legal/${documentId}`),
 };

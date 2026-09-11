@@ -37,6 +37,10 @@ public class UserService {
         User user = userRepository.findByEmail(request.email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        if (user.getIsErased()) {
+            throw new RuntimeException("Account has been erased and anonymized per DPDP Act Section 12");
+        }
+
         if (!passwordEncoder.matches(request.password, user.getPasswordHash())) {
             throw new RuntimeException("Invalid password");
         }
@@ -54,6 +58,22 @@ public class UserService {
         user.setName(request.name);
         user.setEmail(request.email);
         user.setPasswordHash(passwordEncoder.encode(request.password));
+
+        boolean isMinor = request.isMinor != null && request.isMinor;
+        user.setIsMinor(isMinor);
+        user.setAge(request.age != null ? request.age : (isMinor ? 16 : 18));
+        user.setGuardianEmail(request.guardianEmail);
+        user.setGuardianName(request.guardianName);
+        user.setGuardianConsentStatus(isMinor ? "PENDING" : "NOT_REQUIRED");
+
+        if (isMinor) {
+            user.setAnalyticsConsent(false);
+            user.setMarketingConsent(false);
+        } else {
+            user.setAnalyticsConsent(request.analyticsConsent != null && request.analyticsConsent);
+            user.setMarketingConsent(request.marketingConsent != null && request.marketingConsent);
+        }
+
         user = userRepository.save(user);
 
         String token = jwtUtil.generateToken(user.getEmail());
@@ -63,6 +83,9 @@ public class UserService {
     public SpedexUserDto findByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+        if (user.getIsErased()) {
+            throw new RuntimeException("Account has been erased");
+        }
         return mapToDto(user);
     }
 
@@ -89,7 +112,16 @@ public class UserService {
         dto.plan = user.getPlan();
         dto.avatarInitials = user.getAvatarInitials();
         dto.profilePictureUrl = user.getProfilePictureUrl();
-        dto.memberSince = user.getMemberSince().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        dto.memberSince = user.getMemberSince() != null
+                ? user.getMemberSince().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                : null;
+        dto.isMinor = user.getIsMinor();
+        dto.age = user.getAge();
+        dto.guardianEmail = user.getGuardianEmail();
+        dto.guardianName = user.getGuardianName();
+        dto.guardianConsentStatus = user.getGuardianConsentStatus();
+        dto.analyticsConsent = user.getAnalyticsConsent();
+        dto.marketingConsent = user.getMarketingConsent();
         return dto;
     }
 

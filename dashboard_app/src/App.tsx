@@ -4,6 +4,9 @@ import QRCode from "react-qr-code";
 import { addVendor, getCurrentUser, loadDashboardBundle, login, setAuthToken, signUp, updateProfile, warmUpBackend, getTrips, startTrip, getTripDetails, completeTrip, addManualTransaction } from "./api";
 import { MobileSyncSimulator } from "./components/mobile/MobileSyncSimulator";
 import { LandingPage } from "./components/landing/LandingPage";
+import { PrivacyCenter } from "./components/privacy/PrivacyCenter";
+import { CookieConsentBanner } from "./components/privacy/CookieConsentBanner";
+import { LegalDocViewer } from "./components/privacy/LegalDocViewer";
 import type {
   AnalyticsData,
   BudgetScreenData,
@@ -14,9 +17,10 @@ import type {
   SpedexUser,
   Trip,
   TripDetails,
+  LegalDocType,
 } from "./types";
 
-type ViewId = "landing" | "home" | "payments" | "analytics" | "budget" | "settings" | "trips";
+type ViewId = "landing" | "home" | "payments" | "analytics" | "budget" | "settings" | "trips" | "privacy";
 type AuthMode = "login" | "signup";
 
 const STORAGE_KEY = "spedex.dashboard.session";
@@ -28,6 +32,7 @@ const navItems: Array<{ id: ViewId; label: string; icon: string }> = [
   { id: "analytics", label: "Signals", icon: "insights" },
   { id: "budget", label: "Budgets", icon: "calendar_month" },
   { id: "settings", label: "Profile", icon: "settings" },
+  { id: "privacy", label: "Privacy & DPDP", icon: "shield" },
   { id: "landing", label: "Landing Page", icon: "public" },
 ];
 
@@ -1372,6 +1377,7 @@ export default function App() {
   const [showMobileSync, setShowMobileSync] = useState(true);
   const [activeTrip, setActiveTrip] = useState<Trip | null>(null);
   const [showAuthPortal, setShowAuthPortal] = useState(false);
+  const [activeLegalDoc, setActiveLegalDoc] = useState<LegalDocType | null>(null);
 
   const deferredSearch = useDeferredValue(searchQuery);
 
@@ -1595,6 +1601,8 @@ export default function App() {
       content = <BudgetView budget={budget!} />;
     } else if (activeView === "settings") {
       content = <SettingsView overview={overview!} onRefresh={handleRefresh} />;
+    } else if (activeView === "privacy") {
+      content = <PrivacyCenter onOpenDoc={(doc) => setActiveLegalDoc(doc)} onLogout={handleSignOut} />;
     }
   } else {
     content = <SkeletonLoaderView view={activeView} />;
@@ -1603,6 +1611,11 @@ export default function App() {
   return (
     <div className="app-shell" style={{ display: "flex", flexDirection: "row", width: "100%", height: "100vh", overflow: "hidden" }}>
       {showAddVendor && <AddVendorModal onClose={() => setShowAddVendor(false)} onSave={handleAddVendor} />}
+      {activeLegalDoc && <LegalDocViewer docType={activeLegalDoc} onClose={() => setActiveLegalDoc(null)} />}
+      <CookieConsentBanner
+        onOpenPreferences={() => setActiveView("privacy")}
+        onOpenDoc={(doc) => setActiveLegalDoc(doc as LegalDocType)}
+      />
       <Sidebar activeView={activeView} onSelect={(view) => startTransition(() => setActiveView(view))} />
       <main className="main-pane" style={{ flex: 1, overflowY: "auto" }}>
         <Topbar

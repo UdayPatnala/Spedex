@@ -13,4 +13,18 @@ public class SpedexUserDto {
     public String memberSince; // ISO string
     @JsonProperty("profile_picture_url")
     public String profilePictureUrl;
+
+    @JsonProperty("is_minor")
+    public Boolean isMinor;
+    public Integer age;
+    @JsonProperty("guardian_email")
+    public String guardianEmail;
+    @JsonProperty("guardian_name")
+    public String guardianName;
+    @JsonProperty("guardian_consent_status")
+    public String guardianConsentStatus;
+    @JsonProperty("analytics_consent")
+    public Boolean analyticsConsent;
+    @JsonProperty("marketing_consent")
+    public Boolean marketingConsent;
 }
