@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [v2.3.0] - 2026-09-11
+### Added
+- **Product-First Engineering Governance & 4-Layer Memory Architecture**:
+  - Adopted the Universal Product-First Engineering System in `.agents/AGENTS.md`.
+  - Enshrined the non-negotiable principle: *"Never let the current codebase overwrite the project's historical product intent. Reconcile the code with the intent."*
+  - Institutionalized Product Archaeology: Conversations $\rightarrow$ Motive $\rightarrow$ Vision $\rightarrow$ Decisions $\rightarrow$ Product Definition (Must be, Can be, Must not be) $\rightarrow$ Gap Analysis $\rightarrow$ Decision Making $\rightarrow$ Implementation.
+  - Reconstituted Layer 2 persistent engineering memory with `docs/ARCHITECTURE.md` and `docs/PROJECT_STATUS.md`.
+  - Synchronized the 4-layer memory architecture (Product Memory, Engineering Memory, Historical Git Log, and Runtime State).
+  - Maintained 100% verification across all 4 suites (142 tests passing).
+
+---
+
 ## [v2.2.0] - 2026-03-01
 ### Added
 - **DPDP Act 2023 & DPDP Rules 2025 Full-Stack Compliance**:
