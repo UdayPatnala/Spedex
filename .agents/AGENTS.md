@@ -1,273 +1,204 @@
-# UNIVERSAL PROJECT ENGINEERING & EXECUTION SYSTEM: SPEDEX
+# UNIVERSAL PRODUCT-FIRST ENGINEERING SYSTEM: SPEDEX
 
-## Master Execution Directive
+## Master Operational Philosophy: Product Intent Recovery First
 
 ```text
-NEVER START BY CODING.
+                 PREVIOUS CHATS & DISCUSSIONS
+                              │
+               ┌──────────────┼──────────────┐
+               ↓              ↓              ↓
+             MOTIVE         VISION       DECISIONS
+               │              │              │
+               └──────────────┼──────────────┘
+                              ↓
+                      PRODUCT DEFINITION
+                              │
+                  ┌───────────┼───────────┐
+                  ↓           ↓           ↓
+               WHAT IT      WHAT IT      WHAT IT
+               MUST BE      CAN BE       MUST NOT BE
+                  │           │           │
+                  └───────────┼───────────┘
+                              ↓
+                      CURRENT PROJECT
+                              │
+                      ┌───────┴───────┐
+                      ↓               ↓
+                  GIT HISTORY      FILES/CODE
+                      │               │
+                      └───────┬───────┘
+                              ↓
+                        GAP ANALYSIS
+                              ↓
+                  MISSING / CORRECT / EXTRA
+                              ↓
+                        DECISION MAKING
+                              ↓
+                        IMPLEMENTATION
+```
 
-FIRST:
-Understand the product → recover previous conversations → inspect all relevant project files/docs → read complete relevant Git history → inspect current state → identify what exists, what is missing, what failed, what was intentionally removed, and what is over-engineered → research only what is necessary → make the engineering/product decision → create a safe recoverable checkpoint.
+> **NON-NEGOTIABLE RULE**:
+> **Never let the current codebase overwrite the project's historical product intent. Reconcile the code with the intent.**
+>
+> The code is only one representation of the product—it may be incomplete, outdated, overbuilt, or drifted. The product intent accumulated across conversations, motives, decisions, and lessons is the foundational truth.
 
-THEN:
-Implement the simplest correct working solution → verify → improve only where justified → test → audit security/privacy/performance/accessibility/UX/deployment → inspect Git diff/status → re-check history → update VERSION_HISTORY.md and EXECUTION_HISTORY.md → preserve the final known-good state → record remaining work.
+---
 
-IF THE TASK IS TOO LARGE:
-Do NOT rush or force completion in one session. Stop at a safe checkpoint, document the exact state, and continue in a later session.
+## Core Product-First Hierarchy
 
-IF SOMETHING FAILS:
-Do not repeatedly retry blindly. Diagnose → compare alternatives → use a workaround/indirect approach where possible → rollback to the safe version if necessary → try a better approach.
-
-IF SOMETHING CANNOT BE DONE DIRECTLY:
-Do not simply give up. Find the closest technically reliable result achievable with the available tools, technologies, free resources, and constraints.
-
-ALWAYS:
-Preserve project intent.
-Preserve working versions.
-Preserve history.
-Do not overwrite unrelated work.
-Do not fabricate.
-Do not over-engineer.
-Do not add unnecessary features.
-Do not waste model credits.
-Do not introduce paid services without approval.
-Do not declare completion without verification.
-
-FINAL PIPELINE:
-ANALYZE → LIST → RECOVER → RESEARCH → DECIDE → PLAN → SAFE VERSION → IMPLEMENT → CHECK → FIX → AUDIT → UPDATE → VERIFY → FINISH
+```text
+CONVERSATIONS / DISCUSSIONS
+        ↓
+MOTIVE
+        ↓
+VISION
+        ↓
+PURPOSE
+        ↓
+PRODUCT IDENTITY
+        ↓
+INTENDED USER EXPERIENCE
+        ↓
+AGREED FEATURES + BEHAVIOR
+        ↓
+CONSTRAINTS + "DO NOT" DECISIONS
+        ↓
+CURRENT IMPLEMENTATION
+        ↓
+GIT / VERSION HISTORY
+        ↓
+RESEARCH
+        ↓
+ENGINEERING DECISIONS
+        ↓
+IMPLEMENTATION
+        ↓
+VERIFICATION
+        ↓
+UPDATED PRODUCT
 ```
 
 ---
 
-## Three-Layer Project Memory Architecture
+## Four-Layer Project Memory Architecture
 
-Cross-check all three layers before initiating and after completing any task:
+Cross-check all four layers before initiating and after completing any task:
 
 ```text
-LAYER 1 — PRODUCT MEMORY
-Previous conversations | Vision | Motivation | Agreed features | Rejected/deferred features | Design decisions | User requirements
+LAYER 1 — PRODUCT INTENT & CONVERSATIONAL MEMORY
+Previous chats | Motive | Vision | Purpose | Intended UX | Agreed features | Rejected/deferred ideas | Prohibitions
         ↓
 LAYER 2 — ENGINEERING MEMORY
-docs/VERSION_HISTORY.md | docs/EXECUTION_HISTORY.md | ARCHITECTURE.md | PROJECT_STATUS.md | Known issues | Lessons | Warnings | Decisions
+docs/VERSION_HISTORY.md | docs/EXECUTION_HISTORY.md | docs/ARCHITECTURE.md | docs/PROJECT_STATUS.md | Lessons | Decisions
         ↓
-LAYER 3 — ACTUAL STATE
-Git history | Git branches/tags | Current code | Files | Dependencies | Environment | Deployment | Database | Runtime | Production
+LAYER 3 — HISTORICAL SOURCE OF TRUTH
+Git commits | Complete git log | Branches | Tags | Prior reverts | Abandoned approaches | Known-good baselines
+        ↓
+LAYER 4 — ACTUAL RUNTIME STATE
+Working tree | Current code | Dependencies | Build configuration | Test suites | Deployment | Runtime behavior
 ```
 
 ---
 
-## SpeDex Domain & Architectural Boundaries
+## Product Intent Invariants: SpeDex
 
-### 1. Vision, Purpose & Compliance Alignment
-- Always preserve SpeDex's identity as a high-frequency smart wallet, financial intelligence platform, and non-custodial financial utility.
-- Maintain INR currency note aesthetic standards and typography hierarchy (`Cormorant Garamond` + `Sora`).
-- Strictly enforce DPDP Act 2023 & DPDP Rules 2025 compliance across all codebases (verifiable parental consent for minors <18, non-custodial financial disclaimers, granular opt-in/opt-out consent, data minimization, right to access/export, right to erasure, and grievance redressal).
+### 1. Product Motive & Vision
+- **Why SpeDex Exists**: To deliver high-frequency personal expense tracking, automated multi-session trip ledgers, and financial velocity analytics without invasive telemetry or custodial security liabilities.
+- **Fintech Philosophy**: Non-custodial utility. SpeDex never acts as a bank or custodial intermediary; it provides personal financial intelligence and friction-free tracking.
 
-### 2. Architectural Boundaries
-- Backend logic must strictly reside in `backend/`. Maintain clean separation between Controllers, Services, and Repositories.
-- Web UI components reside in `dashboard_app/src/components/` and views in `dashboard_app/src/views/`. Keep components modular and reusable.
-- Mobile cross-platform screens reside in `mobile/src/screens/`. Maintain feature parity with the web dashboard.
-- Native Android code resides in `mobile_native_android/app/src/main/java/`.
-- Legal policies and markdown disclosures reside in `legal/`.
-- Version and execution history reside in `docs/VERSION_HISTORY.md` and `docs/EXECUTION_HISTORY.md`.
+### 2. Product Identity & Design Language
+- **Indian Rupee (INR) Aesthetic**: Curated banknote palette (Deep Emerald Note Green `#0d2818`/`#164223`, Accent Gold `#d4af37`, Warm Sand Base `#fdfbf7`).
+- **Typography**: `Cormorant Garamond` (classic elegance, currency heritage for headings) + `Sora` (crisp modern clarity for data, numbers, tables, and controls).
+- **Anti-Vibe-Code Mandate**: Zero dead buttons, placeholder copy, fake metrics, or unlinked controls. Real rupee symbols (`₹`) and authentic velocity analytics.
 
-### 3. Security, Privacy & Validation Rules
-- All backend endpoints must validate user ownership. Always return `403 Forbidden` for IDOR attempts.
-- Passwords must always be hashed with BCrypt.
-- Pass token authentication headers in all client API calls.
-- Never store banking passwords, MPINs, or UPI credentials.
-- Minors (<18) must have behavioral tracking and marketing cookies permanently disabled.
+### 3. Legal & Regulatory Non-Negotiables
+- **DPDP Act 2023 & DPDP Rules 2025 Compliance**:
+  - Minors (<18 years): Verifiable parental consent mandatory; behavioral tracking and targeted profiling permanently disabled.
+  - Consent Management: Granular opt-in/opt-out across functional, analytics, and marketing categories.
+  - User Rights: Full machine-readable data export (`GET /api/privacy/export`), irreversible account erasure (`POST /api/privacy/erase`), and grievance redressal SLA tracking.
 
-### 4. Mandatory 4-Part Verification Standard
-Before declaring any task or milestone complete:
-1. Run `./mvnw.cmd test` in `backend/` (49/49 tests passing).
-2. Run `npm test -- --run` and `npm run build` in `dashboard_app/` (9/9 tests passing, 0 type errors).
-3. Run `npm test` and `npx tsc --noEmit` in `mobile/` (7/7 tests passing, 0 type errors).
-4. Run `python test-trips-e2e.py` (77/77 tests passing).
+### 4. Security & Tenant Isolation
+- **IDOR Prevention**: All queries strictly filtered by authenticated `user_id`. Unauthorized cross-tenant access returns `403 Forbidden`.
+- **Zero Credential Storage**: Never store banking passwords, UPI MPINs, or debit/credit card credentials.
+- **Stateless Authentication**: Passwords hashed with BCrypt; all client requests authenticated via JWT Bearer tokens.
+
+### 5. Mandatory 4-Part Verification Standard
+Before declaring any task, feature, or refactor complete:
+1. **Backend**: `./mvnw.cmd test` in `backend/` (49/49 tests passing).
+2. **Dashboard**: `npm test -- --run` and `npm run build` in `dashboard_app/` (9/9 tests passing, 0 build/type errors).
+3. **Mobile**: `npm test` and `npx tsc --noEmit` in `mobile/` (7/7 tests passing, 0 type errors).
+4. **Root E2E**: `python test-trips-e2e.py` (77/77 tests passing).
 
 ---
 
-## Universal Project Engineering Protocols (0–60)
+## Universal Product-First Engineering Protocols (1–23)
 
-### 0. Core Objective
-Execute full lifecycle: `ANALYZE → LIST → RESEARCH → RECOVER CONTEXT → IDENTIFY CURRENT STATE → IDENTIFY RISKS → MAKE DECISIONS → PLAN → PRESERVE SAFE VERSION → IMPLEMENT → TEST → AUDIT → FIX → VERIFY → UPDATE DOCUMENTATION/HISTORY → VERIFY GIT → VERIFY DEPLOYMENT → FINISH`.
+### 1. Product Intent is the Primary Context
+Reconstruct the project's intended identity from all available previous conversations and project discussions before modifying code. Extract motive, vision, intended feel, terminology, accepted tradeoffs, and explicit prohibitions.
 
-### 1. Project Context is the First Source of Truth
-Reconstruct product reality before changing code. Recover difference between intended state, current state, historical attempts, and non-negotiables.
+### 2. Build a Product Intent Model
+Construct an internal model: Motive, Purpose, Vision, Identity, Principles, User Experience, Functional Model, Visual Model, Technical Model, Constraint Model, and Future Model.
 
-### 2. Previous Conversations Must Be Consulted
-Recover relevant decisions, constraints, and rejected approaches. Do not reinvent established decisions.
+### 3. Conversations Are Not Just Reference Material
+Search conversations to discover features discussed but not yet implemented, features intentionally removed, design references, and reasons for architectural decisions. Never assume "not present in code = not required" or "present in code = intended."
 
-### 3. Complete Git History Protocol
-Inspect git status, branches, tags, full relevant git log, commit diffs, and blame. Never overwrite unrelated uncommitted work.
+### 4. Distinguish Intent from Implementation
+For every feature, compare intended vs current state. If implementation conflicts with product vision, do not blindly preserve the code; investigate and restore alignment with intent.
 
-### 4. Version History + Execution History
-Treat `docs/VERSION_HISTORY.md` and `docs/EXECUTION_HISTORY.md` as persistent project memory. Read before task; record truthfully after task. Never rewrite history to hide errors.
+### 5. Product Drift Audit
+Regularly audit whether the project has drifted into generic UI, feature creep, excessive complexity, or unaligned architecture. Trace drift origins and recommend corrective simplification.
 
-### 5. Safe Version / Recovery Protocol
-Create a recoverable checkpoint (`git commit`, branch, or tag) before any risky modification. If an experiment fails, revert cleanly to the baseline.
+### 6. Missing vs Over-Applied
+Continuously evaluate both directions: What is missing (critical states, error handling, accessibility, performance, intent)? What is over-applied (excessive decoration, unneeded dependencies, premature abstraction, redundant features)?
 
-### 6. Never Destroy a Working System for a Better Idea
-Prefer `WORKING → IMPROVE` over speculative rewrites.
+### 7. Preserve the Product's Uniqueness
+Never normalize the project into a generic SaaS template. Design and interaction patterns must naturally express this specific product's motive.
 
-### 7. No-Budget / Free-First Policy
-Project budget = 0. Prioritize open-source, local tooling, native browser/platform capabilities, and zero-cost infrastructure.
+### 8. Previous Agreements Have Weight
+Explicit past decisions (required, rejected, deferred, prohibited) must not be silently reversed without explicit user direction or newly discovered technical blockers.
 
-### 8. Research Before Decision
-Consult primary/official documentation. Research only what matters to make a sound decision.
+### 9. Motive Over Feature Count
+A feature is justified only if it strengthens the product's reason for existing. If removing a feature makes the product clearer, simpler, and more aligned, recommend removal.
 
-### 9. Decision-Making Framework
-Choose the simplest reliable solution satisfying product purpose, UX, security, performance, accessibility, and maintainability.
+### 10. Vision-Preserving Engineering
+Technical decisions (frameworks, libraries, schemas, caching, storage) must serve the product vision. Do not adopt technology for novelty and then force the product to fit it.
 
-### 10. Simple-First Engineering
-Level 1 (Simplest working) → Level 2 (Correctness & reliability) → Level 3 (Measured optimization) → Level 4 (Maintainability) → Level 5 (Advanced capability only when justified).
+### 11. Research the Product, Not Just the Technology
+Answer both: "What is the best technical approach?" and "Is this actually the right thing for this product?" Technical excellence applied to the wrong product requirement is waste.
 
-### 11. Problem-Solving Protocol
-Define problem → Reproduce → Find root cause → Choose smallest reliable fix → Implement → Verify regressions.
+### 12. Vision-First Decision Process
+1. Recover motive and vision $\rightarrow$ 2. Recover past agreements $\rightarrow$ 3. Understand task $\rightarrow$ 4. Inspect current code and git history $\rightarrow$ 5. Identify gaps and drift $\rightarrow$ 6. Select simplest intent-aligned approach $\rightarrow$ 7. Create safe checkpoint $\rightarrow$ 8. Implement $\rightarrow$ 9. Verify $\rightarrow$ 10. Audit against vision $\rightarrow$ 11. Record history $\rightarrow$ 12. Preserve known-good state.
 
-### 12. If Something Cannot Be Achieved Directly
-Do not say "I can't". Find platform-native workarounds, approximations, fallbacks, or indirect architectures.
+### 13. Before Every Feature
+Ask: Why does it exist? What user problem does it solve? Was it agreed or rejected? Does it fit the vision? What is the simplest correct implementation? How can it be reversed?
 
-### 13. Tool Selection
-Select tools and libraries that produce measurable net improvements in speed, reliability, and maintenance.
+### 14. Before Every Bug Fix
+Ask: What should the product do? What does it do now? Did an older implementation work correctly? Is this a symptom of architectural drift? Will the fix preserve intended UX?
 
-### 14. Language / Framework Pragmatism
-Choose the technology that best solves the problem without unnecessary ecosystem churn.
+### 15. Before Every UI Change
+Recover visual vision, UX hierarchy, and previous design decisions. Improve UI only when it strengthens alignment with the product's intended experience.
 
-### 15. Algorithm & Complexity Discipline
-Measure before optimizing. Correctness first → identify bottleneck → optimize → measure again.
+### 16. Before Every Architectural Change
+Understand why the current architecture exists and what problem the new architecture solves. Ensure simplicity, maintainability, and clear rollback paths.
 
-### 16. Architecture Review
-Audit module boundaries, state flow, API boundaries, and coupling. Avoid premature abstraction.
+### 17. Complete Project Memory Synthesis
+Cross-check all four sources: Previous Conversations, Project Documentation/History, Git History, and Runtime Implementation. Discrepancies between sources reveal critical engineering facts.
 
-### 17. Feature Implementation
-Understand user problem → check existing components → define states (loading, empty, error, success) → implement simple working version → verify → update history.
+### 18. Safe Version / Recovery Baseline
+Before any risky modification, ensure a recoverable Git checkpoint exists. Implement the simplest working solution first, verify it, preserve it, and only then optimize.
 
-### 18. UI / UX / Custom Design
-Design intentionally for SpeDex (Cormorant Garamond, Sora, INR currency note aesthetic). Avoid generic AI-generated aesthetics, decorative noise, and fake testimonials.
+### 19. "Make It Better" Does Not Mean "Add More"
+Evaluate all four paths: Add, Remove, Simplify, Restructure. The most impactful improvement is frequently simplification or removal of unnecessary complexity.
 
-### 19. Responsive Design
-Verify desktop, tablet, mobile, and narrow mobile layouts. Check touch targets, forms, and overflow.
+### 20. Final Product-Intent Check
+Before declaring completion, ask: "If someone who participated in all original discussions inspected this result, would they recognize it as the product we intended?" Technical correctness and product alignment are both mandatory.
 
-### 20. Accessibility
-Enforce semantic HTML, keyboard navigation, visible focus indicators, color contrast, and correct ARIA usage.
+### 21. Universal Execution Pipeline
+`PRODUCT CONTEXT → MOTIVE → VISION → PURPOSE → IDENTITY → PREVIOUS DECISIONS → CURRENT STATE → GIT HISTORY → DOCUMENTATION → GAPS → OVER-APPLICATION → RESEARCH → OPTIONS → DECISION → SAFE VERSION → SIMPLE WORKING IMPLEMENTATION → TEST → DEBUG → REFINE → SECURITY → PRIVACY → PERFORMANCE → ACCESSIBILITY → UX/UI → DEPLOYMENT → GIT VERIFICATION → PRODUCT-VISION COMPARISON → HISTORY UPDATE → PRESERVE KNOWN-GOOD VERSION → FINISH`.
 
-### 21. Content Quality
-Never invent statistics, users, testimonials, or financial claims. Production copy must be authentic.
+### 22. Most Important Rule
+**The product's motive and vision must survive every technical change.** Never allow a library, framework, refactor, optimization, or workaround to silently change what the product is supposed to be.
 
-### 22. SEO & Discoverability
-Maintain valid `robots.txt`, `sitemap.xml`, Open Graph tags, JSON-LD structured data, and clean URL routing.
-
-### 23. AI / Machine Discoverability
-Maintain clean `llms.txt` and semantic markup accurately representing the project.
-
-### 24. Security
-Zero secrets in code. BCrypt for passwords. Enforce least privilege, IDOR ownership checks, input validation, and CSP.
-
-### 25. Privacy
-DPDP Act 2023 compliance. Strict minor protection (<18), data minimization, right to erasure, and granular consent.
-
-### 26. Performance
-Minimize bundle size, eliminate duplicate dependencies, optimize network waterfalls, and avoid unneeded re-renders.
-
-### 27. Development Artifact Cleanup
-Purge debug logs, console errors, test mocks, and temporary flags before production builds.
-
-### 28. Error Handling
-All user-facing workflows must handle loading, empty, error, retry, and permission failure states gracefully.
-
-### 29. Testing Standard
-Test actual behavior, boundary conditions, and edge cases. Maintain 100% passing test baseline.
-
-### 30. Build Verification
-TypeScript typecheck, lint, unit tests, and production build must pass before declaring work complete.
-
-### 31. Git Safety Checks
-Inspect `git status` and `git diff`. Never execute destructive git commands (`reset --hard`, `clean -fd`, force push) without explicit justification and safe recovery points.
-
-### 32. Dependency Management
-Evaluate size, security, maintenance, and native alternatives before introducing any third-party dependency.
-
-### 33. Vercel / Cloud Frontend Checklist
-Inspect build command, output directory, environment variables, rewrites, and runtime errors.
-
-### 34. Render / Cloud Backend Checklist
-Verify start command, port binding, environment variables, health checks, and database connections.
-
-### 35. Deployment Discipline
-Verify locally first. Inspect deployment logs, check production console/network, and maintain rollback paths.
-
-### 36. Database / Data Safety
-Additive migrations over destructive changes. Back up state prior to schema modifications.
-
-### 37. API Design
-Enforce validation, ownership checks (`403`), standardized JSON responses, appropriate HTTP status codes, and backward compatibility.
-
-### 38. Code Quality
-Prioritize readability, small cohesive modules, explicit data flows, and strong typing. Avoid clever hacks.
-
-### 39. "Vibe-Code" Prevention
-No dead buttons, broken links, placeholder copy, fake statistics, or unexplained code.
-
-### 40. Feature Bloat Control
-Resist unnecessary features that introduce maintenance overhead without solving core user problems.
-
-### 41. Permitted Autonomous Actions
-Refactor, fix bugs, optimize performance, harden security, update documentation, and clean dead code autonomously while preserving product intent.
-
-### 42. Actions Requiring Explicit Approval
-Never change core product vision, remove agreed features, expose sensitive data, or introduce paid services without user authorization.
-
-### 43. Token & Resource Efficiency
-Targeted searches, focused file reads, and concise reporting. Correctness first, but eliminate wasteful dumps.
-
-### 44. Multi-Session Execution
-Large initiatives divide into safe checkpoints. Never leave the repository in a broken state to rush a single turn.
-
-### 45. Resume Protocol
-On resume, inspect git status, recent commits, history ledgers, and actual implementation before proceeding.
-
-### 46. Continuous Audit
-Classify observed issues: P0 (Critical/Security/Production), P1 (Correctness/UX/Perf), P2 (Improvement), P3 (Polish), P4 (Future). Fix in-scope issues; record others.
-
-### 47. Find What is Missing
-Systematically check edge cases, error states, mobile responsiveness, empty states, and test coverage.
-
-### 48. Find What is Over-Applied
-Audit for excess dependencies, over-abstraction, and redundant state synchronization. Simplify where beneficial.
-
-### 49. Preserve Product Identity
-Honor SpeDex's distinct financial utility identity, design motifs, and user expectations.
-
-### 50. Documentation Integrity
-Document architectural decisions, setup steps, rollback procedures, and lessons learned in persistent project files.
-
-### 51. Final Forensic Review
-Conduct multi-dimensional audit: Product, Code, Architecture, UI/UX, Security, Privacy, Performance, Testing, Deployment, Git, and Documentation.
-
-### 52. Required Completion Loop
-Follow the 32-step execution pipeline from context analysis to verified completion.
-
-### 53. Handling Failures
-Document failed attempts, root causes, and lessons learned. Revert cleanly and pursue alternative verified paths.
-
-### 54. Practical Engineering Heuristics
-Use binary-search regression hunting, network inspection, git diff, and minimal reproductions.
-
-### 55. No False Confidence
-Use strictly truthful status indicators: VERIFIED, PARTIALLY VERIFIED, NOT VERIFIED, BLOCKED, DEFERRED, FAILED.
-
-### 56. User Communication
-Concise, structured reporting: WHAT WAS FOUND, WHAT WAS DECIDED, WHAT WAS CHANGED, WHAT WAS VERIFIED, WHAT REMAINS, NEXT SAFE STEP.
-
-### 57. Priority Hierarchy
-1. Safety → 2. Security → 3. Data Integrity → 4. User Instruction → 5. Vision/Intent → 6. Architecture/Compatibility → 7. Correctness → 8. Reliability → 9. Maintainability → 10. Performance → 11. Accessibility → 12. UX → 13. Discoverability → 14. Convenience → 15. Polish.
-
-### 58. Golden Rules (1–25)
-Understand before changing. Search before creating. Check history before reinventing. Preserve safe versions. Build simple first. Fix root causes. Avoid over-engineering. Zero budget default. Test before declaring completion. Leave recoverable history.
-
-### 59. Default Execution Mode
-Always execute: `[CONTEXT RECOVERY] → [AUDIT] → [PROBLEM DEFINITION] → [RESEARCH] → [DECISION] → [SAFE CHECKPOINT] → [IMPLEMENTATION] → [VERIFICATION] → [FORENSIC AUDIT] → [HISTORY UPDATE] → [FINAL STATE]`.
-
-### 60. Final Principle
-Deliver verified, resilient, documented, and recoverable software that advances the product's true purpose.
-
+### 23. Final Operating Principle
+Do not think: "What code should I write?"
+Think: "What was this product intended to become? What is preventing it from reaching that state? What is the safest, simplest, most efficient way to close that gap?"

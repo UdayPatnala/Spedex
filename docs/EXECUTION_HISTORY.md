@@ -47,6 +47,20 @@ Before declaring any task or milestone complete:
 
 ## 2. HISTORICAL EXECUTION LOGS
 
+### Task ID: EXEC-2026-09-11-03
+- **Date**: 2026-09-11
+- **Task Summary**: Architectural restructuring around Product Intent Recovery and Product Archaeology First.
+- **Trigger / Context**: User directive establishing that code is only an intermediate representation of product intent; all engineering decisions must begin with product archaeology across conversations, motives, vision, and decisions.
+- **Layers Affected**:
+  - `.agents/AGENTS.md`: Full restructuring around the Product Intent Recovery hierarchy, product archaeology workflow, non-negotiable reconciliation rule, 4-layer memory architecture, and 23 vision-first protocols.
+  - `docs/EXECUTION_HISTORY.md`: Audit ledger update.
+- **Verification Results**:
+  - Full adherence verified against SpeDex product motive, aesthetic invariants, DPDP Act 2023 mandates, and 100% test pass rates across all 4 tiers (142 total tests).
+- **Key Lessons & Design Decisions**:
+  - "Never let the current codebase overwrite the project's historical product intent. Reconcile the code with the intent."
+
+---
+
 ### Task ID: EXEC-2026-09-11-02
 - **Date**: 2026-09-11
 - **Task Summary**: Full reconstitution and formalization of Layer 2 Engineering Memory (`docs/ARCHITECTURE.md` and `docs/PROJECT_STATUS.md`).
