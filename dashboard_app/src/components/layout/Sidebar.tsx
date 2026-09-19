@@ -1,5 +1,6 @@
 import type { ViewId } from "../../types";
 import { BrandLockup } from "./BrandLockup";
+import { APP_VERSION } from "../../version";
 
 export const navItems: Array<{ id: ViewId; label: string; icon: string }> = [
   { id: "home", label: "Overview", icon: "home" },
@@ -46,6 +47,10 @@ export function Sidebar({
       <a href="/spedex.apk" download className="sidebar-cta" style={{ textDecoration: 'none', textAlign: 'center' }}>
         Download Mobile APK
       </a>
+
+      <div className="sidebar-version-badge" aria-label={`Spedex Version ${APP_VERSION}`}>
+        v{APP_VERSION}
+      </div>
     </aside>
   );
 }

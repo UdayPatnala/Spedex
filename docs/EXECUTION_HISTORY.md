@@ -47,6 +47,37 @@ Before declaring any task or milestone complete:
 
 ## 2. HISTORICAL EXECUTION LOGS
 
+### Task ID: EXEC-2026-09-19-03
+- **Date**: 2026-09-19
+- **Task Summary**: Universal Version Controller Historical Reconstruction & Dynamic Live Application Version Display (`2.04.01.0`).
+- **Trigger / Context**: Implementation of mandatory historical reconstruction and live application version display protocols from the Universal Version Controller specification. Reconstructed the full 117-commit project timeline from initial prototype (`1.00.00.0` at `965ef6d`) through the SpeDex 2.0 rewrite, Trips Ledger, DPDP compliance, and view modularization to establish `VERSION_CONTROLLER.md`. Synchronized version metadata across all manifests (`package.json`, `pom.xml`, `version.ts`) and integrated a restrained live application version indicator in the dashboard UI.
+- **Layers Affected**:
+  - `VERSION_CONTROLLER.md`: Created root persistent version controller with full historical ledger, unreleased roadmap, known historical gaps, and versioning rules.
+  - `.agents/AGENTS.md`: Integrated the full 44-section Universal Version Controller + Change Governance System.
+  - `dashboard_app/src/version.ts`: Created single authoritative frontend runtime version source (`APP_VERSION = "2.04.01.0"`).
+  - `dashboard_app/package.json`: Updated version metadata to `2.04.01.0`.
+  - `backend/pom.xml`: Updated project version to `2.04.01.0`.
+  - `mobile/package.json`: Updated version metadata to `2.04.01.0`.
+  - `dashboard_app/src/components/layout/Sidebar.tsx`: Rendered unobtrusive sidebar version badge.
+  - `dashboard_app/src/App.tsx`: Added restrained bottom-right corner fixed version indicator.
+  - `dashboard_app/src/components/landing/LandingPage.tsx`: Connected footer version text and APK download filename dynamically.
+  - `dashboard_app/src/styles.css`: Added styling for `.app-version-indicator` and `.sidebar-version-badge`.
+  - `docs/VERSION_HISTORY.md`: Logged release `2.04.01.0`.
+  - `docs/PROJECT_STATUS.md`: Synchronized current version to `2.04.01.0`.
+  - `docs/EXECUTION_HISTORY.md`: Task audit ledger update.
+- **Verification Results**:
+  - `backend/`: 49/49 tests passing (`./mvnw.cmd test`).
+  - `dashboard_app/`: 9/9 tests passing (`npm test -- --run`) & build passes (`npm run build`).
+  - `mobile/`: 7/7 tests passing (`npm test`) & 0 TypeScript errors (`npx tsc --noEmit`).
+  - Root E2E: 77/77 tests passing (`python test-trips-e2e.py`).
+  - Total: 142/142 tests passing across all suites.
+  - Consistency Check: `VERSION_CONTROLLER.md` = `package.json` = `pom.xml` = `src/version.ts` = Live UI Display = `2.04.01.0`.
+- **Key Lessons & Design Decisions**:
+  - The Version Controller is persistent engineering memory; starting version history from the current version is unacceptable when rich historical evidence exists.
+  - Live version displays must be dynamic from a single source of truth to avoid UI drift.
+
+---
+
 ### Task ID: EXEC-2026-09-19-02
 - **Date**: 2026-09-19
 - **Task Summary**: Adoption of Universal Version Control & Change Governance System (`A.BC.DE.F` Authoritative Format & Release Governance Engine).

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { APP_VERSION } from '../../version';
 
 export interface LandingPageProps {
   onLaunchDashboard: () => void;
@@ -450,13 +451,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchDashboard }) =
           <span className="font-serif" style={{ fontSize: '20px', fontWeight: 700, color: '#0F172A' }}>Spedex Smart Wallet</span>
         </div>
         <p style={{ fontSize: '13px', color: '#64748B', margin: '0 0 16px 0' }}>
-          © 2026 SpeDex Inc. All rights reserved. ● Enterprise Personal Financial Workspace.
+          © 2026 SpeDex Inc. All rights reserved. ● Enterprise Personal Financial Workspace ● v{APP_VERSION}
         </p>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '20px' }}>
           <button onClick={onLaunchDashboard} style={{ background: 'none', border: 'none', color: '#CF3082', cursor: 'pointer', fontSize: '13px', fontWeight: 700 }}>
             Launch Web Workspace
           </button>
-          <a href="/downloads/spedex-release.apk" download="spedex-v2.2.0.apk" style={{ color: '#059669', textDecoration: 'none', fontSize: '13px', fontWeight: 700 }}>
+          <a href="/downloads/spedex-release.apk" download={`spedex-v${APP_VERSION}.apk`} style={{ color: '#059669', textDecoration: 'none', fontSize: '13px', fontWeight: 700 }}>
             Download Android APK
           </a>
         </div>

@@ -7,6 +7,20 @@ Authoritative Version Format: `A.BC.DE.F` (`A` = Major Version, `BC` = Sub-Versi
 
 ---
 
+## [2.04.01.0] - 2026-09-19
+Type: Functional
+Status: Verified
+
+### Added
+- **Persistent Root Version Controller & 44-Protocol Release Governance**:
+  - Established root `VERSION_CONTROLLER.md` as the mandatory persistent version ledger and historical source of truth.
+  - Upgraded `.agents/AGENTS.md` to the 44-section UNIVERSAL VERSION CONTROLLER + CHANGE GOVERNANCE SYSTEM.
+  - Mandated the Version Controller as the first checkpoint before change and the final ledger after change.
+  - Synchronized complete version traceability matrix across all historical platform milestones.
+  - Preserved 100% test pass rate across all 4 suites (142/142 tests passing).
+
+---
+
 ## [2.04.00.0] - 2026-09-19
 Type: Sub-version
 Status: Verified

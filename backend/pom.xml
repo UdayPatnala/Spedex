@@ -11,7 +11,7 @@
     </parent>
     <groupId>com.spedex</groupId>
     <artifactId>spedex-backend</artifactId>
-    <version>1.0.0</version>
+    <version>2.04.01.0</version>
     <name>Spedex Backend</name>
     <description>Student Hostel Smart Wallet API</description>
     <properties>

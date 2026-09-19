@@ -20,6 +20,7 @@ import { CookieConsentBanner } from "./components/privacy/CookieConsentBanner";
 import { LegalDocViewer } from "./components/privacy/LegalDocViewer";
 import { PrivacyCenter } from "./components/privacy/PrivacyCenter";
 import { AddVendorModal } from "./components/vendors/AddVendorModal";
+import { APP_VERSION } from "./version";
 import type {
   AnalyticsData,
   AuthMode,
@@ -339,6 +340,9 @@ export default function App() {
           />
         </aside>
       )}
+      <div className="app-version-indicator" aria-label={`Spedex Version ${APP_VERSION}`}>
+        v{APP_VERSION}
+      </div>
     </div>
   );
 }

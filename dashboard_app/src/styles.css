@@ -1278,5 +1278,27 @@ input::placeholder {
   background: rgba(236, 72, 153, 0.5);
 }
 
+/* Live Application Version Display (Unobtrusive Metadata) */
+.app-version-indicator {
+  position: fixed;
+  bottom: 8px;
+  right: 12px;
+  font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: rgba(148, 163, 184, 0.55);
+  pointer-events: none;
+  z-index: 9999;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
 
-
+.sidebar-version-badge {
+  margin-top: 10px;
+  text-align: center;
+  font-family: 'Sora', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.70rem;
+  letter-spacing: 0.04em;
+  color: rgba(148, 163, 184, 0.6);
+  user-select: none;
+}
