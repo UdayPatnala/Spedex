@@ -189,3 +189,15 @@ export type LegalDocument = {
   lastUpdated: string;
 };
 
+export type ViewId =
+  | "landing"
+  | "home"
+  | "payments"
+  | "analytics"
+  | "budget"
+  | "settings"
+  | "trips"
+  | "privacy";
+
+export type AuthMode = "login" | "signup";
+
