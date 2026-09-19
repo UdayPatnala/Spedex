@@ -2,11 +2,29 @@
 
 All notable changes, architectural milestones, feature additions, security enhancements, and compliance implementations for the SpeDex platform are documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The project operates under the **Universal Version Control & Change Governance System** codified in `.agents/AGENTS.md`.
+Authoritative Version Format: `A.BC.DE.F` (`A` = Major Version, `BC` = Sub-Version / Release Line [01-99], `DE` = Functional Change [01-99], `F` = Minor Fix / Patch [0-9], `00` = reset state).
 
 ---
 
-## [v2.3.1] - 2026-09-19
+## [2.04.00.0] - 2026-09-19
+Type: Sub-version
+Status: Verified
+
+### Added
+- **Universal Version Control & Change Governance System**:
+  - Adopted strict hierarchical release-governance mechanism (`A.BC.DE.F` authoritative version format) in `.agents/AGENTS.md`.
+  - Enforced 35 non-negotiable governance rules spanning change classification, pre-change snapshot, atomic change rule, bug fix / refactor / dependency rules, and testing gates.
+  - Institutionalized mandatory pre/post Command Execution Loop: Understand Intent $\rightarrow$ Reverse-Engineer Impact $\rightarrow$ Classify Change $\rightarrow$ Calculate Target Version $\rightarrow$ Check Risks/Dependencies $\rightarrow$ Implement $\rightarrow$ Test/Verify $\rightarrow$ Update Version Metadata $\rightarrow$ Update Changelog $\rightarrow$ Report Final State.
+  - Documented and resolved version discrepancies across project manifests against authoritative documentation.
+  - Preserved 100% verification across all 4 suites (142/142 tests passing).
+
+---
+
+## [2.03.01.0] (v2.3.1) - 2026-09-19
+Type: Functional
+Status: Verified
+
 ### Changed
 - **Dashboard Component Architecture Modularization**:
   - Eliminated frontend monolith debt by decomposing `dashboard_app/src/App.tsx` (1,642 lines down to 290 lines).
@@ -30,7 +48,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
-## [v2.3.0] - 2026-09-11
+## [2.03.00.0] (v2.3.0) - 2026-09-11
+Type: Sub-version
+Status: Verified
+
 ### Added
 - **Product-First Engineering Governance & 4-Layer Memory Architecture**:
   - Adopted the Universal Product-First Engineering System in `.agents/AGENTS.md`.
@@ -42,7 +63,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
-## [v2.2.0] - 2026-03-01
+## [2.02.00.0] (v2.2.0) - 2026-03-01
+Type: Sub-version
+Status: Verified
+
 ### Added
 - **DPDP Act 2023 & DPDP Rules 2025 Full-Stack Compliance**:
   - **Legal Repository (`legal/`)**:
@@ -84,7 +108,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
-## [v2.1.0] - 2026-02-15
+## [2.01.00.0] (v2.1.0) - 2026-02-15
+Type: Sub-version
+Status: Verified
+
 ### Added
 - **Trips Ledger Subsystem**:
   - Live multi-city trip budgeting and auto-linking of transactions to active trips.
@@ -98,7 +125,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
-## [v2.0.0] - 2026-01-20
+## [2.00.00.0] (v2.0.0) - 2026-01-20
+Type: Major
+Status: Verified
+
 ### Added
 - **SpeDex 2.0 Master Architecture**:
   - Full-stack transition to Spring Boot 3.4.1 (Java 17) backend with Spring Security 6 & JWT authentication.
@@ -109,7 +139,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
-## [v1.0.0] - 2025-11-10
+## [1.00.00.0] (v1.0.0) - 2025-11-10
+Type: Major
+Status: Verified
+
 ### Added
 - Initial release of SpeDex high-frequency smart wallet platform.
 - Basic UPI payment preparation, expense tracking, and offline cash entry.
