@@ -47,6 +47,38 @@ Before declaring any task or milestone complete:
 
 ## 2. HISTORICAL EXECUTION LOGS
 
+### Task ID: EXEC-2026-09-19-01
+- **Date**: 2026-09-19
+- **Task Summary**: Full Dashboard View Modularization and Component Architecture Refactor (`dashboard_app/src/App.tsx`).
+- **Trigger / Context**: Elimination of the primary frontend architectural debt identified during reverse engineering. The monolith `App.tsx` (1,642 lines) mingled navigation routing, vendor management state, velocity calculations, filter pipelines, trip forms, and settings tabs. Refactored into clean domain view modules, layout components, shared formatters, and modals, slimming `App.tsx` down to 290 lines while maintaining 100% feature and test parity.
+- **Layers Affected**:
+  - `dashboard_app/src/utils/formatters.ts`: Centralized currency formatting (`formatINR`, `formatCompactINR`, etc.), status badge styling, and payment velocity metrics.
+  - `dashboard_app/src/components/layout/BrandLockup.tsx`: Reusable currency note brand header with seal motif.
+  - `dashboard_app/src/components/layout/Sidebar.tsx`: Modularized navigation sidebar with active tab triggers and user profile card.
+  - `dashboard_app/src/components/layout/Topbar.tsx`: Header bar with dynamic tab titling, active trip quick indicator, and quick-action triggers.
+  - `dashboard_app/src/components/vendors/AddVendorModal.tsx`: Dedicated vendor registration modal dialog.
+  - `dashboard_app/src/components/common/SkeletonLoaderView.tsx`: Polished INR currency note skeleton loader for asynchronous data fetches.
+  - `dashboard_app/src/views/HomeView.tsx`: Dashboard overview with metric cards, velocity banner, vendor breakdown, and recent expenses.
+  - `dashboard_app/src/views/PaymentsView.tsx`: High-frequency payment records, quick filters, and payment velocity analytics.
+  - `dashboard_app/src/views/AnalyticsView.tsx`: Category spending breakdowns, monthly distributions, and spending trends.
+  - `dashboard_app/src/views/BudgetView.tsx`: Budget allocation gauges, alert thresholds, and spending velocity targets.
+  - `dashboard_app/src/views/TripsView.tsx`: Comprehensive travel ledger with live session toggles, multi-agent expense distribution, and cash/UPI splits.
+  - `dashboard_app/src/views/SettingsView.tsx`: Multi-tab preference center with DPDP Privacy Center integration and tenant isolation controls.
+  - `dashboard_app/src/views/AuthView.tsx`: Non-custodial sign-in/sign-up forms with minor age detection and parental consent workflow.
+  - `dashboard_app/src/App.tsx`: Refactored core router and state hub down from 1,642 lines to 290 lines.
+  - `docs/EXECUTION_HISTORY.md`: Task audit ledger update.
+- **Verification Results**:
+  - `backend/`: 49/49 tests passing (`./mvnw.cmd test`).
+  - `dashboard_app/`: 9/9 tests passing (`npm test -- --run`) & build passes (`npm run build`).
+  - `mobile/`: 7/7 tests passing (`npm test`) & 0 TypeScript errors (`npx tsc --noEmit`).
+  - Root E2E: 77/77 tests passing (`python test-trips-e2e.py`).
+  - Total: 142/142 tests passing across all suites.
+- **Key Lessons & Design Decisions**:
+  - Modularizing views while passing explicit typed props keeps UI state centralized in `App.tsx` until full store migration is needed, avoiding unnecessary state management libraries or prop-drilling chaos.
+  - Centralizing INR formatters prevents display inconsistencies across dashboard cards and table cells.
+
+---
+
 ### Task ID: EXEC-2026-09-11-04
 - **Date**: 2026-09-11
 - **Task Summary**: Integration of Reverse Engineering and Three-Reality Reconciliation into the Universal Operating System.

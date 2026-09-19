@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ---
 
+## [v2.3.1] - 2026-09-19
+### Changed
+- **Dashboard Component Architecture Modularization**:
+  - Eliminated frontend monolith debt by decomposing `dashboard_app/src/App.tsx` (1,642 lines down to 290 lines).
+  - Extracted domain views into `dashboard_app/src/views/`:
+    - `HomeView.tsx` (metrics, velocity banner, vendor breakdown, recent expenses)
+    - `PaymentsView.tsx` (payment log, velocity stats, search/category filtering)
+    - `AnalyticsView.tsx` (category breakdown, monthly distributions, spending trends)
+    - `BudgetView.tsx` (budget allocations, category progress, alert thresholds)
+    - `TripsView.tsx` (active session tracking, multi-agent expense distribution, settlement ledger)
+    - `SettingsView.tsx` (preference panels, DPDP Privacy Center integration)
+    - `AuthView.tsx` (sign-in/sign-up forms with minor detection and parental consent modal)
+  - Extracted layout components into `dashboard_app/src/components/layout/`:
+    - `BrandLockup.tsx` (currency note lockup with seal motif)
+    - `Sidebar.tsx` (navigation sidebar with responsive collapsible states)
+    - `Topbar.tsx` (header bar with dynamic tab titling and quick-action triggers)
+  - Extracted common modals and utilities:
+    - `dashboard_app/src/components/vendors/AddVendorModal.tsx` (vendor modal)
+    - `dashboard_app/src/components/common/SkeletonLoaderView.tsx` (INR note loading skeleton)
+    - `dashboard_app/src/utils/formatters.ts` (centralized currency and numeric formatting)
+  - Maintained 100% test pass rate across all 4 suites (142/142 tests passing).
+
+---
+
 ## [v2.3.0] - 2026-09-11
 ### Added
 - **Product-First Engineering Governance & 4-Layer Memory Architecture**:
