@@ -5,6 +5,8 @@ import com.spedex.dto.LoginRequestDto;
 import com.spedex.dto.SignUpRequestDto;
 import com.spedex.dto.SpedexUserDto;
 import com.spedex.model.User;
+import com.spedex.repository.ConsentRecordRepository;
+import com.spedex.repository.PrivacyAuditLogRepository;
 import com.spedex.repository.UserRepository;
 import com.spedex.security.JwtUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +36,12 @@ public class UserServiceTest {
 
     @Mock
     private JwtUtil jwtUtil;
+
+    @Mock
+    private ConsentRecordRepository consentRecordRepository;
+
+    @Mock
+    private PrivacyAuditLogRepository auditLogRepository;
 
     @InjectMocks
     private UserService userService;

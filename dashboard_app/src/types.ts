@@ -6,6 +6,15 @@ export type SpedexUser = {
   avatar_initials: string;
   member_since: string;
   profile_picture_url?: string | null;
+  is_minor?: boolean;
+  age?: number;
+  guardian_email?: string | null;
+  guardian_name?: string | null;
+  guardian_consent_status?: "NOT_REQUIRED" | "PENDING" | "VERIFIED" | "REJECTED";
+  analytics_consent?: boolean;
+  marketing_consent?: boolean;
+  location_consent?: boolean;
+  ai_consent?: boolean;
 };
 
 export type AuthResponse = {
@@ -130,9 +139,24 @@ export type TripDetails = {
   transactions: Transaction[];
 };
 
+export type UserCapabilities = {
+  canInitiatePayment: boolean;
+  canOpenPaymentLink: boolean;
+  canSavePaymentMethod: boolean;
+  canUseMerchantQR: boolean;
+  canRecordManualTransaction: boolean;
+  canManageBudgets: boolean;
+  canUseAnalytics: boolean;
+  canReceiveMarketing: boolean;
+  mode: "FULL_TRANSACTIONAL" | "LEARNING_JOURNAL";
+  restrictionNotice?: string | null;
+};
+
 export type PrivacySettings = {
   analyticsConsent: boolean;
   marketingConsent: boolean;
+  locationConsent?: boolean;
+  aiConsent?: boolean;
   isMinor: boolean;
   age: number;
   guardianEmail?: string | null;
@@ -152,6 +176,16 @@ export type ConsentRecord = {
   details?: string;
 };
 
+export type PrivacyAuditLog = {
+  id: number;
+  userEmail: string;
+  eventType: string;
+  description: string;
+  ipAddress?: string;
+  userAgent?: string;
+  timestamp: string;
+};
+
 export type PrivacyGrievance = {
   ticketId: string;
   category: string;
@@ -162,12 +196,26 @@ export type PrivacyGrievance = {
   responseMessage?: string | null;
 };
 
+export type SubprocessorInfo = {
+  name: string;
+  purpose: string;
+  location: string;
+  dataHandled: string;
+  safeguards: string;
+};
+
 export type UserDataExport = {
   exportTimestamp: string;
   userData: SpedexUser;
   privacySettings: PrivacySettings;
+  capabilities?: UserCapabilities;
+  transactions?: Transaction[];
+  vendors?: Vendor[];
+  budgets?: BudgetCard[];
+  reminders?: Reminder[];
   trips: Trip[];
   consentHistory: ConsentRecord[];
+  auditLogs?: PrivacyAuditLog[];
   grievanceHistory: PrivacyGrievance[];
   complianceNotice: string;
 };

@@ -13,6 +13,10 @@ import com.spedex.model.Reminder;
 import com.spedex.model.Transaction;
 import com.spedex.model.User;
 import com.spedex.model.Vendor;
+import com.spedex.model.ConsentRecord;
+import com.spedex.model.PrivacyAuditLog;
+import com.spedex.repository.ConsentRecordRepository;
+import com.spedex.repository.PrivacyAuditLogRepository;
 import com.spedex.repository.UserRepository;
 import com.spedex.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +36,12 @@ public class UserService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private ConsentRecordRepository consentRecordRepository;
+
+    @Autowired
+    private PrivacyAuditLogRepository auditLogRepository;
 
     public AuthResponseDto login(LoginRequestDto request) {
         User user = userRepository.findByEmail(request.email)
@@ -59,9 +69,10 @@ public class UserService {
         user.setEmail(request.email);
         user.setPasswordHash(passwordEncoder.encode(request.password));
 
-        boolean isMinor = request.isMinor != null && request.isMinor;
+        int userAge = request.age != null ? request.age : ((request.isMinor != null && request.isMinor) ? 16 : 18);
+        boolean isMinor = userAge < 18 || (request.isMinor != null && request.isMinor);
+        user.setAge(userAge);
         user.setIsMinor(isMinor);
-        user.setAge(request.age != null ? request.age : (isMinor ? 16 : 18));
         user.setGuardianEmail(request.guardianEmail);
         user.setGuardianName(request.guardianName);
         user.setGuardianConsentStatus(isMinor ? "PENDING" : "NOT_REQUIRED");
@@ -69,12 +80,52 @@ public class UserService {
         if (isMinor) {
             user.setAnalyticsConsent(false);
             user.setMarketingConsent(false);
+            user.setLocationConsent(false);
+            user.setAiConsent(false);
         } else {
             user.setAnalyticsConsent(request.analyticsConsent != null && request.analyticsConsent);
             user.setMarketingConsent(request.marketingConsent != null && request.marketingConsent);
+            user.setLocationConsent(request.locationConsent != null && request.locationConsent);
+            user.setAiConsent(request.aiConsent != null && request.aiConsent);
         }
 
         user = userRepository.save(user);
+
+        // Record initial Terms and Privacy notice consent
+        ConsentRecord termsConsent = new ConsentRecord();
+        termsConsent.setUser(user);
+        termsConsent.setConsentType("TERMS_AND_PRIVACY");
+        termsConsent.setAction("GRANTED");
+        termsConsent.setDetails("Accepted upon account registration");
+        consentRecordRepository.save(termsConsent);
+
+        // Record audit logs
+        PrivacyAuditLog creationLog = new PrivacyAuditLog(
+                user,
+                user.getEmail(),
+                "ACCOUNT_CREATED",
+                "User account registered with declared age: " + userAge + " (" + (isMinor ? "Minor Mode" : "Adult Mode") + ")"
+        );
+        auditLogRepository.save(creationLog);
+
+        PrivacyAuditLog ageAudit = new PrivacyAuditLog(
+                user,
+                user.getEmail(),
+                "AGE_CATEGORY_ASSIGNED",
+                isMinor ? "Assigned Financial Learning Mode (<18). Payment initiation restricted. Guardian verification required."
+                        : "Assigned Full Transactional Mode (18+)."
+        );
+        auditLogRepository.save(ageAudit);
+
+        if (isMinor && user.getGuardianEmail() != null && !user.getGuardianEmail().trim().isEmpty()) {
+            PrivacyAuditLog guardianLog = new PrivacyAuditLog(
+                    user,
+                    user.getEmail(),
+                    "GUARDIAN_CONSENT_REQUESTED",
+                    "Parental consent verification token pending for guardian: " + user.getGuardianEmail()
+            );
+            auditLogRepository.save(guardianLog);
+        }
 
         String token = jwtUtil.generateToken(user.getEmail());
         return new AuthResponseDto(token, mapToDto(user));
@@ -122,6 +173,8 @@ public class UserService {
         dto.guardianConsentStatus = user.getGuardianConsentStatus();
         dto.analyticsConsent = user.getAnalyticsConsent();
         dto.marketingConsent = user.getMarketingConsent();
+        dto.locationConsent = user.getLocationConsent();
+        dto.aiConsent = user.getAiConsent();
         return dto;
     }
 

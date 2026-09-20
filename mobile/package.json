@@ -1,6 +1,6 @@
 {
   "name": "spedex-mobile",
-  "version": "2.04.01.0",
+  "version": "2.05.00.0",
   "private": true,
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {

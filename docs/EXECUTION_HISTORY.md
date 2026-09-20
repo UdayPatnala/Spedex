@@ -47,6 +47,44 @@ Before declaring any task or milestone complete:
 
 ## 2. HISTORICAL EXECUTION LOGS
 
+### Task ID: EXEC-2026-09-20-01
+- **Date**: 2026-09-20
+- **Task Summary**: SpeDex Privacy, Age Verification, Consent & Financial Safety System Milestone (`2.05.00.0`).
+- **Trigger / Context**: Goal directive to reverse-engineer SpeDex, design, and implement a production-grade privacy, consent, age-verification, financial-safety, and data-governance layer supporting DPDP Act 2023 technical requirements without breaking core product functionality.
+- **Layers Affected**:
+  - `backend/src/main/java/com/spedex/model/PrivacyAuditLog.java`: Created immutable audit log entity for security, privacy, and capability events.
+  - `backend/src/main/java/com/spedex/repository/PrivacyAuditLogRepository.java`: Created audit log repository.
+  - `backend/src/main/java/com/spedex/dto/UserCapabilitiesDto.java`: Created user capabilities DTO.
+  - `backend/src/main/java/com/spedex/service/UserCapabilityService.java`: Created centralized server-side capability engine enforcing age gating and financial learning mode.
+  - `backend/src/main/java/com/spedex/controller/CapabilityController.java`: Exposed `GET /api/capabilities`.
+  - `backend/src/main/java/com/spedex/controller/PaymentController.java`: Enforced capability check on payment preparation (`POST /api/payments/prepare`), blocking minor accounts with HTTP 403 Forbidden and logging `PAYMENT_ACTION_BLOCKED`.
+  - `backend/src/main/java/com/spedex/model/User.java`: Added purpose-separated consent fields (`locationConsent`, `aiConsent`) and audit log relationship.
+  - `backend/src/main/java/com/spedex/service/UserService.java`: Enforced age gating on signup, initial consent recording, and audit logging.
+  - `backend/src/main/java/com/spedex/service/PrivacyService.java`: Expanded consent updates, added `withdrawConsent()`, expanded data export bundle, and added audit logs.
+  - `backend/src/main/java/com/spedex/controller/PrivacyController.java`: Added `POST /api/privacy/consent/withdraw` and `GET /api/privacy/audit-logs`.
+  - `backend/src/test/java/com/spedex/service/UserCapabilityServiceTest.java`: Added 3 unit tests for capability validation across adult, minor, and erased users.
+  - `backend/src/test/java/com/spedex/controller/PaymentControllerTest.java`: Added 2 unit tests verifying HTTP 403 Forbidden for minors and HTTP 200 for adults.
+  - `backend/src/test/java/com/spedex/service/PrivacyServiceTest.java`: Expanded tests to 13 passing unit tests including consent withdrawal.
+  - `dashboard_app/src/types.ts`: Added `UserCapabilities`, `PrivacyAuditLog`, `SubprocessorInfo`, and expanded `PrivacySettings` and `UserDataExport`.
+  - `dashboard_app/src/api.ts`: Added `getCapabilities()`, `withdrawConsent()`, `getPrivacyAuditLogs()`.
+  - `dashboard_app/src/App.tsx`: Loaded capabilities and passed to `PaymentsView`.
+  - `dashboard_app/src/views/PaymentsView.tsx`: Integrated minor financial learning banner and suppressed live UPI QR modal for minor accounts.
+  - `dashboard_app/src/components/privacy/PrivacyCenter.tsx`: Upgraded with purpose-separated consents, minor safety indicators, live immutable audit ledger, and third-party subprocessor registry table.
+  - `mobile/src/screens/PaymentsScreen.tsx`: Enforced minor gating on QR scanning and vendor payment actions.
+  - `docs/PRIVACY_DATA_GOVERNANCE_SPECIFICATION.md`: Authored comprehensive technical compliance specification.
+  - `VERSION_CONTROLLER.md`, `pom.xml`, `package.json` (dashboard & mobile), `version.ts`: Bumped version to `2.05.00.0`.
+- **Verification Results**:
+  - `backend/`: 55/55 tests passing (`./mvnw.cmd test`).
+  - `dashboard_app/`: 9/9 tests passing (`npm test -- --run`) & build clean (`npm run build`).
+  - `mobile/`: 7/7 tests passing (`npm test`) & 0 TypeScript errors (`npx tsc --noEmit`).
+  - Root E2E: 77/77 tests passing (`python test-trips-e2e.py`).
+  - Total: 148/148 tests passing across all suites (100% pass rate).
+- **Key Lessons & Design Decisions**:
+  - Client flags must never be trusted for financial operations; server-side capability authorization guarantees minor safety regardless of client environment.
+  - Immutable audit logs provide provable compliance evidence for consent lifecycles and blocked actions under DPDP Act standards.
+
+---
+
 ### Task ID: EXEC-2026-09-19-03
 - **Date**: 2026-09-19
 - **Task Summary**: Universal Version Controller Historical Reconstruction & Dynamic Live Application Version Display (`2.04.01.0`).

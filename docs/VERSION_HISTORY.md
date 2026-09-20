@@ -7,6 +7,23 @@ Authoritative Version Format: `A.BC.DE.F` (`A` = Major Version, `BC` = Sub-Versi
 
 ---
 
+## [2.05.00.0] - 2026-09-20
+Type: Sub-version
+Status: Verified
+
+### Added
+- **Privacy, Age Verification, Consent & Financial Safety System**:
+  - **Server-Side Capability Authorization Layer (`UserCapabilityService`)**: Gated sensitive payment actions server-side. Adult accounts operate with full transactional autonomy; minor accounts (<18) are restricted to **Financial Learning / Journal Mode** where manual expense logging, budgeting, and privacy-safe insights are active, but payment initiation (`POST /api/payments/prepare`) and live UPI QR generation are strictly blocked with HTTP 403 Forbidden.
+  - **Immutable Privacy & Safety Audit Trail (`PrivacyAuditLog`)**: Dedicated audit ledger recording critical lifecycle and privacy events (`ACCOUNT_CREATED`, `AGE_CATEGORY_ASSIGNED`, `GUARDIAN_CONSENT_REQUESTED`, `GUARDIAN_CONSENT_VERIFIED`, `PAYMENT_ACTION_BLOCKED`, `DATA_EXPORT_REQUESTED`, `ACCOUNT_DELETION_REQUESTED`, `CONSENT_UPDATED`, `CONSENT_WITHDRAWN`).
+  - **Purpose-Separated Consent Architecture**: Granular, independent consent toggles for Essential operations, Telemetry & Performance Analytics, Educational & Marketing Digests, Travel Geolocation, and AI Smart Insights with 1-click immediate withdrawal.
+  - **Verifiable Parental Consent Lifecycle**: Minimal guardian data collection with tokenized verification link workflow.
+  - **Comprehensive Data Subject Rights & Export**: Automated machine-readable JSON archive export (`Download My SpeDex Data`) covering user profile, capabilities, transactions, vendors, budgets, reminders, trips, consent history, grievances, and audit logs (Section 11). Right to Erasure / Anonymization requiring exact confirmation text `DELETE MY DATA` (Section 12).
+  - **Third-Party Subprocessors Registry & Cookie Preference System**: Complete transparency register covering Render, Vercel, Supabase, and Google Fonts with zero sensitive credential storage.
+  - **Technical Compliance Specification**: Authored `docs/PRIVACY_DATA_GOVERNANCE_SPECIFICATION.md` detailing technical controls supporting compliance with the DPDP Act, 2023.
+  - **Automated Verification**: Increased test coverage to 148/148 passing tests across all 4 suites (Backend 55, Dashboard 9, Mobile 7, Root E2E 77).
+
+---
+
 ## [2.04.01.0] - 2026-09-19
 Type: Functional
 Status: Verified

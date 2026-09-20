@@ -2,6 +2,7 @@ import { startTransition, useDeferredValue, useEffect, useMemo, useState } from 
 
 import {
   addVendor,
+  getCapabilities,
   getCurrentUser,
   getTrips,
   loadDashboardBundle,
@@ -28,6 +29,7 @@ import type {
   DashboardOverview,
   LegalDocType,
   Trip,
+  UserCapabilities,
   VendorDirectoryData,
   ViewId,
 } from "./types";
@@ -51,6 +53,7 @@ export default function App() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [sessionReady, setSessionReady] = useState(false);
   const [sessionUser, setSessionUser] = useState<DashboardOverview["user"] | null>(null);
+  const [capabilities, setCapabilities] = useState<UserCapabilities | null>(null);
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [authName, setAuthName] = useState("");
   const [authEmail, setAuthEmail] = useState("");
@@ -106,9 +109,13 @@ export default function App() {
           });
         }
 
-        const currentUser = await getCurrentUser().catch(() => null);
-        if (mounted && currentUser) {
-          setSessionUser(currentUser);
+        const [currentUser, userCaps] = await Promise.all([
+          getCurrentUser().catch(() => null),
+          getCapabilities().catch(() => null),
+        ]);
+        if (mounted) {
+          if (currentUser) setSessionUser(currentUser);
+          if (userCaps) setCapabilities(userCaps);
         }
       } catch (e: any) {
         if (mounted) {
@@ -205,9 +212,13 @@ export default function App() {
     setBudget(bundle.budget);
     setAnalytics(bundle.analytics);
     try {
-      const trips = await getTrips();
+      const [trips, userCaps] = await Promise.all([
+        getTrips().catch(() => []),
+        getCapabilities().catch(() => null),
+      ]);
       const currentActive = (trips || []).find((t) => t.status === "ACTIVE");
       setActiveTrip(currentActive || null);
+      if (userCaps) setCapabilities(userCaps);
     } catch (e) {
       // ignore
     }
@@ -284,7 +295,13 @@ export default function App() {
         />
       );
     } else if (activeView === "payments") {
-      content = <PaymentsView vendors={vendors!} onAddVendor={() => setShowAddVendor(true)} />;
+      content = (
+        <PaymentsView
+          vendors={vendors!}
+          capabilities={capabilities}
+          onAddVendor={() => setShowAddVendor(true)}
+        />
+      );
     } else if (activeView === "trips") {
       content = <TripsView />;
     } else if (activeView === "analytics") {

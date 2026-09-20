@@ -202,6 +202,10 @@ export function deleteReminder(id: number) {
   });
 }
 
+export function getCapabilities() {
+  return request<import("./types").UserCapabilities>("/capabilities");
+}
+
 export function getLegalDocument(docType: import("./types").LegalDocType) {
   return request<import("./types").LegalDocument>(`/privacy/legal/${docType}`);
 }
@@ -210,11 +214,27 @@ export function getPrivacySettings() {
   return request<import("./types").PrivacySettings>("/privacy/settings");
 }
 
-export function updatePrivacyConsents(payload: { analyticsConsent?: boolean; marketingConsent?: boolean }) {
+export function updatePrivacyConsents(payload: {
+  analyticsConsent?: boolean;
+  marketingConsent?: boolean;
+  locationConsent?: boolean;
+  aiConsent?: boolean;
+}) {
   return request<import("./types").PrivacySettings>("/privacy/consent", {
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+export function withdrawConsent(consentType: string) {
+  return request<import("./types").PrivacySettings>("/privacy/consent/withdraw", {
+    method: "POST",
+    body: JSON.stringify({ consentType }),
+  });
+}
+
+export function getPrivacyAuditLogs() {
+  return request<import("./types").PrivacyAuditLog[]>("/privacy/audit-logs");
 }
 
 export function requestGuardianConsent(payload: { guardianName: string; guardianEmail: string }) {

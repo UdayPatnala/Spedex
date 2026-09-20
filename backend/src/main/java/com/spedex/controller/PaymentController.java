@@ -17,6 +17,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import com.spedex.model.PrivacyAuditLog;
+import com.spedex.repository.PrivacyAuditLogRepository;
+import com.spedex.service.UserCapabilityService;
+import org.springframework.http.HttpStatus;
 import java.util.Map;
 
 @RestController
@@ -38,11 +42,34 @@ public class PaymentController {
     @Autowired
     private TripRepository tripRepository;
 
+    @Autowired
+    private UserCapabilityService capabilityService;
+
+    @Autowired
+    private PrivacyAuditLogRepository auditLogRepository;
+
     @PostMapping("/prepare")
     public ResponseEntity<Map<String, Object>> preparePayment(@RequestBody Map<String, Object> payload) {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!capabilityService.canInitiatePayment(user)) {
+            PrivacyAuditLog auditLog = new PrivacyAuditLog(
+                    user,
+                    user.getEmail(),
+                    "PAYMENT_ACTION_BLOCKED",
+                    "Payment initiation blocked for minor or restricted account. Payee: " + payload.getOrDefault("payee_name", "Unknown")
+            );
+            auditLogRepository.save(auditLog);
+
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "PAYMENT_ACTION_BLOCKED_FOR_MINOR");
+            errorResponse.put("message", "Payment initiation and UPI shortcuts are disabled for accounts under 18. Manual journaling and budgeting remain available.");
+            errorResponse.put("mode", "LEARNING_JOURNAL");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+        }
+
         double amount = payload.get("amount") instanceof Number number ? number.doubleValue() : 0.0;
         String payeeName = String.valueOf(payload.getOrDefault("payee_name", "Unknown Vendor"));
         String upiHandle = String.valueOf(payload.getOrDefault("upi_handle", ""));

@@ -22,4 +22,6 @@ public class SignUpRequestDto {
     public String guardianName;
     public Boolean analyticsConsent = false;
     public Boolean marketingConsent = false;
+    public Boolean locationConsent = false;
+    public Boolean aiConsent = false;
 }

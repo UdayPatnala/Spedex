@@ -32,8 +32,13 @@ public class User {
     private String guardianConsentStatus = "NOT_REQUIRED"; // "NOT_REQUIRED", "PENDING", "VERIFIED", "REJECTED"
     private Boolean analyticsConsent = false;
     private Boolean marketingConsent = false;
+    private Boolean locationConsent = false;
+    private Boolean aiConsent = false;
     private Boolean isErased = false;
     private LocalDateTime erasedAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PrivacyAuditLog> privacyAuditLogs;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vendor> vendors;
@@ -89,6 +94,10 @@ public class User {
     public void setAnalyticsConsent(Boolean analyticsConsent) { this.analyticsConsent = analyticsConsent; }
     public Boolean getMarketingConsent() { return marketingConsent != null && marketingConsent; }
     public void setMarketingConsent(Boolean marketingConsent) { this.marketingConsent = marketingConsent; }
+    public Boolean getLocationConsent() { return locationConsent != null && locationConsent; }
+    public void setLocationConsent(Boolean locationConsent) { this.locationConsent = locationConsent; }
+    public Boolean getAiConsent() { return aiConsent != null && aiConsent; }
+    public void setAiConsent(Boolean aiConsent) { this.aiConsent = aiConsent; }
     public Boolean getIsErased() { return isErased != null && isErased; }
     public void setIsErased(Boolean isErased) { this.isErased = isErased; }
     public LocalDateTime getErasedAt() { return erasedAt; }
@@ -108,4 +117,6 @@ public class User {
     public void setConsentRecords(List<ConsentRecord> consentRecords) { this.consentRecords = consentRecords; }
     public List<PrivacyGrievance> getPrivacyGrievances() { return privacyGrievances; }
     public void setPrivacyGrievances(List<PrivacyGrievance> privacyGrievances) { this.privacyGrievances = privacyGrievances; }
+    public List<PrivacyAuditLog> getPrivacyAuditLogs() { return privacyAuditLogs; }
+    public void setPrivacyAuditLogs(List<PrivacyAuditLog> privacyAuditLogs) { this.privacyAuditLogs = privacyAuditLogs; }
 }

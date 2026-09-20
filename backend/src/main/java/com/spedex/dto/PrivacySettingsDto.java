@@ -3,6 +3,8 @@ package com.spedex.dto;
 public class PrivacySettingsDto {
     public Boolean analyticsConsent;
     public Boolean marketingConsent;
+    public Boolean locationConsent;
+    public Boolean aiConsent;
     public Boolean isMinor;
     public Integer age;
     public String guardianEmail;
@@ -14,10 +16,14 @@ public class PrivacySettingsDto {
 
     public PrivacySettingsDto() {}
 
-    public PrivacySettingsDto(Boolean analyticsConsent, Boolean marketingConsent, Boolean isMinor, Integer age,
+    public PrivacySettingsDto(Boolean analyticsConsent, Boolean marketingConsent,
+                              Boolean locationConsent, Boolean aiConsent,
+                              Boolean isMinor, Integer age,
                               String guardianEmail, String guardianName, String guardianConsentStatus) {
         this.analyticsConsent = analyticsConsent;
         this.marketingConsent = marketingConsent;
+        this.locationConsent = locationConsent;
+        this.aiConsent = aiConsent;
         this.isMinor = isMinor;
         this.age = age;
         this.guardianEmail = guardianEmail;

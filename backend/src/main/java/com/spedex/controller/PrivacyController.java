@@ -74,4 +74,18 @@ public class PrivacyController {
                                                              @RequestBody Map<String, String> body) {
         return ResponseEntity.ok(privacyService.eraseUserData(authentication.getName(), body));
     }
+
+    // Authenticated: Withdraw specific consent
+    @PostMapping("/consent/withdraw")
+    public ResponseEntity<PrivacySettingsDto> withdrawConsent(Authentication authentication,
+                                                             @RequestBody Map<String, String> body) {
+        String consentType = body != null ? body.get("consentType") : null;
+        return ResponseEntity.ok(privacyService.withdrawConsent(authentication.getName(), consentType));
+    }
+
+    // Authenticated: Retrieve privacy audit logs
+    @GetMapping("/audit-logs")
+    public ResponseEntity<List<PrivacyAuditLogDto>> getAuditLogs(Authentication authentication) {
+        return ResponseEntity.ok(privacyService.getAuditLogs(authentication.getName()));
+    }
 }

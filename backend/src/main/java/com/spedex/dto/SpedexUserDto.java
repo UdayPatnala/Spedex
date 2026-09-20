@@ -27,4 +27,8 @@ public class SpedexUserDto {
     public Boolean analyticsConsent;
     @JsonProperty("marketing_consent")
     public Boolean marketingConsent;
+    @JsonProperty("location_consent")
+    public Boolean locationConsent;
+    @JsonProperty("ai_consent")
+    public Boolean aiConsent;
 }

@@ -74,6 +74,14 @@ export function PaymentsScreen({ navigation }: any) {
   const handleQrData = (qrData: string) => {
     setIsScannerVisible(false);
 
+    if (data?.user?.is_minor) {
+      Alert.alert(
+        "Payment Action Blocked",
+        "Direct payment actions are restricted for accounts under 18 in accordance with minor protection safeguards."
+      );
+      return;
+    }
+
     if (qrData.startsWith("upi://pay")) {
       const url = new URL(qrData.replace("upi://pay", "http://fake.com")); // Trick URL parser
       const pa = url.searchParams.get("pa");
@@ -116,6 +124,14 @@ export function PaymentsScreen({ navigation }: any) {
   };
 
   const openScanner = async () => {
+    if (data?.user?.is_minor) {
+      Alert.alert(
+        "Financial Learning Mode Active",
+        "Payment QR scanning and direct payment initiation are disabled for accounts under 18. Manual journaling is enabled."
+      );
+      return;
+    }
+
     if (!permission?.granted) {
       const { granted } = await requestPermission();
       if (!granted) {
@@ -350,6 +366,18 @@ export function PaymentsScreen({ navigation }: any) {
           </View>
         </Modal>
 
+        {Boolean(data?.user?.is_minor) && (
+          <View style={styles.minorBanner}>
+            <MaterialIcons name="shield" size={24} color={colors.primary} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.minorBannerTitle}>Financial Learning Mode Active</Text>
+              <Text style={styles.minorBannerSubtitle}>
+                Live payment shortcuts and QR actions are disabled for accounts under 18 in accordance with minor protection safeguards. Manual journaling remains available.
+              </Text>
+            </View>
+          </View>
+        )}
+
         {Object.keys(groups).length === 0 ? (
           <View style={{ padding: 32, alignItems: "center", marginTop: 24 }}>
             <MaterialIcons name="folder-open" size={64} color={colors.onSurfaceVariant} style={{ opacity: 0.3 }} />
@@ -370,7 +398,16 @@ export function PaymentsScreen({ navigation }: any) {
                   <Pressable
                     key={vendor.id}
                     style={styles.vendorCard}
-                    onPress={() => navigation.getParent()?.navigate("PaymentConfirm", { vendor, amount: vendor.default_amount })}
+                    onPress={() => {
+                      if (data?.user?.is_minor) {
+                        Alert.alert(
+                          "Financial Learning Mode Active",
+                          `Direct payments to ${vendor.name} are disabled for accounts under 18. You can record manual transactions from your overview screen.`
+                        );
+                        return;
+                      }
+                      navigation.getParent()?.navigate("PaymentConfirm", { vendor, amount: vendor.default_amount });
+                    }}
                   >
                     <View style={styles.vendorInfo}>
                       <View style={[styles.vendorIcon, { backgroundColor: palette.bg }]}>
@@ -714,5 +751,27 @@ const styles = StyleSheet.create({
     color: colors.onSurface,
     fontWeight: "800",
     fontSize: 20,
+  },
+  minorBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    backgroundColor: `${colors.primary}12`,
+    borderWidth: 1,
+    borderColor: `${colors.primary}33`,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  minorBannerTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: colors.primary,
+    marginBottom: 2,
+  },
+  minorBannerSubtitle: {
+    fontSize: 11,
+    color: colors.onSurfaceVariant,
+    lineHeight: 16,
   },
 });
