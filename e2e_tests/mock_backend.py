@@ -253,7 +253,9 @@ class MockBackendHandler(BaseHTTPRequestHandler):
                     "name": t["name"],
                     "status": t["status"],
                     "created_at": t["created_at"],
-                    "completed_at": t["completed_at"]
+                    "completed_at": t["completed_at"],
+                    "currency": t.get("currency", "INR"),
+                    "exchange_rate": t.get("exchange_rate", 1.0)
                 })
             self._send_response(200, response_trips)
             return
@@ -309,12 +311,19 @@ class MockBackendHandler(BaseHTTPRequestHandler):
             
             category_breakdown.sort(key=lambda x: (-x["amount"], x["category"]))
 
+            curr = trip.get("currency", "INR")
+            rate = float(trip.get("exchange_rate", 1.0) or 1.0)
+            foreign_spend = round(total_spend / rate, 2) if curr != "INR" and rate > 0 else None
+
             response = {
                 "id": trip["id"],
                 "name": trip["name"],
                 "status": trip["status"],
                 "created_at": trip["created_at"],
                 "completed_at": trip["completed_at"],
+                "currency": curr,
+                "exchange_rate": rate,
+                "foreign_total_spend": foreign_spend,
                 "total_spend": round(total_spend, 2),
                 "cash_spend": round(cash_spend, 2),
                 "card_online_spend": round(card_online_spend, 2),
@@ -597,13 +606,20 @@ class MockBackendHandler(BaseHTTPRequestHandler):
                     t["status"] = "COMPLETED"
                     t["completed_at"] = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
 
+            currency = body.get('currency', 'INR')
+            if not isinstance(currency, str) or not currency.strip():
+                currency = 'INR'
+            exchange_rate = float(body.get('exchangeRate', body.get('exchange_rate', 1.0)) or 1.0)
+
             new_trip = {
                 "id": TRIP_ID_COUNTER,
                 "name": trip_name.strip(),
                 "status": "ACTIVE",
                 "created_at": datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
                 "completed_at": None,
-                "user_email": user_email
+                "user_email": user_email,
+                "currency": currency.strip().upper(),
+                "exchange_rate": exchange_rate
             }
             TRIPS.append(new_trip)
             TRIP_ID_COUNTER += 1
@@ -613,7 +629,9 @@ class MockBackendHandler(BaseHTTPRequestHandler):
                 "name": new_trip["name"],
                 "status": new_trip["status"],
                 "created_at": new_trip["created_at"],
-                "completed_at": new_trip["completed_at"]
+                "completed_at": new_trip["completed_at"],
+                "currency": new_trip["currency"],
+                "exchange_rate": new_trip["exchange_rate"]
             })
             return
 

@@ -283,4 +283,51 @@ public class TripServiceTest {
                 tripService.addManualTransaction(10L, 50.0, "Coffee", "Food", "john@example.com"));
         assertEquals("Cannot add transactions to a completed trip", ex.getMessage());
     }
+
+    @Test
+    void startTrip_WithCustomCurrencyAndExchangeRate() {
+        when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(mockUser));
+        when(tripRepository.findByUserAndStatus(mockUser, TripStatus.ACTIVE)).thenReturn(Optional.empty());
+        when(tripRepository.save(any(Trip.class))).thenAnswer(invocation -> {
+            Trip saved = invocation.getArgument(0);
+            saved.setId(99L);
+            return saved;
+        });
+
+        TripDto dto = tripService.startTrip("Singapore Tech Summit", "SGD", 64.0, "john@example.com");
+
+        assertNotNull(dto);
+        assertEquals(99L, dto.id);
+        assertEquals("Singapore Tech Summit", dto.name);
+        assertEquals("SGD", dto.currency);
+        assertEquals(64.0, dto.exchangeRate);
+    }
+
+    @Test
+    void getTripDetails_ComputesForeignTotalSpend_ForNonInrTrip() {
+        mockTrip.setCurrency("USD");
+        mockTrip.setExchangeRate(86.5);
+
+        Transaction t1 = new Transaction();
+        t1.setId(101L);
+        t1.setAmount(865.0); // Exactly 10 USD
+        t1.setStatus("completed");
+        t1.setDirection("expense");
+        t1.setPaymentMethod("DIGITAL");
+        t1.setCategory("Food");
+        mockTrip.getTransactions().add(t1);
+
+        when(userRepository.findByEmail("john@example.com")).thenReturn(Optional.of(mockUser));
+        when(tripRepository.findById(10L)).thenReturn(Optional.of(mockTrip));
+        when(userService.mapToDto(any(Transaction.class))).thenReturn(new TransactionDto());
+
+        TripDetailsDto details = tripService.getTripDetails(10L, "john@example.com");
+
+        assertNotNull(details);
+        assertEquals("USD", details.currency);
+        assertEquals(86.5, details.exchangeRate);
+        assertEquals(865.0, details.totalSpend);
+        assertNotNull(details.foreignTotalSpend);
+        assertEquals(10.0, details.foreignTotalSpend);
+    }
 }

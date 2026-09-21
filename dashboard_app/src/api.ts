@@ -144,10 +144,10 @@ export function getTrips() {
   return request<Trip[]>("/trips");
 }
 
-export function startTrip(name: string) {
+export function startTrip(name: string, currency: string = "INR", exchangeRate: number = 1.0) {
   return request<Trip>("/trips", {
     method: "POST",
-    body: JSON.stringify({ name }),
+    body: JSON.stringify({ name, currency, exchangeRate }),
   });
 }
 

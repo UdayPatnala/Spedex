@@ -8,17 +8,27 @@ import {
 } from "../api";
 import type { Trip, TripDetails } from "../types";
 import { categoryLabel, formatCurrency, formatDate } from "../utils/formatters";
+import {
+  FOREX_CACHE,
+  formatForeignCurrency,
+  convertInrToForeign,
+  convertForeignToInr,
+  getExchangeRate,
+} from "../utils/forex";
 
 export function TripsView() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [selectedTripId, setSelectedTripId] = useState<number | null>(null);
   const [tripDetails, setTripDetails] = useState<TripDetails | null>(null);
   const [newTripName, setNewTripName] = useState("");
+  const [newTripCurrency, setNewTripCurrency] = useState("INR");
+  const [newTripRate, setNewTripRate] = useState<number>(1.0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Manual cash transaction form
   const [cashAmount, setCashAmount] = useState("");
+  const [cashCurrencyMode, setCashCurrencyMode] = useState<"INR" | "FOREIGN">("INR");
   const [cashDesc, setCashDesc] = useState("");
   const [cashCategory, setCashCategory] = useState("Dining");
   const [customCategory, setCustomCategory] = useState("");
@@ -78,8 +88,10 @@ export function TripsView() {
     try {
       setLoading(true);
       setError(null);
-      const newTrip = await startTrip(newTripName.trim());
+      const newTrip = await startTrip(newTripName.trim(), newTripCurrency, newTripRate);
       setNewTripName("");
+      setNewTripCurrency("INR");
+      setNewTripRate(1.0);
       setSelectedTripId(newTrip.id);
       await fetchTrips();
     } catch (e: any) {
@@ -117,21 +129,36 @@ export function TripsView() {
   const handleAddTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedTripId === null) return;
-    const amountNum = parseFloat(cashAmount);
-    if (isNaN(amountNum) || amountNum <= 0) {
+    const rawAmount = parseFloat(cashAmount);
+    if (isNaN(rawAmount) || rawAmount <= 0) {
       setError("Please enter a valid positive amount.");
       return;
     }
+
+    // Convert to INR if entered in foreign currency
+    let finalInrAmount = rawAmount;
+    let descriptionSuffix = "";
+    if (
+      cashCurrencyMode === "FOREIGN" &&
+      tripDetails?.currency &&
+      tripDetails.currency !== "INR"
+    ) {
+      const rate = tripDetails.exchange_rate || getExchangeRate(tripDetails.currency);
+      finalInrAmount = convertForeignToInr(rawAmount, tripDetails.currency, rate);
+      descriptionSuffix = ` (${formatForeignCurrency(rawAmount, tripDetails.currency)} @ ₹${rate})`;
+    }
+
     try {
       setSubmittingTx(true);
       setError(null);
       await addManualTransaction(selectedTripId, {
-        amount: amountNum,
-        description: cashDesc.trim() || "Cash Expense",
+        amount: finalInrAmount,
+        description: (cashDesc.trim() || "Cash Expense") + descriptionSuffix,
         category: cashCategory,
       });
       setCashAmount("");
       setCashDesc("");
+      setCashCurrencyMode("INR");
       // Refresh details
       const details = await getTripDetails(selectedTripId);
       setTripDetails(details);
@@ -154,13 +181,36 @@ export function TripsView() {
           <form onSubmit={handleStartTrip} className="start-trip-form">
             <input
               type="text"
-              placeholder="e.g. Mumbai Business, Goa 2026"
+              placeholder="e.g. Mumbai, Singapore, Nepal 2026"
               value={newTripName}
               onChange={(e) => setNewTripName(e.target.value)}
               className="text-input"
               required
             />
-            <button type="submit" disabled={loading} className="cta-button primary">
+            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+              <select
+                value={newTripCurrency}
+                onChange={(e) => {
+                  const curr = e.target.value;
+                  setNewTripCurrency(curr);
+                  setNewTripRate(getExchangeRate(curr));
+                }}
+                className="select-input"
+                style={{ flex: 1, padding: "8px 10px", borderRadius: 10, border: "0.5px solid var(--border-soft)", background: "white", fontSize: "0.82rem" }}
+              >
+                {Object.values(FOREX_CACHE).map((c) => (
+                  <option key={c.code} value={c.code}>
+                    {c.flag} {c.code} ({c.symbol})
+                  </option>
+                ))}
+              </select>
+              {newTripCurrency !== "INR" && (
+                <div style={{ display: "flex", alignItems: "center", fontSize: "0.75rem", color: "var(--text-muted)", paddingRight: 4 }}>
+                  <span>₹{newTripRate}</span>
+                </div>
+              )}
+            </div>
+            <button type="submit" disabled={loading} className="cta-button primary" style={{ marginTop: 8 }}>
               <span className="material-symbols-outlined">add</span> Start New Trip
             </button>
           </form>
@@ -174,14 +224,23 @@ export function TripsView() {
               className={`trip-history-item ${t.id === selectedTripId ? "active" : ""}`}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                <span style={{ fontWeight: 600 }}>{t.name}</span>
+                <span style={{ fontWeight: 600 }}>
+                  {FOREX_CACHE[t.currency || "INR"]?.flag || "🇮🇳"} {t.name}
+                </span>
                 <span className={`status-chip ${t.status === "ACTIVE" ? "active" : "soft"}`}>
                   {t.status}
                 </span>
               </div>
-              <span className="subtle" style={{ fontSize: "0.75rem", marginTop: 4, display: "block" }}>
-                Started: {formatDate(t.created_at)}
-              </span>
+              <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+                <span className="subtle" style={{ fontSize: "0.75rem" }}>
+                  Started: {formatDate(t.created_at)}
+                </span>
+                {t.currency && t.currency !== "INR" && (
+                  <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--primary)" }}>
+                    {t.currency}
+                  </span>
+                )}
+              </div>
             </button>
           ))}
           {trips.length === 0 && <p className="subtle text-center">No trips started yet.</p>}
@@ -200,9 +259,16 @@ export function TripsView() {
           <div className="trip-details-view">
             <div className="section-header" style={{ marginBottom: 20 }}>
               <div>
-                <span className={`status-chip ${tripDetails.status === "ACTIVE" ? "active" : "soft"}`}>
-                  {tripDetails.status}
-                </span>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span className={`status-chip ${tripDetails.status === "ACTIVE" ? "active" : "soft"}`}>
+                    {tripDetails.status}
+                  </span>
+                  {tripDetails.currency && tripDetails.currency !== "INR" && (
+                    <span className="status-chip soft" style={{ background: "rgba(212, 175, 55, 0.15)", color: "#8a6d1c" }}>
+                      ✈️ {FOREX_CACHE[tripDetails.currency]?.flag || "🌐"} {tripDetails.currency} (1 {tripDetails.currency} = ₹{tripDetails.exchange_rate || getExchangeRate(tripDetails.currency)})
+                    </span>
+                  )}
+                </div>
                 <h2 className="page-title section-title" style={{ marginTop: 6 }}>{tripDetails.name}</h2>
                 <p className="subtle">
                   Started: {formatDate(tripDetails.created_at)}
@@ -224,8 +290,13 @@ export function TripsView() {
 
             <div className="trip-stat-grid">
               <div className="trip-stat-card card">
-                <p className="eyebrow text-muted">Total Spent</p>
+                <p className="eyebrow text-muted">Total Spent (INR)</p>
                 <strong className="trip-stat-value">{formatCurrency(tripDetails.total_spend)}</strong>
+                {tripDetails.currency && tripDetails.currency !== "INR" && (
+                  <span className="subtle" style={{ fontSize: "0.85rem", color: "#8a6d1c", marginTop: 2, display: "block" }}>
+                    ~{formatForeignCurrency(tripDetails.foreign_total_spend ?? convertInrToForeign(tripDetails.total_spend, tripDetails.currency, tripDetails.exchange_rate), tripDetails.currency)}
+                  </span>
+                )}
               </div>
               <div className="trip-stat-card card">
                 <p className="eyebrow text-muted">Cash Spend</p>
@@ -311,6 +382,28 @@ export function TripsView() {
           <div className="qr-modal-card" onClick={(e) => e.stopPropagation()} style={{ width: "100%", maxWidth: 420 }}>
             <h3>Log Cash Transaction</h3>
             <p className="subtle" style={{ marginBottom: 16 }}>Log a manual cash transaction to this active trip.</p>
+
+            {tripDetails?.currency && tripDetails.currency !== "INR" && (
+              <div style={{ display: "flex", gap: 8, marginBottom: 14, padding: 4, background: "rgba(0,0,0,0.04)", borderRadius: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => setCashCurrencyMode("INR")}
+                  className={`cta-button ${cashCurrencyMode === "INR" ? "primary" : "secondary"}`}
+                  style={{ flex: 1, padding: "6px 8px", fontSize: "0.8rem", borderRadius: 8 }}
+                >
+                  🇮🇳 Enter in INR (₹)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCashCurrencyMode("FOREIGN")}
+                  className={`cta-button ${cashCurrencyMode === "FOREIGN" ? "primary" : "secondary"}`}
+                  style={{ flex: 1, padding: "6px 8px", fontSize: "0.8rem", borderRadius: 8 }}
+                >
+                  {FOREX_CACHE[tripDetails.currency]?.flag || "🌐"} {tripDetails.currency} ({FOREX_CACHE[tripDetails.currency]?.symbol || "$"})
+                </button>
+              </div>
+            )}
+
             <form onSubmit={async (e) => {
               await handleAddTransaction(e);
               setShowLogCashModal(false);
@@ -319,7 +412,7 @@ export function TripsView() {
                 <input
                   type="number"
                   step="0.01"
-                  placeholder="Amount (₹)"
+                  placeholder={cashCurrencyMode === "FOREIGN" && tripDetails?.currency ? `Amount (${tripDetails.currency} ${FOREX_CACHE[tripDetails.currency]?.symbol || ""})` : "Amount (₹)"}
                   value={cashAmount}
                   onChange={(e) => setCashAmount(e.target.value)}
                   style={{ flex: 1 }}
@@ -334,6 +427,12 @@ export function TripsView() {
                   required
                 />
               </div>
+
+              {cashCurrencyMode === "FOREIGN" && tripDetails?.currency && cashAmount && !isNaN(parseFloat(cashAmount)) && (
+                <p style={{ fontSize: "0.8rem", color: "#8a6d1c", textAlign: "left", marginTop: 4, marginBottom: 6, paddingLeft: 4 }}>
+                  ≈ ₹{convertForeignToInr(parseFloat(cashAmount) || 0, tripDetails.currency, tripDetails.exchange_rate)} INR (1 {tripDetails.currency} = ₹{tripDetails.exchange_rate || getExchangeRate(tripDetails.currency)})
+                </p>
+              )}
 
               <div className="form-group" style={{ display: "flex", flexDirection: "column", gap: 6, textAlign: "left" }}>
                 <label className="eyebrow" style={{ paddingLeft: 4 }}>Category Tag</label>

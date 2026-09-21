@@ -28,6 +28,12 @@ public class Trip {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    @Column(name = "currency")
+    private String currency = "INR";
+
+    @Column(name = "exchange_rate")
+    private Double exchangeRate = 1.0;
+
     @OneToMany(mappedBy = "trip", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Transaction> transactions = new ArrayList<>();
 
@@ -57,6 +63,12 @@ public class Trip {
 
     public LocalDateTime getCompletedAt() { return completedAt; }
     public void setCompletedAt(LocalDateTime completedAt) { this.completedAt = completedAt; }
+
+    public String getCurrency() { return currency != null ? currency : "INR"; }
+    public void setCurrency(String currency) { this.currency = currency; }
+
+    public Double getExchangeRate() { return exchangeRate != null ? exchangeRate : 1.0; }
+    public void setExchangeRate(Double exchangeRate) { this.exchangeRate = exchangeRate; }
 
     public List<Transaction> getTransactions() { return transactions; }
     public void setTransactions(List<Transaction> transactions) { this.transactions = transactions; }

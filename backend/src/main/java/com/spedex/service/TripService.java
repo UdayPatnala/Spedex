@@ -39,6 +39,10 @@ public class TripService {
     private UserService userService;
 
     public TripDto startTrip(String name, String userEmail) {
+        return startTrip(name, "INR", 1.0, userEmail);
+    }
+
+    public TripDto startTrip(String name, String currency, Double exchangeRate, String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -54,6 +58,8 @@ public class TripService {
         trip.setUser(user);
         trip.setStatus(TripStatus.ACTIVE);
         trip.setCreatedAt(LocalDateTime.now());
+        trip.setCurrency(currency != null && !currency.isBlank() ? currency.toUpperCase().trim() : "INR");
+        trip.setExchangeRate(exchangeRate != null && exchangeRate > 0.0 ? exchangeRate : 1.0);
 
         Trip savedTrip = tripRepository.save(trip);
         return mapToDto(savedTrip);
@@ -160,6 +166,14 @@ public class TripService {
         details.completedAt = trip.getCompletedAt() == null
                 ? null
                 : trip.getCompletedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        details.currency = trip.getCurrency();
+        details.exchangeRate = trip.getExchangeRate();
+        if (!"INR".equalsIgnoreCase(details.currency) && details.exchangeRate != null && details.exchangeRate > 0.0) {
+            double converted = totalSpend / details.exchangeRate;
+            details.foreignTotalSpend = Math.round(converted * 100.0) / 100.0;
+        } else {
+            details.foreignTotalSpend = null;
+        }
         details.totalSpend = totalSpend;
         details.cashSpend = cashSpend;
         details.cardOnlineSpend = cardOnlineSpend;
@@ -214,6 +228,8 @@ public class TripService {
         dto.completedAt = trip.getCompletedAt() == null
                 ? null
                 : trip.getCompletedAt().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        dto.currency = trip.getCurrency();
+        dto.exchangeRate = trip.getExchangeRate();
         return dto;
     }
 }

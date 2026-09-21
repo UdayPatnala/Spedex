@@ -17,6 +17,11 @@ public class TripDetailsDto {
     public Double cashSpend;
     @JsonProperty("card_online_spend")
     public Double cardOnlineSpend;
+    public String currency = "INR";
+    @JsonProperty("exchange_rate")
+    public Double exchangeRate = 1.0;
+    @JsonProperty("foreign_total_spend")
+    public Double foreignTotalSpend;
     @JsonProperty("category_breakdown")
     public List<CategoryBreakdownDto> categoryBreakdown;
     public List<TransactionDto> transactions;

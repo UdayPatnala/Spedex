@@ -10,4 +10,7 @@ public class TripDto {
     public String createdAt;
     @JsonProperty("completed_at")
     public String completedAt;
+    public String currency = "INR";
+    @JsonProperty("exchange_rate")
+    public Double exchangeRate = 1.0;
 }

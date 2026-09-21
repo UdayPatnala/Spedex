@@ -118,10 +118,10 @@ export const spedexApi = {
       body: JSON.stringify(payload),
     }),
   getTrips: () => request<Trip[]>("/trips"),
-  startTrip: (name: string) =>
+  startTrip: (name: string, currency: string = "INR", exchangeRate: number = 1.0) =>
     request<Trip>("/trips", {
       method: "POST",
-      body: JSON.stringify({ name }),
+      body: JSON.stringify({ name, currency, exchangeRate }),
     }),
   getTripDetails: (id: number) => request<TripDetails>(`/trips/${id}`),
   completeTrip: (id: number) =>

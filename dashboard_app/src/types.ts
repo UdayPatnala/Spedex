@@ -118,6 +118,8 @@ export type Trip = {
   status: "ACTIVE" | "COMPLETED";
   created_at: string;
   completed_at: string | null;
+  currency?: string;
+  exchange_rate?: number;
 };
 
 export type CategoryBreakdown = {
@@ -132,6 +134,9 @@ export type TripDetails = {
   status: "ACTIVE" | "COMPLETED";
   created_at: string;
   completed_at: string | null;
+  currency?: string;
+  exchange_rate?: number;
+  foreign_total_spend?: number | null;
   total_spend: number;
   cash_spend: number;
   card_online_spend: number;

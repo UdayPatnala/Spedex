@@ -27,7 +27,17 @@ public class TripController {
         if (!(nameObj instanceof String name) || name.trim().isEmpty()) {
             throw new RuntimeException("Invalid trip name");
         }
-        TripDto tripDto = tripService.startTrip(name, email);
+        String currency = "INR";
+        if (payload.get("currency") instanceof String cur && !cur.trim().isEmpty()) {
+            currency = cur.trim();
+        }
+        Double exchangeRate = 1.0;
+        if (payload.get("exchangeRate") instanceof Number num) {
+            exchangeRate = num.doubleValue();
+        } else if (payload.get("exchange_rate") instanceof Number num2) {
+            exchangeRate = num2.doubleValue();
+        }
+        TripDto tripDto = tripService.startTrip(name.trim(), currency, exchangeRate, email);
         return new ResponseEntity<>(tripDto, HttpStatus.CREATED);
     }
 

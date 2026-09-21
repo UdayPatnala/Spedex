@@ -174,7 +174,9 @@ export function TripsScreen() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.activeTripName}>{activeTrip.name}</Text>
+            <Text style={styles.activeTripName}>
+              {activeTrip.name} {activeTrip.currency && activeTrip.currency !== "INR" ? `(${activeTrip.currency})` : ""}
+            </Text>
             <Text style={styles.activeTripDate}>
               Started {new Date(activeTrip.created_at).toLocaleDateString()}
             </Text>
@@ -185,6 +187,11 @@ export function TripsScreen() {
                 <View style={styles.statBox}>
                   <Text style={styles.statLabel}>Total Spend</Text>
                   <Text style={styles.statValue}>₹{activeTripDetails.total_spend.toLocaleString()}</Text>
+                  {activeTripDetails.currency && activeTripDetails.currency !== "INR" && (
+                    <Text style={{ fontSize: 11, color: colors.tertiary, marginTop: 2, fontWeight: "600" }}>
+                      ~{activeTripDetails.foreign_total_spend ?? (activeTripDetails.exchange_rate ? Math.round((activeTripDetails.total_spend / activeTripDetails.exchange_rate) * 100) / 100 : 0)} {activeTripDetails.currency}
+                    </Text>
+                  )}
                 </View>
                 <View style={styles.statBox}>
                   <Text style={styles.statLabel}>Cash Spend</Text>
