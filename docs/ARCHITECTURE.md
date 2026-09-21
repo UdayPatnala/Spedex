@@ -120,11 +120,16 @@ SpeDex incorporates a complete full-stack compliance engine adhering to the **Di
 ## 5. Verification & Testing Matrix
 
 The platform enforces a mandatory 4-part verification standard:
-1. **Backend**: ./mvnw.cmd test — 49/49 unit/integration tests passing.
-2. **Dashboard**: 
-pm test -- --run & 
-pm run build — 9/9 tests passing, 0 TypeScript/build errors.
-3. **Mobile**: 
-pm test & 
-px tsc --noEmit — 7/7 tests passing, 0 TypeScript errors.
-4. **End-to-End**: python test-trips-e2e.py — 77/77 tests passing.
+1. **Backend**: `./mvnw.cmd test` — 57/57 unit/integration tests passing.
+2. **Dashboard**: `npm test -- --run` & `npm run build` — 9/9 tests passing, 0 TypeScript/build errors.
+3. **Mobile**: `npm test` & `npx tsc --noEmit` — 7/7 tests passing, 0 TypeScript errors.
+4. **End-to-End**: `python test-trips-e2e.py` — 77/77 tests passing.
+**Total Automated Verification**: **150 / 150 tests passing (100% pass rate)**.
+
+---
+
+## 6. Authoritative Modular Governance
+
+For the complete, exhaustive **Universal Modular Architecture & Change-Isolation Governance System**, domain ownership maps, traceability traces, change radius protocols, module registry, and dependency maps, consult the root authoritative specification:
+[`ARCHITECTURE.md`](file:///d:/PROJECT/AROH%20Open%20Source/Products/Spedex/ARCHITECTURE.md) and [`.agents/AGENTS.md`](file:///d:/PROJECT/AROH%20Open%20Source/Products/Spedex/.agents/AGENTS.md).
+

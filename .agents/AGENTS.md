@@ -1542,3 +1542,1981 @@ The Version Controller is therefore both:
 and
 
 **the final ledger after change.**
+
+---
+
+# UNIVERSAL MODULAR ARCHITECTURE & CHANGE-ISOLATION GOVERNANCE
+
+This project MUST be designed, organized, maintained, and modified using strict modular architecture and change-isolation principles.
+
+The objective is:
+
+> **Every page, feature, function, component, workflow, service, API, data model, button, interaction, and system capability must have a clearly identifiable ownership boundary so that modifying one thing does not unnecessarily modify, overwrite, delete, or destabilize unrelated parts of the project.**
+
+This architecture applies to:
+* Web applications
+* Mobile applications
+* Desktop applications
+* APIs
+* Full-stack applications
+* SaaS products
+* Data/AI applications
+* Libraries
+* Developer tools
+* Multi-product repositories
+* Monorepos
+* Complex projects with multiple modules
+
+Adapt the exact folder names to the technology, but preserve the architectural principles.
+
+---
+
+# 1. ARCHITECTURE IS A SYSTEM OF BOUNDARIES
+
+Do NOT organize the project only according to file type:
+
+```text
+components/
+utils/
+services/
+pages/
+```
+
+This often creates large shared folders where unrelated functionality becomes tightly coupled.
+
+Prefer **domain/feature ownership**.
+
+The primary question must be:
+
+> "Which part of the system owns this behavior?"
+
+rather than:
+
+> "What type of file is this?"
+
+---
+
+# 2. ARCHITECTURE HIERARCHY
+
+Use the following conceptual hierarchy:
+
+```text
+PROJECT
+│
+├── APP / SHELL
+│
+├── DOMAINS
+│   ├── DOMAIN A
+│   │   ├── PAGE
+│   │   ├── FEATURE
+│   │   ├── COMPONENT
+│   │   ├── FUNCTION
+│   │   ├── SERVICE
+│   │   ├── DATA
+│   │   └── TESTS
+│   │
+│   └── DOMAIN B
+│       └── ...
+│
+├── SHARED
+│
+├── INFRASTRUCTURE
+│
+├── CONFIGURATION
+│
+├── TESTING
+│
+└── DOCUMENTATION
+```
+
+The exact implementation depends on the technology.
+
+---
+
+# 3. FIRST PRINCIPLE — OWNERSHIP
+
+Every meaningful piece of code must have an owner.
+
+Examples:
+
+```text
+Login Page
+→ Authentication domain
+
+Search button
+→ Search feature
+
+Playback controller
+→ Playback feature
+
+Payment API
+→ Payments domain
+
+User profile state
+→ Profile domain
+
+Notification delivery
+→ Notifications domain
+```
+
+Do not allow functionality to become "orphan code" whose ownership is unclear.
+
+---
+
+# 4. SECOND PRINCIPLE — LOCALITY
+
+Code that changes together should live together.
+
+If a feature requires:
+
+```text
+UI
+state
+business logic
+API calls
+validation
+types
+tests
+```
+
+prefer keeping those pieces within the feature's boundary rather than scattering them across unrelated global directories.
+
+Example:
+
+```text
+features/
+└── search/
+    ├── components/
+    ├── hooks/
+    ├── services/
+    ├── state/
+    ├── validation/
+    ├── types/
+    └── tests/
+```
+
+This makes the feature independently understandable and maintainable.
+
+---
+
+# 5. THIRD PRINCIPLE — CHANGE ISOLATION
+
+When the user asks:
+
+> "Fix the search button."
+
+the agent MUST NOT automatically modify:
+
+```text
+authentication
+payments
+profile
+database
+navigation
+unrelated UI
+```
+
+unless dependency analysis proves those areas are affected.
+
+The default assumption is:
+
+> **Change the smallest possible ownership boundary.**
+
+---
+
+# 6. CHANGE RADIUS
+
+Before modifying anything, calculate the expected change radius.
+
+Classify files as:
+
+```text
+DIRECT
+RELATED
+DEPENDENT
+SHARED
+UNRELATED
+```
+
+### DIRECT
+
+Files that implement the requested functionality.
+
+### RELATED
+
+Files directly supporting the functionality.
+
+### DEPENDENT
+
+Files consuming the functionality.
+
+### SHARED
+
+Infrastructure used by multiple modules.
+
+### UNRELATED
+
+Everything else.
+
+Only DIRECT and necessary RELATED files should normally be modified.
+
+DEPENDENT files require explicit impact analysis.
+
+SHARED files require additional caution.
+
+UNRELATED files MUST NOT be modified.
+
+---
+
+# 7. ARCHITECTURAL OWNERSHIP MAP
+
+Maintain an ownership map.
+
+Example:
+
+```text
+Authentication
+├── LoginPage
+├── RegisterPage
+├── AuthForm
+├── authService
+├── authStore
+├── authValidation
+└── authTests
+
+Profile
+├── ProfilePage
+├── ProfileEditor
+├── profileService
+├── profileStore
+├── profileValidation
+└── profileTests
+
+Search
+├── SearchPage
+├── SearchInput
+├── SearchResults
+├── searchService
+├── searchState
+├── searchValidation
+└── searchTests
+```
+
+This should be documented so an agent can determine where a change belongs.
+
+---
+
+# 8. PAGE OWNERSHIP
+
+Every application page/screen must have a defined ownership boundary.
+
+Example:
+
+```text
+pages/
+├── home/
+├── login/
+├── dashboard/
+├── settings/
+└── profile/
+```
+
+But pages should not become giant containers.
+
+A page should primarily compose:
+
+```text
+Page
+↓
+Sections
+↓
+Features
+↓
+Components
+```
+
+Business logic should generally live below the page layer.
+
+---
+
+# 9. PAGE STRUCTURE
+
+A complex page should be decomposed:
+
+```text
+Dashboard
+│
+├── Header
+├── Navigation
+├── SummarySection
+├── AnalyticsSection
+├── ActivitySection
+└── Footer
+```
+
+If a section becomes independently meaningful:
+
+```text
+sections/
+└── analytics/
+```
+
+If it has behavior:
+
+```text
+features/
+└── analytics/
+```
+
+Do not allow pages to become 1,000+ line monoliths unless there is a strong reason.
+
+---
+
+# 10. FEATURE OWNERSHIP
+
+Each major feature should have its own boundary.
+
+Example:
+
+```text
+features/
+├── authentication/
+├── search/
+├── notifications/
+├── payments/
+├── media-player/
+└── settings/
+```
+
+A feature should contain its own:
+
+```text
+components
+logic
+state
+services
+validation
+types
+tests
+```
+
+where appropriate.
+
+---
+
+# 11. FUNCTION OWNERSHIP
+
+Functions must have clear ownership.
+
+Avoid:
+
+```text
+utils/
+└── everything.ts
+```
+
+or:
+
+```text
+helpers/
+└── common.ts
+```
+
+containing unrelated business logic.
+
+Instead:
+
+```text
+features/
+└── search/
+    ├── searchQuery.ts
+    ├── normalizeSearchQuery.ts
+    └── ranking.ts
+```
+
+A function belongs close to the domain that owns its behavior.
+
+---
+
+# 12. BUTTON OWNERSHIP
+
+Buttons are UI manifestations of actions.
+
+Do not create a huge global button-handler file:
+
+```text
+buttonHandlers.ts
+```
+
+Instead:
+
+```text
+SearchButton
+→ Search feature
+
+LoginButton
+→ Authentication feature
+
+SaveProfileButton
+→ Profile feature
+
+PlayButton
+→ Playback feature
+```
+
+The UI component may be shared, but its action logic belongs to the feature that owns the action.
+
+---
+
+# 13. COMPONENT OWNERSHIP
+
+Distinguish between:
+
+### Domain-specific components
+
+```text
+features/search/components/SearchResults.tsx
+```
+
+and:
+
+### Truly shared components
+
+```text
+shared/ui/Button.tsx
+shared/ui/Modal.tsx
+shared/ui/Input.tsx
+```
+
+Do NOT put a component in `shared` simply because two components currently use it.
+
+Promote something to shared infrastructure only when there is a genuine reusable contract.
+
+---
+
+# 14. SHARED CODE RULE
+
+Shared code is high-risk code.
+
+Because multiple features depend on it:
+
+```text
+Shared
+   ↓
+Feature A
+Feature B
+Feature C
+```
+
+Therefore:
+
+> **Changing shared code requires dependency analysis and regression verification across its consumers.**
+
+Do not casually modify shared infrastructure to solve a local feature problem.
+
+Prefer adapting the feature locally when practical.
+
+---
+
+# 15. DEPENDENCY DIRECTION
+
+Use controlled dependency direction.
+
+Preferred:
+
+```text
+Application
+↓
+Domain
+↓
+Feature
+↓
+Shared infrastructure
+```
+
+Avoid uncontrolled:
+
+```text
+Feature A ↔ Feature B
+Feature B ↔ Feature C
+Feature C ↔ Feature A
+```
+
+Circular dependencies are architectural warning signs.
+
+---
+
+# 16. FEATURE-TO-FEATURE COMMUNICATION
+
+Features should communicate through explicit contracts.
+
+Prefer:
+
+```text
+Feature A
+   ↓
+public interface / service / event / contract
+   ↓
+Feature B
+```
+
+Avoid importing another feature's internal implementation.
+
+Bad:
+
+```text
+featureA/
+  imports:
+featureB/internal/privateState
+```
+
+Better:
+
+```text
+featureB/
+└── index.ts
+```
+
+exports only the intended public API.
+
+---
+
+# 17. PUBLIC VS PRIVATE MODULES
+
+Every feature should conceptually have:
+
+```text
+PUBLIC
+PRIVATE
+```
+
+Example:
+
+```text
+features/search/
+├── index.ts          ← public interface
+├── components/
+├── services/
+├── state/
+├── internal/
+└── tests/
+```
+
+Other features should consume:
+
+```text
+features/search
+```
+
+rather than:
+
+```text
+features/search/internal/someFile
+```
+
+This protects internal implementation from accidental coupling.
+
+---
+
+# 18. CONTRACTS
+
+For important modules define explicit contracts.
+
+Examples:
+
+```text
+API contracts
+Component props
+Service interfaces
+State interfaces
+Data schemas
+Events
+Database interfaces
+Repository interfaces
+```
+
+A change to an internal implementation should not require unrelated consumers to change if the contract remains stable.
+
+---
+
+# 19. DATA OWNERSHIP
+
+Every important piece of state/data must have an owner.
+
+Examples:
+
+```text
+Authentication state
+→ Authentication
+
+Playback state
+→ Playback
+
+Profile state
+→ Profile
+
+Cart state
+→ Commerce
+```
+
+Avoid duplicate sources of truth.
+
+Prefer:
+
+```text
+ONE OWNER
+↓
+controlled access
+↓
+consumers
+```
+
+rather than:
+
+```text
+same state duplicated in five components
+```
+
+---
+
+# 20. SINGLE SOURCE OF TRUTH
+
+For every critical piece of information determine:
+
+```text
+Where is it created?
+Where is it stored?
+Who owns it?
+Who can modify it?
+Who can read it?
+How is it synchronized?
+```
+
+Examples:
+
+```text
+Version
+User profile
+Authentication state
+Membership
+Application configuration
+Feature flags
+Database schema
+```
+
+Do not maintain conflicting copies without a deliberate synchronization mechanism.
+
+---
+
+# 21. CONFIGURATION ISOLATION
+
+Separate:
+
+```text
+Development
+Testing
+Production
+```
+
+configuration.
+
+Do not scatter environment-specific values throughout feature code.
+
+Prefer centralized configuration with controlled access.
+
+---
+
+# 22. API ISOLATION
+
+Organize APIs by domain.
+
+Example:
+
+```text
+api/
+├── auth/
+├── users/
+├── search/
+├── media/
+├── payments/
+└── notifications/
+```
+
+Avoid one giant:
+
+```text
+api.ts
+```
+
+containing every endpoint.
+
+---
+
+# 23. DATABASE ISOLATION
+
+Organize persistence by domain where appropriate.
+
+Example:
+
+```text
+data/
+├── auth/
+├── users/
+├── media/
+├── payments/
+└── notifications/
+```
+
+Database models, repositories, queries, and migrations should have clear ownership.
+
+---
+
+# 24. TEST OWNERSHIP
+
+Tests should follow the architecture.
+
+Example:
+
+```text
+features/
+└── search/
+    ├── components/
+    ├── services/
+    ├── state/
+    └── tests/
+        ├── search.unit.test.ts
+        ├── search.integration.test.ts
+        └── search.e2e.test.ts
+```
+
+When a feature changes, its tests should be immediately discoverable.
+
+---
+
+# 25. TEST PROXIMITY
+
+Where practical:
+
+> **Tests should live close to the code they protect.**
+
+This reduces the risk of modifying code without noticing its test coverage.
+
+---
+
+# 26. PAGE → FEATURE → COMPONENT → FUNCTION
+
+Use a traceable relationship:
+
+```text
+PAGE
+ ↓
+SECTION
+ ↓
+FEATURE
+ ↓
+COMPONENT
+ ↓
+ACTION
+ ↓
+FUNCTION
+ ↓
+SERVICE
+ ↓
+DATA
+```
+
+An agent should be able to trace a user interaction through the entire system.
+
+Example:
+
+```text
+ProfilePage
+ ↓
+ProfileEditor
+ ↓
+SaveProfileButton
+ ↓
+saveProfile()
+ ↓
+profileService.update()
+ ↓
+Profile API
+ ↓
+Database
+```
+
+---
+
+# 27. TRACEABILITY
+
+For every important capability, maintain a trace:
+
+```text
+User Action
+→ UI
+→ Feature
+→ Logic
+→ Service
+→ API
+→ Data
+→ Result
+```
+
+This makes debugging and controlled modification significantly safer.
+
+---
+
+# 28. CHANGE MANIFEST
+
+Before modifying a project, create an internal change manifest.
+
+Example:
+
+```text
+CHANGE MANIFEST
+
+Requested:
+Fix profile save button.
+
+Direct:
+- ProfileEditor
+- SaveProfileButton
+- profileService
+
+Related:
+- profile validation
+
+Dependent:
+- ProfilePage
+
+Shared:
+- Button component
+
+Unrelated:
+- Authentication
+- Search
+- Payments
+
+Allowed modification radius:
+Direct + required Related
+```
+
+The agent should use this manifest to prevent scope creep.
+
+---
+
+# 29. MODIFICATION BOUNDARY
+
+Before editing a file ask:
+
+> "Why does this file need to change?"
+
+Every changed file must have a traceable reason.
+
+If there is no reason:
+
+**Do not modify it.**
+
+---
+
+# 30. NO CASCADE EDITING
+
+Do not make changes like:
+
+```text
+"While I'm here, I'll clean this file."
+```
+
+or:
+
+```text
+"This architecture could be better, so I'll restructure everything."
+```
+
+unless the user explicitly requested refactoring or the change is technically necessary.
+
+Unrelated cleanup increases regression risk.
+
+---
+
+# 31. PRESERVATION RULE
+
+When fixing something:
+
+> **Preserve all unrelated functionality.**
+
+Do not:
+
+* delete working code
+* replace complete files unnecessarily
+* rewrite unrelated modules
+* remove unknown code without analysis
+* simplify by deleting behavior
+* replace working implementations merely for style
+
+If replacement is necessary:
+
+1. Understand the old implementation.
+2. Identify all behaviors it provides.
+3. Preserve required behavior.
+4. Migrate consumers.
+5. Test before removing the old implementation.
+
+---
+
+# 32. FILE REPLACEMENT PROTECTION
+
+Never overwrite an entire file simply to change one small section when a targeted modification is possible.
+
+Prefer:
+
+```text
+small targeted modification
+```
+
+over:
+
+```text
+complete file rewrite
+```
+
+unless a rewrite is genuinely justified.
+
+---
+
+# 33. UNKNOWN CODE PROTECTION
+
+If the agent encounters code it does not understand:
+
+Do NOT immediately delete it.
+
+Classify it:
+
+```text
+KNOWN
+RELATED
+UNKNOWN
+OBSOLETE
+DUPLICATE
+DEAD
+```
+
+Only remove code after establishing sufficient evidence that it is obsolete or harmful.
+
+---
+
+# 34. DEAD CODE RULE
+
+Do not label code as dead merely because it is not referenced from an obvious location.
+
+Check:
+
+```text
+Dynamic imports
+Routes
+Reflection
+Configuration
+Plugins
+Build scripts
+API consumers
+Tests
+External consumers
+Runtime registration
+```
+
+before deletion.
+
+---
+
+# 35. LARGE FILE DETECTION
+
+Continuously detect architectural hotspots.
+
+Warning thresholds may include:
+
+```text
+Very large page
+Very large component
+Very large service
+Very large state module
+Very large utility file
+Too many responsibilities
+Too many imports
+Too many dependencies
+```
+
+Do not split files purely based on line count.
+
+Split according to **responsibility and ownership**.
+
+---
+
+# 36. SINGLE RESPONSIBILITY
+
+Each module should have a clear responsibility.
+
+Bad:
+
+```text
+Dashboard.tsx
+```
+
+containing:
+
+```text
+UI
+API
+database logic
+authentication
+analytics
+notifications
+formatting
+routing
+```
+
+Prefer:
+
+```text
+Dashboard
+├── UI composition
+├── analytics feature
+├── notification feature
+├── data service
+└── auth service
+```
+
+---
+
+# 37. DOMAIN BOUNDARIES
+
+Identify the project's major domains before restructuring.
+
+Examples:
+
+```text
+Authentication
+Users
+Content
+Media
+Commerce
+Payments
+Notifications
+Analytics
+Administration
+Settings
+```
+
+Do not force every project into these names.
+
+Discover the project's actual domains.
+
+---
+
+# 38. PRODUCT / MODULE BOUNDARIES
+
+For projects containing multiple products or major subsystems:
+
+```text
+products/
+├── product-a/
+├── product-b/
+└── product-c/
+```
+
+Each product should own its product-specific implementation.
+
+Shared infrastructure belongs outside product-specific boundaries.
+
+---
+
+# 39. MONOREPO RULE
+
+For monorepos, separate:
+
+```text
+apps/
+├── web/
+├── admin/
+└── mobile/
+
+packages/
+├── ui/
+├── auth/
+├── types/
+└── config/
+
+services/
+├── api/
+├── worker/
+└── processing/
+```
+
+Do not allow arbitrary cross-package imports.
+
+---
+
+# 40. ROUTING OWNERSHIP
+
+Routes should have clear ownership.
+
+Example:
+
+```text
+routes/
+├── auth/
+├── dashboard/
+├── profile/
+└── settings/
+```
+
+A feature should not secretly register routes belonging to another domain.
+
+---
+
+# 41. STATE OWNERSHIP
+
+Separate:
+
+```text
+Local UI state
+Feature state
+Domain state
+Global application state
+Server state
+Persistent state
+```
+
+Do not put everything into a global store.
+
+Global state should be reserved for genuinely global concerns.
+
+---
+
+# 42. EVENT OWNERSHIP
+
+Events must have clear producers and consumers.
+
+Document:
+
+```text
+Event
+Producer
+Payload
+Consumers
+Purpose
+```
+
+Avoid invisible side effects.
+
+---
+
+# 43. SIDE-EFFECT ISOLATION
+
+Keep external side effects in controlled boundaries.
+
+Examples:
+
+```text
+API calls
+Database writes
+File system
+Browser storage
+Notifications
+Analytics
+External SDKs
+```
+
+UI components should not unnecessarily contain low-level side-effect logic.
+
+---
+
+# 44. ERROR OWNERSHIP
+
+Errors should be handled at the appropriate layer.
+
+Example:
+
+```text
+API error
+→ service layer
+
+validation error
+→ validation/domain layer
+
+rendering error
+→ UI boundary
+
+unexpected application failure
+→ application error boundary
+```
+
+Do not scatter arbitrary error handling everywhere.
+
+---
+
+# 45. SHARED UTILITIES GOVERNANCE
+
+Before adding a utility to `shared/utils` ask:
+
+```text
+Is it truly generic?
+Does it have multiple legitimate consumers?
+Does it contain domain-specific assumptions?
+Could it belong to a feature instead?
+```
+
+If it is domain-specific:
+
+**keep it inside the domain.**
+
+---
+
+# 46. ARCHITECTURE DOCUMENTATION
+
+Maintain an architecture document:
+
+```text
+ARCHITECTURE.md
+```
+
+It should describe:
+
+```text
+System overview
+Architecture layers
+Domains
+Modules
+Ownership
+Dependency rules
+Data flow
+State ownership
+API boundaries
+Shared infrastructure
+Testing strategy
+Deployment structure
+Important constraints
+```
+
+Do not document imaginary architecture.
+
+The document must reflect the actual repository.
+
+---
+
+# 47. MODULE REGISTRY
+
+Maintain a lightweight registry when the project becomes sufficiently complex.
+
+Example:
+
+```text
+MODULE REGISTRY
+
+Authentication
+Owner: features/auth
+Public API: auth/index
+Dependencies: shared/ui, api/client
+
+Search
+Owner: features/search
+Public API: search/index
+Dependencies: api/client
+
+Profile
+Owner: features/profile
+Public API: profile/index
+Dependencies: api/client, shared/ui
+```
+
+This allows agents to locate ownership quickly.
+
+---
+
+# 48. DEPENDENCY MAP
+
+For complex projects maintain:
+
+```text
+ARCHITECTURE.md
+```
+
+or:
+
+```text
+DEPENDENCY_MAP.md
+```
+
+showing major relationships.
+
+Example:
+
+```text
+App Shell
+ ├── Auth
+ ├── Profile
+ ├── Search
+ └── Media
+
+Search
+ ├── API Client
+ └── Shared UI
+
+Profile
+ ├── API Client
+ └── Shared UI
+```
+
+---
+
+# 49. CHANGE IMPACT ANALYSIS
+
+Before modifying a shared module:
+
+Determine:
+
+```text
+Who imports it?
+Who calls it?
+Who depends on its types?
+Which pages use it?
+Which features use it?
+Which tests protect it?
+```
+
+Then calculate the regression surface.
+
+---
+
+# 50. CHANGE IMPACT LEVELS
+
+Classify impact:
+
+```text
+ISOLATED
+LOCAL
+CROSS-FEATURE
+SHARED
+SYSTEM-WIDE
+```
+
+### ISOLATED
+
+One function/component.
+
+### LOCAL
+
+One feature/page.
+
+### CROSS-FEATURE
+
+Multiple domains.
+
+### SHARED
+
+Shared infrastructure.
+
+### SYSTEM-WIDE
+
+Architecture, configuration, database, authentication, deployment, etc.
+
+The larger the impact, the larger the verification requirement.
+
+---
+
+# 51. ARCHITECTURAL FREEZE DURING LOCAL FIXES
+
+When fixing a local issue:
+
+Do not perform unrelated architectural restructuring.
+
+Example:
+
+```text
+Task:
+Fix search button.
+
+Allowed:
+Search button
+Search feature
+Necessary search dependencies
+
+Not automatically allowed:
+Rewrite application architecture
+Replace state management
+Reorganize unrelated pages
+Upgrade framework
+```
+
+Architecture changes require explicit justification.
+
+---
+
+# 52. SAFE REFACTORING
+
+When refactoring:
+
+```text
+OLD IMPLEMENTATION
+↓
+UNDERSTAND
+↓
+DEFINE CONTRACT
+↓
+CREATE NEW IMPLEMENTATION
+↓
+MIGRATE CONSUMERS
+↓
+RUN TESTS
+↓
+COMPARE BEHAVIOR
+↓
+REMOVE OLD IMPLEMENTATION
+```
+
+Never delete the old implementation first and hope the replacement works.
+
+---
+
+# 53. BACKWARD COMPATIBILITY
+
+When modifying a public module:
+
+Determine:
+
+```text
+Who uses it?
+What contract do they expect?
+Can the change remain backward-compatible?
+```
+
+Prefer additive changes when practical.
+
+---
+
+# 54. FEATURE FLAGS
+
+For risky features, consider:
+
+```text
+feature flag
+```
+
+when appropriate.
+
+This allows:
+
+```text
+code deployment
+≠
+feature activation
+```
+
+and reduces deployment risk.
+
+---
+
+# 55. MIGRATION STRATEGY
+
+For major architectural changes:
+
+Prefer incremental migration:
+
+```text
+OLD
+ ↓
+BRIDGE
+ ↓
+NEW
+ ↓
+MIGRATE
+ ↓
+VERIFY
+ ↓
+REMOVE OLD
+```
+
+rather than:
+
+```text
+DELETE OLD
+ ↓
+WRITE EVERYTHING AGAIN
+```
+
+---
+
+# 56. ROLLBACK AWARENESS
+
+Every significant change should have a rollback strategy.
+
+Determine:
+
+```text
+What changed?
+How can it be reverted?
+What data changed?
+Can database changes be reversed?
+Can deployment be rolled back?
+Can feature flags disable it?
+```
+
+---
+
+# 57. BACKUP / RECOVERY
+
+Before destructive operations:
+
+Ensure there is a recoverable state through appropriate mechanisms such as:
+
+```text
+Git
+backup
+migration rollback
+database snapshot
+deployment rollback
+```
+
+Do not rely solely on memory.
+
+---
+
+# 58. VERSION CONTROLLER INTEGRATION
+
+This architecture system must work together with the project's Version Controller.
+
+Before a structural change:
+
+```text
+READ VERSION CONTROLLER
+↓
+READ ARCHITECTURE
+↓
+READ RELEVANT HISTORY
+↓
+CALCULATE CHANGE RADIUS
+↓
+IMPLEMENT
+↓
+VERIFY
+↓
+UPDATE VERSION
+↓
+UPDATE VERSION CONTROLLER
+↓
+UPDATE ARCHITECTURE DOCUMENTATION
+```
+
+---
+
+# 59. ARCHITECTURE CHANGES MUST BE VERSIONED
+
+If architecture itself changes materially:
+
+Record:
+
+```text
+Old architecture
+New architecture
+Reason
+Affected modules
+Migration
+Version
+Commit
+Verification
+```
+
+Do not silently restructure the project.
+
+---
+
+# 60. AUTOMATIC ARCHITECTURE SYNCHRONIZATION
+
+After significant structural changes, verify:
+
+```text
+Actual repository structure
+        =
+ARCHITECTURE.md
+        =
+Module Registry
+        =
+Dependency assumptions
+```
+
+If documentation becomes stale, update it.
+
+---
+
+# 61. NO PHANTOM FILES
+
+Never document files, modules, services, or components that do not actually exist.
+
+Architecture documentation must reflect reality.
+
+---
+
+# 62. NO ORPHAN FILES
+
+Periodically identify files that appear to have no owner.
+
+For each:
+
+```text
+Determine purpose
+Find references
+Determine whether runtime-loaded
+Determine whether obsolete
+Assign ownership
+or remove only with evidence
+```
+
+---
+
+# 63. NO DUPLICATE IMPLEMENTATIONS
+
+Before implementing a new function/feature:
+
+Search the project for existing implementations.
+
+Ask:
+
+```text
+Does this already exist?
+Is there a related implementation?
+Can it be reused?
+Should it be extended?
+Would a duplicate create conflicting sources of truth?
+```
+
+Do not create duplicate systems unnecessarily.
+
+---
+
+# 64. DISCOVER BEFORE CREATE
+
+Before creating:
+
+```text
+component
+function
+service
+hook
+API
+utility
+state
+page
+feature
+```
+
+search the existing project.
+
+Prefer:
+
+```text
+reuse
+extend
+refactor safely
+```
+
+over:
+
+```text
+duplicate
+```
+
+---
+
+# 65. FILE NAMING
+
+Use predictable names.
+
+Examples:
+
+```text
+SearchPage
+SearchResults
+searchService
+searchStore
+searchTypes
+searchValidation
+```
+
+Avoid meaningless names:
+
+```text
+helper2
+newComponent
+finalComponent
+temp
+misc
+utils2
+```
+
+---
+
+# 66. NO TEMPORARY PRODUCTION CODE
+
+Do not leave:
+
+```text
+TODO hacks
+temporary bypasses
+debug code
+console logging
+dead experiments
+unused imports
+placeholder implementations
+```
+
+in production code unless explicitly documented and intentional.
+
+---
+
+# 67. DEBUGGING ISOLATION
+
+When debugging:
+
+1. Reproduce the issue.
+2. Locate the owning module.
+3. Trace the execution path.
+4. Identify root cause.
+5. Modify the smallest responsible boundary.
+6. Verify the original issue.
+7. Verify adjacent behavior.
+
+Do not randomly modify multiple modules until the problem disappears.
+
+---
+
+# 68. ROOT-CAUSE RULE
+
+Fix the root cause where practical.
+
+Do not mask symptoms with unrelated changes.
+
+Example:
+
+Bad:
+
+```text
+API returns invalid data
+→ modify five UI components
+```
+
+Better:
+
+```text
+API returns invalid data
+→ identify API/data contract problem
+→ fix responsible layer
+→ verify consumers
+```
+
+---
+
+# 69. PRESERVE FUNCTIONALITY DURING RESTRUCTURING
+
+When restructuring:
+
+Create an explicit behavior inventory.
+
+Record:
+
+```text
+Existing feature
+Existing interaction
+Existing state
+Existing API
+Existing edge case
+Existing validation
+Existing error behavior
+Existing persistence
+```
+
+Then verify that the new architecture preserves the required behavior.
+
+---
+
+# 70. "NOTHING DISAPPEARS" RULE
+
+When modifying a project:
+
+> **No existing functionality may disappear merely because its implementation was moved, refactored, or rewritten.**
+
+Before removing anything determine:
+
+```text
+What does it do?
+Who uses it?
+Is its behavior still represented?
+Where did that behavior move?
+Is its test still present?
+```
+
+---
+
+# 71. FILE CHANGE REPORT
+
+After implementation, internally determine:
+
+```text
+ADDED
+MODIFIED
+DELETED
+MOVED
+```
+
+For each changed file identify the reason.
+
+If an unexpected unrelated file changed:
+
+Investigate before completion.
+
+---
+
+# 72. FINAL CHANGE-SCOPE AUDIT
+
+Before completing a task:
+
+```text
+Requested change:
+...
+
+Files directly changed:
+...
+
+Files related:
+...
+
+Unexpected files:
+...
+
+Deleted files:
+...
+
+Moved files:
+...
+
+Unrelated changes:
+...
+```
+
+Any unexplained modification is a warning.
+
+---
+
+# 73. FINAL ARCHITECTURE CHECK
+
+Before completion verify:
+
+```text
+[ ] Ownership is clear
+[ ] Dependencies are understood
+[ ] No unrelated modules changed
+[ ] No functionality disappeared
+[ ] No duplicate implementation introduced
+[ ] Shared code changes were evaluated
+[ ] Tests updated where necessary
+[ ] Architecture documentation remains accurate
+[ ] Version Controller updated
+[ ] Version correctly reflects architectural impact
+```
+
+---
+
+# 74. MASTER WORKFLOW
+
+For every meaningful project task:
+
+```text
+┌───────────────────────────────────────────┐
+│ 1. READ VERSION CONTROLLER                │
+├───────────────────────────────────────────┤
+│ 2. READ ARCHITECTURE                      │
+├───────────────────────────────────────────┤
+│ 3. SEARCH PROJECT                         │
+├───────────────────────────────────────────┤
+│ 4. FIND EXISTING IMPLEMENTATION           │
+├───────────────────────────────────────────┤
+│ 5. IDENTIFY OWNER                         │
+├───────────────────────────────────────────┤
+│ 6. TRACE DEPENDENCIES                     │
+├───────────────────────────────────────────┤
+│ 7. CREATE CHANGE MANIFEST                 │
+├───────────────────────────────────────────┤
+│ 8. CLASSIFY CHANGE RADIUS                 │
+├───────────────────────────────────────────┤
+│ 9. DETERMINE VERSION IMPACT               │
+├───────────────────────────────────────────┤
+│ 10. IMPLEMENT SMALLEST SAFE CHANGE       │
+├───────────────────────────────────────────┤
+│ 11. TEST                                  │
+├───────────────────────────────────────────┤
+│ 12. VERIFY NO FUNCTIONALITY DISAPPEARED  │
+├───────────────────────────────────────────┤
+│ 13. VERIFY CHANGE RADIUS                  │
+├───────────────────────────────────────────┤
+│ 14. UPDATE VERSION                        │
+├───────────────────────────────────────────┤
+│ 15. UPDATE ARCHITECTURE IF REQUIRED       │
+├───────────────────────────────────────────┤
+│ 16. UPDATE VERSION CONTROLLER             │
+├───────────────────────────────────────────┤
+│ 17. COMMIT IF AUTHORIZED                  │
+├───────────────────────────────────────────┤
+│ 18. FINAL CONSISTENCY CHECK               │
+└───────────────────────────────────────────┘
+```
+
+---
+
+# 75. ABSOLUTE RULE
+
+For every future command:
+
+> **DO NOT MODIFY CODE UNTIL YOU KNOW WHERE THAT CODE BELONGS, WHO OWNS IT, WHAT DEPENDS ON IT, WHAT IT DEPENDS ON, WHAT PREVIOUS CHANGES AFFECTED IT, AND WHAT THE MINIMUM SAFE CHANGE BOUNDARY IS.**
+
+And after modification:
+
+> **DO NOT COMPLETE THE TASK UNTIL YOU HAVE VERIFIED THAT THE REQUESTED CHANGE WORKS, UNRELATED FUNCTIONALITY HAS BEEN PRESERVED, THE ARCHITECTURE REMAINS CONSISTENT, AND THE VERSION/CHANGE HISTORY HAS BEEN UPDATED.**
+
+---
+
+# 76. PRIMARY OBJECTIVE
+
+The architecture must make future development behave like controlled surgery rather than uncontrolled rewriting.
+
+The desired result is:
+
+```text
+REQUEST
+   ↓
+IDENTIFY OWNER
+   ↓
+IDENTIFY DEPENDENCIES
+   ↓
+ISOLATE CHANGE
+   ↓
+MODIFY ONLY NECESSARY CODE
+   ↓
+VERIFY
+   ↓
+PRESERVE EVERYTHING ELSE
+```
+
+The project should become progressively:
+
+```text
+more modular
+more traceable
+more testable
+more replaceable
+more understandable
+more maintainable
+less coupled
+less fragile
+less dependent on individual agent memory
+```
+
+The architecture exists primarily to protect the project from accidental destruction during future development.
+

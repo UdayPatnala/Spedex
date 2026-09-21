@@ -47,6 +47,62 @@ Before declaring any task or milestone complete:
 
 ## 2. HISTORICAL EXECUTION LOGS
 
+### Task ID: EXEC-2026-09-20-03
+- **Date**: 2026-09-20
+- **Task Summary**: Universal Modular Architecture & Change-Isolation Governance System Integration (`2.05.02.0`).
+- **Trigger / Context**: Goal directive to integrate the complete 76-protocol Universal Modular Architecture & Change-Isolation Governance System into the SpeDex engineering infrastructure, establishing strict domain ownership boundaries, locality, change radius constraints, and action-to-data traceability to prevent regressions during future development.
+- **Layers Affected**:
+  - `.agents/AGENTS.md`: Embedded the full 76-protocol Universal Modular Architecture & Change-Isolation Governance System as Part 3.
+  - `ARCHITECTURE.md`: Created root authoritative specification defining 6 loosely coupled domains (Auth, Ledger, Trips, Payments, Privacy, Simulator), complete architectural ownership maps, action-to-data traceability traces (`PAGE -> SECTION -> FEATURE -> COMPONENT -> ACTION -> FUNCTION -> SERVICE -> DATA`), change radius protocols, module registry, and dependency maps.
+  - `docs/ARCHITECTURE.md`: Updated with references to root `ARCHITECTURE.md` and synchronized test verification matrices.
+  - `SPEDEX.md`: Upgraded master project knowledge with the 3 pillars of engineering governance, domain ownership maps, and traceability models; bumped version to `2.05.02.0`.
+  - `dashboard_app/src/version.ts`, `backend/pom.xml`, `dashboard_app/package.json`, `mobile/package.json`: Bumped version metadata to `2.05.02.0`.
+  - `VERSION_CONTROLLER.md`, `docs/VERSION_HISTORY.md`, `docs/PROJECT_STATUS.md`: Synchronized version, change descriptions, and test matrices.
+- **Verification Results**:
+  - `backend/`: 57/57 tests passing (`./mvnw.cmd test`).
+  - `dashboard_app/`: 9/9 tests passing (`npm test -- --run`) & build clean (`npm run build`).
+  - `mobile/`: 7/7 tests passing (`npm test`) & 0 TypeScript errors (`npx tsc --noEmit`).
+  - Root E2E: 77/77 tests passing (`python test-trips-e2e.py`).
+  - Total: 150/150 tests passing across all 4 suites (100% pass rate).
+- **Key Lessons & Design Decisions**:
+  - Explicit domain boundaries prevent uncontrolled coupling; grouping files by domain ownership rather than mere file type makes each feature independently understandable and maintainable.
+  - The Change Radius protocol ensures that modifications are strictly confined to DIRECT and RELATED files, preventing unintended side effects in UNRELATED subsystems.
+
+---
+
+### Task ID: EXEC-2026-09-20-02
+- **Date**: 2026-09-20
+- **Task Summary**: Dynamic Multi-Currency Travel Conversion & Offline Forex Cache (`2.05.01.0`).
+- **Trigger / Context**: Next roadmap milestone implementation: add cross-border trip destination currency support with offline forex rate caching, custom exchange rate overrides, and live secondary foreign spend analytics while anchoring the primary ledger to INR ₹.
+- **Layers Affected**:
+  - `backend/src/main/java/com/spedex/model/Trip.java`: Added `currency` (`"INR"`) and `exchangeRate` (`1.0`) fields.
+  - `backend/src/main/java/com/spedex/dto/TripDto.java`: Added `currency` and `exchange_rate` JSON mappings.
+  - `backend/src/main/java/com/spedex/dto/TripDetailsDto.java`: Added `currency`, `exchange_rate`, and `foreign_total_spend`.
+  - `backend/src/main/java/com/spedex/service/TripService.java`: Overloaded `startTrip()` to accept currency and exchangeRate; computed `foreignTotalSpend` in `getTripDetails()`.
+  - `backend/src/main/java/com/spedex/controller/TripController.java`: Updated `POST /api/trips` endpoint to support currency and exchangeRate payload parameters.
+  - `backend/src/test/java/com/spedex/service/TripServiceTest.java`: Added unit tests verifying trip creation with custom currency/rate and correct foreign total spend calculation.
+  - `dashboard_app/src/utils/forex.ts`: Created offline forex cache with rates for USD, EUR, GBP, AED, SGD, THB, NPR, JPY, conversion helpers, and currency formatting.
+  - `dashboard_app/src/types.ts`: Extended `Trip` and `TripDetails` types.
+  - `dashboard_app/src/api.ts`: Updated `startTrip()` client signature.
+  - `dashboard_app/src/views/TripsView.tsx`: Added destination currency selector with flags, preset rates, custom exchange rate override, dual-currency header stats, and dual-mode cash expense logging.
+  - `mobile/src/types.ts`: Extended `Trip` and `TripDetails` types.
+  - `mobile/src/api/client.ts`: Updated `startTrip()` client signature.
+  - `mobile/src/screens/TripsScreen.tsx`: Added trip destination currency badge and secondary foreign spend estimate.
+  - `e2e_tests/mock_backend.py`: Updated mock backend endpoints (`POST /api/trips`, `GET /api/trips`, `GET /api/trips/{id}`) with currency and foreign spend support.
+  - `dashboard_app/src/version.ts`, `backend/pom.xml`, `dashboard_app/package.json`, `mobile/package.json`: Bumped version to `2.05.01.0`.
+  - `VERSION_CONTROLLER.md`, `SPEDEX.md`, `docs/VERSION_HISTORY.md`, `docs/PROJECT_STATUS.md`: Synchronized version, test counts (150/150), and architecture logs.
+- **Verification Results**:
+  - `backend/`: 57/57 tests passing (`./mvnw.cmd test`).
+  - `dashboard_app/`: 9/9 tests passing (`npm test -- --run`) & build clean (`npm run build`).
+  - `mobile/`: 7/7 tests passing (`npm test`) & 0 TypeScript errors (`npx tsc --noEmit`).
+  - Root E2E: 77/77 tests passing (`python test-trips-e2e.py`).
+  - Total: 150/150 tests passing across all 4 suites (100% pass rate).
+- **Key Lessons & Design Decisions**:
+  - Primary ledger must remain strictly anchored in INR ₹ for audit integrity, tax accounting, and consistent user-level analytics; foreign currency conversion acts as an organizational and perceptual aid scoped per travel session.
+  - Offline forex cache guarantees friction-free trip setup and logging even when traveling with intermittent or zero roaming cellular data.
+
+---
+
 ### Task ID: EXEC-2026-09-20-01
 - **Date**: 2026-09-20
 - **Task Summary**: SpeDex Privacy, Age Verification, Consent & Financial Safety System Milestone (`2.05.00.0`).

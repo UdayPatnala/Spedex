@@ -2,11 +2,11 @@
 
 ## 1. Executive Summary
 
-- **Current Version**: 2.05.00.0 (Privacy, Age Verification, Consent & Financial Safety Milestone)
+- **Current Version**: 2.05.02.0 (Universal Modular Architecture & Change-Isolation Governance Integration)
 - **Active Release Branch**: `main`
 - **Overall System Status**: **HEALTHY / 100% VERIFIED**
 - **Last Verification Date**: 2026-09-20
-- **Operating Framework**: Universal Product Reverse-Engineering + Universal Version Controller (44-protocol release-control specification)
+- **Operating Framework**: 3-Pillar System: Universal Reverse-Engineering (29 rules) + Universal Version Controller (44 protocols) + Universal Modular Architecture (76 protocols)
 
 ---
 
@@ -16,7 +16,7 @@
 | :--- | :--- | :--- | :--- |
 | **Layer 1: Product Memory** | Vision, aesthetic rules, DPDP legal constraints | **SYNCHRONIZED** | INR currency note theme, non-custodial fintech bounds preserved |
 | **Layer 2: Engineering Memory** | `VERSION_CONTROLLER.md`, `VERSION_HISTORY.md`, `EXECUTION_HISTORY.md`, `ARCHITECTURE.md`, `PROJECT_STATUS.md`, `PRIVACY_DATA_GOVERNANCE_SPECIFICATION.md` | **SYNCHRONIZED** | Mandatory persistent version controller, audit logs, and status active |
-| **Layer 3: Actual State** | Git commits, source code, build configs, dependencies | **SYNCHRONIZED** | Clean working tree on `main`, all 4 verification test suites 100% passing (148/148) |
+| **Layer 3: Actual State** | Git commits, source code, build configs, dependencies | **SYNCHRONIZED** | Clean working tree on `main`, all 4 verification test suites 100% passing (150/150) |
 
 ---
 
@@ -24,7 +24,7 @@
 
 | Subsystem | Tech Stack | Unit Tests | Build / Typecheck | Health State |
 | :--- | :--- | :--- | :--- | :--- |
-| **Backend API** | Spring Boot 3.x / Java 17 | 55 / 55 PASS | Maven compile clean | **OPERATIONAL** |
+| **Backend API** | Spring Boot 3.x / Java 17 | 57 / 57 PASS | Maven compile clean | **OPERATIONAL** |
 | **Dashboard App** | React 19 / Vite 6 / TS 5.8 | 9 / 9 PASS | `vite build` clean (0 errors) | **OPERATIONAL** |
 | **Mobile App** | Expo SDK 53 / React Native 0.79 | 7 / 7 PASS | `tsc --noEmit` clean (0 errors) | **OPERATIONAL** |
 | **E2E Test Suite** | Python 3.x / Mock Backend | 77 / 77 PASS | Clean exit code 0 | **OPERATIONAL** |
@@ -36,8 +36,9 @@
 
 1. **High-Frequency Expense Tracking**:
    - Instant categorization, cash vs digital tag, payment velocity analytics.
-2. **Trips Ledger Subsystem**:
+2. **Trips Ledger Subsystem & Multi-Currency Forex**:
    - Live travel sessions, automatic closure of overlapping active trips, category-based distributions, cash/online splits.
+   - Dynamic multi-currency travel conversion for cross-border trips (USD, EUR, GBP, AED, SGD, THB, NPR, JPY) with offline forex cache and per-trip custom exchange rate override while anchoring primary ledger to INR ₹.
 3. **DPDP Act 2023 Compliance**:
    - Minor protection flow (<18) with verifiable parental consent.
    - Permanent opt-out of behavioral tracking for minors.

@@ -7,6 +7,34 @@ Authoritative Version Format: `A.BC.DE.F` (`A` = Major Version, `BC` = Sub-Versi
 
 ---
 
+## [2.05.02.0] - 2026-09-20
+Type: Functional
+Status: Verified
+
+### Added
+- **Universal Modular Architecture & Change-Isolation Governance System**:
+  - **Permanent Governance Codification (`.agents/AGENTS.md`)**: Embedded the complete 76-protocol Universal Modular Architecture & Change-Isolation Governance System as the third permanent governance pillar alongside Product Reverse-Engineering (29 rules) and Universal Version Control (44 protocols).
+  - **Authoritative Architecture Specification (`ARCHITECTURE.md`)**: Created root `ARCHITECTURE.md` establishing 6 loosely coupled domains (Auth, Ledger, Trips, Payments, Privacy, Simulator), complete architectural ownership maps, action-to-data traceability traces (`PAGE -> SECTION -> FEATURE -> COMPONENT -> ACTION -> FUNCTION -> SERVICE -> DATA`), change radius protocols, module registry, and dependency maps.
+  - **Synchronized Architecture Ledger (`docs/ARCHITECTURE.md`)**: Aligned historical documentation with the root specification and synchronized test matrices.
+  - **Automated Verification**: Verified 100% pass rate across all 150 automated tests (Backend 57, Dashboard 9, Mobile 7, Root E2E 77).
+
+---
+
+## [2.05.01.0] - 2026-09-20
+Type: Functional
+Status: Verified
+
+### Added
+- **Dynamic Multi-Currency Travel Conversion & Offline Forex Cache**:
+  - **Cross-Border Trip Model & DTOs**: Added optional destination currency code (`currency`) and exchange rate (`exchangeRate`) to `Trip.java`, `TripDto.java`, and `TripDetailsDto.java`. Computes `foreign_total_spend = totalSpend / exchangeRate` while strictly maintaining base accounting ledger anchored in Indian Rupee (INR ₹).
+  - **Offline Forex Cache Engine (`forex.ts`)**: Embedded resilient offline exchange rates for 8 major international currencies (USD, EUR, GBP, AED, SGD, THB, NPR, JPY) relative to INR, complete with conversion helpers, currency symbols, and localized formatting.
+  - **Dashboard Web Travel UI (`TripsView.tsx`)**: Destination currency selector with regional flags and preset exchange rates in trip creation modal; custom exchange rate override; dual-currency trip stat badges (`formatCurrency` + `formatForeignCurrency`); dual-mode manual cash expense logging (`INR` vs `FOREIGN`) with real-time conversion preview.
+  - **Mobile App Travel Screen (`TripsScreen.tsx`)**: Trip destination currency badge, secondary foreign spend estimates on active trip banner and trip cards.
+  - **Hermetic E2E Mock Backend (`mock_backend.py`)**: Updated mock trip endpoints (`POST /api/trips`, `GET /api/trips`, `GET /api/trips/{id}`) to accept and return currency fields and compute `foreign_total_spend`.
+  - **Automated Verification**: Increased test coverage to 150/150 passing tests across all 4 test suites (Backend 57, Dashboard 9, Mobile 7, Root E2E 77).
+
+---
+
 ## [2.05.00.0] - 2026-09-20
 Type: Sub-version
 Status: Verified
