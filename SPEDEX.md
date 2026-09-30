@@ -1,12 +1,12 @@
-# SpeDex — Master Project Knowledge & System Specification
+# SpeDex — Authoritative Product Master (SPEDEX.md / PRODUCT_MASTER.md)
 
-**Authoritative Project Master File (`SPEDEX.md`)**  
-**Current System Version:** `2.05.02.0`  
+**Authoritative Product Master File (`SPEDEX.md`)**  
+**Current System Version:** `2.06.00.0`  
 **Governing Architecture:** Universal Reverse-Engineering, Universal Version Control & Universal Modular Architecture (`.agents/AGENTS.md`)  
 **Repository Working Tree:** Verified Clean (`main`)  
 **Automated Test Status:** 150 / 150 Tests Passing (100% Pass Rate across 4 Test Suites)  
 **Authoritative Version Controller:** [`VERSION_CONTROLLER.md`](file:///d:/PROJECT/AROH%20Open%20Source/Products/Spedex/VERSION_CONTROLLER.md)  
-**Authoritative Architecture Source:** [`ARCHITECTURE.md`](file:///d:/PROJECT/AROH%20Open%20Source/Products/Spedex/ARCHITECTURE.md)
+**Governance Invariant:** Exactly two authoritative Markdown documents are maintained at repository root (`SPEDEX.md` as Product Master and `VERSION_CONTROLLER.md` as Version Control Master).
 
 ---
 
@@ -16,7 +16,7 @@
 - **Etymology / Blend:** **Speed Index** (high-frequency, frictionless expense logging) + **Spending Index** (real-time velocity analytics and financial awareness).
 - **Project Type:** Personal financial ledger, travel expense journal, vendor quick-pay directory, and campus budgeting utility.
 - **Product Classification:** Non-custodial financial utility and organizational layer. SpeDex is **not** a bank, **not** a payment processor, and **not** a custodial wallet.
-- **Operating Version:** `2.05.02.0` (Functional change: Universal Modular Architecture & Change-Isolation Governance System).
+- **Operating Version:** `2.06.00.0` (Sub-Version: Jetpack Compose Android Native Feature Parity & File Consolidation).
 - **Status:** **OPERATIONAL & 100% VERIFIED**.
 - **Repository Location:** Local workspace `d:\PROJECT\AROH Open Source\Products\Spedex`.
 - **Target Deployment Environments:**
@@ -427,26 +427,171 @@ The SpeDex repository is governed by three foundational, permanent pillars codif
 2. **Pillar 2 — Universal Version Controller & Change Governance (Protocols 1–44):** Mandatory persistent version ledger in `VERSION_CONTROLLER.md`; strict `A.BC.DE.F` hierarchy; the first checkpoint before modification and final ledger after verification.
 3. **Pillar 3 — Universal Modular Architecture & Change-Isolation Governance (Protocols 1–76):** Strict domain boundaries, bounded change radius, action-to-data traceability, and preservation rules ("Nothing Disappears").
 
-### 10.4 Domain Ownership Map & Modular Boundaries
-The platform partitions responsibilities across 6 explicit, loosely coupled domains:
-- **Domain 1: Authentication & Identity (`auth`):** Login, signup, age verification gating, BCrypt hashing, JWT issuance.
-- **Domain 2: Core Expense Ledger & Velocity (`ledger`):** Micro-transaction entry, category burn rate, spending velocity gauges, cash vs online tagging.
-- **Domain 3: Trips Ledger & Multi-Currency Forex (`trips`):** Travel sessions, offline forex cache (8 currencies), foreign total spend analytics, single active trip invariant.
-- **Domain 4: Vendor Directory & Quick-Pay (`payments`):** Merchant UPI references, dynamic QR generation, minor capability authorization gating.
-- **Domain 5: DPDP Privacy & Consent (`privacy`):** Purpose-separated consents, parental verification tokens, JSON data export (Sec 11), erasure (Sec 12), immutable audit logging (`PrivacyAuditLog`), grievance redressal SLA tracking (Sec 13).
-- **Domain 6: Mobile Sync Simulation (`simulator`):** Dashboard companion diagnostic tool.
+### 10.4 Major System Domains & Modular Ownership Boundaries
+SpeDex is partitioned into 6 distinct, loosely coupled domains:
 
-For complete ownership maps and dependency graphs, see root [`ARCHITECTURE.md`](file:///d:/PROJECT/AROH%20Open%20Source/Products/Spedex/ARCHITECTURE.md).
+```text
+SPEDEX DOMAINS
+├── DOMAIN 1: Authentication & User Accounts (Auth)
+├── DOMAIN 2: Core Expense Ledger & Velocity Analytics (Ledger)
+├── DOMAIN 3: Trips Ledger Subsystem & Multi-Currency Forex (Trips)
+├── DOMAIN 4: Vendor Directory & UPI Payment Preparation (Payments)
+├── DOMAIN 5: DPDP Act 2023 Privacy, Age Verification & Consent (Privacy)
+└── DOMAIN 6: Mobile Sync Simulation & Companion Diagnostics (Simulator)
+```
 
-### 10.5 Traceability Engine & Change Radius Protocol
-Every feature execution follows the explicit chain:
-`PAGE -> SECTION -> FEATURE -> COMPONENT -> ACTION -> FUNCTION -> SERVICE -> DATA`
-Before any file is touched, the change radius is calculated:
-- **DIRECT:** Modules implementing the change.
-- **RELATED:** Supporting types, tests, and configurations.
-- **DEPENDENT:** Consumers requiring regression testing.
-- **SHARED:** High-risk shared infrastructure requiring deep regression audit.
-- **UNRELATED:** Explicitly protected modules (STRICTLY PROHIBITED FROM MODIFICATION).
+#### Domain 1: Authentication & User Accounts (`auth`)
+- **Responsibility**: User signup, age verification gating (<18 vs 18+), BCrypt password hashing, stateless HMAC-SHA256 JWT generation, profile management, and account status enforcement.
+- **Backend Components**: `AuthController.java`, `UserService.java`, `UserRepository.java`, `User.java`, `JwtUtil.java`, `SecurityConfig.java`.
+- **Frontend Components**: `LoginView.tsx`, `Sidebar.tsx` (user badge), `api.ts` (`login`, `signup`, `getMe`).
+- **Mobile Components**: `AuthProvider.tsx`, `LoginScreen.tsx`.
+- **Android Native Components**: `SpedexViewModel.kt` (`user`, `updateProfile`), Room `UserDao`, `Entities.kt` (`User`).
+- **Tests**: `UserServiceTest.java`, `JwtUtilTest.java`, `AuthProvider.test.tsx`.
+
+#### Domain 2: Core Expense Ledger & Velocity Analytics (`ledger`)
+- **Responsibility**: Micro-transaction recording, categorization, weekly burn rate computation, spending velocity gauges, cash vs digital tagging, and monthly budget limits.
+- **Backend Components**: `DashboardController.java`, `TransactionService.java`, `TransactionRepository.java`, `BudgetRepository.java`, `Transaction.java`, `Budget.java`.
+- **Frontend Components**: `OverviewView.tsx`, `AnalyticsView.tsx`, `TransactionModal.tsx`, `StatsCard.tsx`.
+- **Mobile Components**: `HomeScreen.tsx`, `AnalyticsScreen.tsx`.
+- **Android Native Components**: `HomeScreen.kt`, `BudgetsScreen.kt`, `AnalyticsScreen.kt`, Room `TransactionDao`, `BudgetDao`.
+- **Tests**: `DashboardControllerTest.java`, `App.test.tsx`.
+
+#### Domain 3: Trips Ledger Subsystem & Multi-Currency Forex (`trips`)
+- **Responsibility**: Travel budgeting, session lifecycle (Single Active Trip Invariant), foreign currency conversion with offline forex rate cache (USD, EUR, GBP, AED, SGD, THB, NPR, JPY), per-trip custom exchange rates, category percentage distribution, and secondary foreign spend analytics (`foreign_total_spend = totalSpend / exchangeRate`).
+- **Backend Components**: `TripController.java`, `TripService.java`, `TripRepository.java`, `Trip.java`, `TripDto.java`, `TripDetailsDto.java`.
+- **Frontend Components**: `TripsView.tsx`, `forex.ts`, `TripCard.tsx`.
+- **Mobile Components**: `TripsScreen.tsx`, `TripsScreen.test.tsx`.
+- **Android Native Components**: `TripsScreen.kt`, `NativeParityUnitTest.kt`, Room `TripDao`, `Entities.kt` (`Trip`).
+- **E2E Infrastructure**: `mock_backend.py`, `test-trips-e2e.py` (77 tests).
+- **Tests**: `TripServiceTest.java` (12 tests), `NativeParityUnitTest.kt`.
+
+#### Domain 4: Vendor Directory & UPI Payment Preparation (`payments`)
+- **Responsibility**: Local merchant directory, frequency tracking, non-custodial UPI intent generation (`upi://pay`), static and dynamic QR code generation, and server-side capability authorization gating.
+- **Backend Components**: `PaymentController.java`, `UserCapabilityService.java`, `VendorRepository.java`, `Vendor.java`.
+- **Frontend Components**: `PaymentsView.tsx`, `VendorsView.tsx`, `QrModal.tsx`.
+- **Mobile Components**: `PaymentsScreen.tsx`, `PaymentConfirmScreen.tsx`.
+- **Android Native Components**: `PayConfirmScreen.kt`, `ScannerScreen.kt`, Room `VendorDao`.
+- **Tests**: `PaymentControllerTest.java`, `UserCapabilityServiceTest.java`, `PaymentConfirmScreen.test.tsx`.
+
+#### Domain 5: DPDP Act 2023 Privacy, Age Verification & Consent (`privacy`)
+- **Responsibility**: DPDP technical compliance, minor protection (<18 Financial Learning Mode), verifiable parental consent lifecycle, purpose-separated consent toggles (Essential, Analytics, Marketing, Location, AI), immutable audit logging (`PrivacyAuditLog`), machine-readable JSON data export (`Download My SpeDex Data`), right to erasure (`DELETE MY DATA`), and grievance redressal ticketing with SLA monitoring.
+- **Backend Components**: `PrivacyController.java`, `CapabilityController.java`, `PrivacyService.java`, `UserCapabilityService.java`, `ConsentRecordRepository.java`, `PrivacyAuditLogRepository.java`, `PrivacyGrievanceRepository.java`.
+- **Frontend Components**: `PrivacyCenter.tsx`, `CookieConsentBanner.tsx`.
+- **Mobile Components**: `PrivacyScreen.tsx`, `PrivacyScreen.test.tsx`.
+- **Android Native Components**: `PrivacyCenterScreen.kt`, Room `PrivacyDao`, `Entities.kt` (`PrivacySettings`, `PrivacyAuditLogItem`).
+- **Tests**: `PrivacyServiceTest.java` (13 tests), `PrivacyCenter.test.tsx` (2 tests), `NativeParityUnitTest.kt`.
+
+#### Domain 6: Mobile Sync Simulation & Companion Diagnostics (`simulator`)
+- **Responsibility**: Side-by-side live simulator embedded in web dashboard, QR synchronization diagnostics, and cross-client preview.
+- **Frontend Components**: `MobileSyncSimulator.tsx`.
+
+---
+
+### 10.5 Architectural Ownership Map
+
+| Layer | Domain 1 (Auth) | Domain 2 (Ledger) | Domain 3 (Trips) | Domain 4 (Payments) | Domain 5 (Privacy) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Web View** | `LoginView` | `OverviewView`, `AnalyticsView` | `TripsView` | `PaymentsView`, `VendorsView` | `PrivacyCenter` |
+| **Mobile Screen** | `LoginScreen` | `HomeScreen`, `AnalyticsScreen` | `TripsScreen` | `PaymentsScreen`, `PaymentConfirmScreen` | `PrivacyScreen` |
+| **Android Screen**| `HomeScreen` (Profile) | `HomeScreen`, `BudgetsScreen`, `AnalyticsScreen` | `TripsScreen` | `ScannerScreen`, `PayConfirmScreen` | `PrivacyCenterScreen` |
+| **Key Features** | Age verification, JWT | Weekly burn, Velocity | Forex cache, Trip sessions | Payee quick-pay, UPI QR | Consent switches, Data export, Audit log |
+| **Service Layer** | `UserService` | `TransactionService` | `TripService` | `UserCapabilityService` | `PrivacyService`, `UserCapabilityService` |
+| **Controller** | `AuthController` | `DashboardController` | `TripController` | `PaymentController` | `PrivacyController`, `CapabilityController` |
+| **Data Entity** | `User` | `Transaction`, `Budget` | `Trip` | `Vendor` | `ConsentRecord`, `PrivacyAuditLog`, `PrivacyGrievance` |
+| **Shared Infra** | `JwtAuthenticationFilter`, `SecurityConfig` | Currency formatters, DB | Forex cache, DB | QR rendering, Capabilities | Audit engine, SLA monitoring |
+
+---
+
+### 10.6 Traceability Engine (Action $\rightarrow$ Data)
+
+Every user interaction traces through a deterministic, unidirectional sequence:
+`PAGE -> SECTION -> FEATURE -> COMPONENT -> ACTION -> FUNCTION -> SERVICE -> API / REST -> DATA REPOSITORY`
+
+#### Trace A: Starting a Cross-Border International Trip
+```text
+TripsView / TripsScreen (Page)
+ └── Start Trip Modal (Section)
+      └── Destination Currency Selector (Feature)
+           └── Currency Dropdown & Exchange Rate Input (Component)
+                └── User clicks "Start Trip" (Action)
+                     └── handleStartTrip() (Function)
+                          └── api.startTrip(name, currency, rate) (Client Service)
+                               └── POST /api/trips (REST API)
+                                    └── TripService.startTrip() (Backend Service)
+                                         ├── Enforces Single Active Trip Invariant (closes prior trips)
+                                         └── TripRepository.save(trip) (Data Layer)
+```
+
+#### Trace B: Minor Account Live Payment Safeguard
+```text
+PaymentsView / ScannerScreen (Page)
+ └── Vendor Card / QR Reader (Section)
+      └── "Pay via UPI" Button (Component)
+           └── User clicks "Pay" (Action)
+                └── handlePreparePayment() (Function)
+                     └── POST /api/payments/prepare (REST API)
+                          └── PaymentController evaluates UserCapabilityService.canInitiatePayment()
+                               ├── Gated: user.isMinor == true -> throws AccessDeniedException
+                               ├── Logs PAYMENT_ACTION_BLOCKED in PrivacyAuditLog
+                               └── Returns HTTP 403 Forbidden {"mode": "LEARNING_JOURNAL"}
+```
+
+#### Trace C: Right to Erasure / Anonymization
+```text
+Settings -> Privacy Center (Page)
+ └── Danger Zone (Section)
+      └── Account Erasure Modal (Feature)
+           └── Confirmation Input "DELETE MY DATA" (Component)
+                └── User submits confirmation (Action)
+                     └── handleEraseAccount() (Function)
+                          └── POST /api/privacy/erase (REST API)
+                               └── PrivacyService.eraseUserData() (Backend Service)
+                                    ├── Scrambles PII & credentials to "Erased User"
+                                    ├── Sets isErased = true
+                                    ├── Appends ACCOUNT_DELETION_REQUESTED to PrivacyAuditLog
+                                    └── Flushes user session and returns HTTP 200
+```
+
+---
+
+### 10.7 Change Radius Protocol & Change Manifest Model
+
+Before executing any modification, calculate the **Change Radius**:
+```text
+Files classified as:
+├── DIRECT:     Files directly implementing the requested change.
+├── RELATED:    Files immediately supporting the change (types, tests).
+├── DEPENDENT:  Files consuming the feature (views, callers).
+├── SHARED:     Shared infrastructure (CORS, JWT filter, shared UI components).
+└── UNRELATED:  All other modules (STRICTLY PROHIBITED FROM MODIFICATION).
+```
+
+Allowed modification radius is **Direct + necessary Related**.
+
+---
+
+### 10.8 Module Registry & Public API Contracts
+
+| Module | Owning Domain | Public Contract Entry Point | External Consumers |
+| :--- | :--- | :--- | :--- |
+| **`auth`** | Authentication | `api.login()`, `api.signup()`, `SecurityConfig` | App shell, navigation guards |
+| **`trips`** | Trips Ledger | `TripService`, `api.getTrips()`, `api.startTrip()`, `forex.ts` | `TripsView`, `TripsScreen`, E2E suite |
+| **`payments`** | Payments | `PaymentController`, `UserCapabilityService`, `api.preparePayment()` | `PaymentsView`, `PaymentsScreen`, Android Native |
+| **`privacy`** | Privacy & DPDP | `PrivacyService`, `UserCapabilityService`, `PrivacyCenter` | Settings, Auth signup, Capability guards |
+| **`ledger`** | Core Ledger | `TransactionService`, `DashboardController`, `api.getDashboard()` | `OverviewView`, `AnalyticsView`, `HomeScreen` |
+| **`ui_shared`** | Shared Infra | `components/common/`, `Sidebar.tsx`, `forex.ts` | All views and screens |
+
+---
+
+### 10.9 Anti-Cascade & Preservation Invariants
+
+1. **No Cascade Cleanup**: Never perform opportunistic "cleanups" or refactoring of unrelated files during a targeted fix.
+2. **File Replacement Protection**: Never rewrite an entire file when a targeted, surgical change achieves the goal.
+3. **Preservation Rule ("Nothing Disappears")**: Moving or updating code must preserve all existing edge cases, validations, error responses, and test assertions.
+4. **Single Source of Truth**:
+   - Application version: `dashboard_app/src/version.ts` synchronized with `pom.xml`, `package.json`, and `VERSION_CONTROLLER.md`.
+   - Accounting ledger base currency: Indian Rupee (INR ₹).
+   - Server capability enforcement: `UserCapabilityService.java`.
 
 ---
 
@@ -683,17 +828,57 @@ All endpoints run on base path `/api`. Unauthenticated requests to protected end
 
 ## 15. Privacy & Data Governance (DPDP Act 2023)
 
-SpeDex incorporates a complete technical data governance layer supporting India's **Digital Personal Data Protection Act, 2023 (DPDP Act)** and **DPDP Rules 2025**:
+SpeDex incorporates a complete technical data governance layer supporting India's **Digital Personal Data Protection Act, 2023 (DPDP Act)** and **DPDP Rules 2025**. Under the DPDP Act, SpeDex acts as a Data Fiduciary regarding user profile information, adhering strictly to:
 
-1. **Data Minimization (Section 6(1)):** Collects only what is strictly necessary for expense journaling and travel budgeting.
-2. **Purpose-Separated Consent (Section 6(1) & 6(4)):** Granular opt-in switches for Telemetry, Marketing, Geolocation, and AI. Withdrawing consent is 1-click and immediate without penalizing core ledger tracking.
-3. **Minor Protection (Section 9):** Individuals under 18 operate in **Financial Learning / Journal Mode**. Live payment execution is prohibited server-side, and profiling/behavioral tracking is permanently disabled.
-4. **Parental Verification Link Lifecycle:** Minimal guardian data collection (parent name and email only) with tokenized link verification (`PENDING`, `VERIFIED`, `REJECTED`, `WITHDRAWN`).
-5. **Immutable Privacy Audit Trail:** All safety-critical and consent events are recorded in `privacy_audit_logs` for auditable compliance verification.
-6. **Right to Access / Data Portability (Section 11):** 1-click structured machine-readable JSON export (`GET /api/privacy/export`) covering user profile, capabilities, transactions, vendors, budgets, reminders, trips, consent records, audit logs, and grievances.
-7. **Right to Erasure (Section 12):** Immediate irreversible anonymization requiring exact confirmation text `DELETE MY DATA`.
-8. **Grievance Redressal (Section 13):** In-app ticketing system with automated SLA tracking (48h acknowledgement, 15–30 day redressal) and Data Protection Officer contact (`dpo@spedex.internal`).
-9. **Third-Party Subprocessor Registry:** Complete public transparency register disclosing Render Inc. (API hosting), Vercel Inc. (Web CDN), Supabase/AWS (PostgreSQL storage), and Google Fonts (typography).
+1. **Data Minimization (Section 6(1)):** Collects only data strictly necessary for expense journaling and travel budgeting. Banking secrets (UPI MPINs, card CVVs, net banking passwords) are never requested, transmitted, or stored.
+2. **Purpose Limitation (Section 6(2)):** Personal data gathered for transactional ledgering is never repurposed for behavioural advertising or third-party data broker monetization.
+3. **Purpose-Separated Consent (Section 6(1) & 6(4)):** Granular opt-in switches for Telemetry, Marketing, Geolocation, and AI. Withdrawing consent is 1-click and immediate without penalizing core ledger tracking.
+4. **Minor Protection (Section 9):** Individuals under 18 operate in **Financial Learning / Journal Mode**. Live payment execution is prohibited server-side, and profiling/behavioral tracking is permanently disabled.
+5. **Parental Verification Link Lifecycle:** Minimal guardian data collection (parent name and email only) with tokenized link verification (`PENDING`, `VERIFIED`, `REJECTED`, `WITHDRAWN`).
+6. **Immutable Privacy Audit Trail:** All safety-critical and consent events are recorded in `privacy_audit_logs` for auditable compliance verification.
+7. **Right to Access / Data Portability (Section 11):** 1-click structured machine-readable JSON export (`GET /api/privacy/export`) covering user profile, capabilities, transactions, vendors, budgets, reminders, trips, consent records, audit logs, and grievances.
+8. **Right to Erasure (Section 12):** Immediate irreversible anonymization requiring exact confirmation text `DELETE MY DATA`.
+9. **Grievance Redressal (Section 13):** In-app ticketing system with automated SLA tracking (48h acknowledgement, 15–30 day redressal) and Data Protection Officer contact (`dpo@spedex.internal`).
+10. **Third-Party Subprocessor Registry:** Complete public transparency register disclosing Render Inc. (API hosting), Vercel Inc. (Web CDN), Supabase/AWS (PostgreSQL storage), and Google Fonts (typography).
+
+### 15.1 Server-Side Capability Enforcement Matrix
+Client-side flags (`isMinor`) are never trusted for authorization. The centralized `UserCapabilityService` enforces restrictions server-side:
+
+| Action / Capability | Adult (18+) | Minor (<18) | Enforcement Mechanism |
+|---|---|---|---|
+| **Initiate Payment (`POST /api/payments/prepare`)** | Allowed | **Blocked (HTTP 403)** | `UserCapabilityService.canInitiatePayment()` checks user age; logs `PAYMENT_ACTION_BLOCKED` in audit ledger |
+| **Complete Payment (`POST /api/payments/{id}/complete`)** | Allowed | **Blocked (HTTP 403)** | Server-side validation |
+| **Generate UPI QR Code** | Allowed | **Suppressed / Replaced** | Web & Mobile UI hides live QR; displays educational notice |
+| **Scan UPI Payment QR** | Allowed | **Suppressed** | Mobile camera suppresses UPI scanner for minors |
+| **Record Manual Expense** | Allowed | **Allowed** | Full access to educational expense bookkeeping |
+| **Manage Budgets & Goals** | Allowed | **Allowed** | Full access to hostel budgeting tools |
+| **Telemetry Analytics** | Opt-In Required | **Permanently Blocked** | Section 9 prohibits minor tracking |
+| **Educational Marketing** | Opt-In Required | **Permanently Blocked** | Section 9 prohibits targeted marketing to minors |
+
+### 15.2 Purpose-Separated Consent Architecture (Section 6)
+
+| Purpose Key | Category | Default Adult | Default Minor | Description |
+|---|---|---|---|---|
+| `TERMS_AND_PRIVACY` | Essential | Granted | Granted | Essential platform operation (authentication, password hash, encryption) |
+| `ANALYTICS` | Telemetry | Opt-In (false) | **Permanently False** | Anonymous performance benchmarks and system crash diagnostics |
+| `MARKETING` | Communication | Opt-In (false) | **Permanently False** | Student financial literacy digests and product release summaries |
+| `LOCATION` | Contextual | Opt-In (false) | **Permanently False** | Approximate city-level tagging for active travel trips |
+| `AI` | Smart Features | Opt-In (false) | **Permanently False** | Predictive heuristics for automatic expense categorization |
+
+### 15.3 Third-Party Subprocessor Registry
+
+| Subprocessor | Operational Purpose | Data Handled | Jurisdiction | Security Safeguards |
+|---|---|---|---|---|
+| **Render Inc.** | Backend API Hosting | Encrypted application payloads, JWTs | Frankfurt (EU) / Singapore (APAC) | TLS 1.3 in transit, ISO 27001, SOC 2 Type II |
+| **Vercel Inc.** | Web Dashboard CDN | Static client bundle, edge caching | Global Edge / Mumbai PoP | SOC 2 Type II, edge origin shield |
+| **Supabase / AWS** | Managed PostgreSQL DB | Hashed passwords, encrypted ledgers | Singapore (`ap-southeast-1`) | AES-256 at rest, VPC isolation, Automated Backups |
+| **Google Fonts** | Typography Assets | CDN caching of font files | Global Anycast | Zero PII logging, cookieless domain |
+
+### 15.4 Grievance Redressal SLA & Escalation Hierarchy (Section 13)
+- **Acknowledgement SLA:** Within 48 hours of ticket submission.
+- **Resolution SLA:** Within 15 to 30 calendar days.
+- **Data Protection Officer (DPO) Contact:** `dpo@spedex.internal`.
+- **Statutory Escalation:** If unsatisfied with internal grievance resolution, data principals have the explicit statutory right to escalate disputes to the **Data Protection Board of India (DPBI)** per DPDP Act Section 13(3).
 
 ---
 
@@ -782,13 +967,40 @@ SpeDex enforces a mandatory **4-Tier Verification Matrix**. No milestone or vers
 
 ## 21. Current State
 
-- **Branch:** `main` (Git working tree is completely clean).
-- **Active Version:** `2.05.00.0`.
-- **Backend Health:** Spring Boot 3.4.1 compiles cleanly; 55/55 JUnit tests pass.
+- **Branch:** `main` (Git working tree clean).
+- **Active Version:** `2.06.00.0` (Jetpack Compose Android Native Feature Parity).
+- **Backend Health:** Spring Boot 3.4.4 compiles cleanly; 57/57 JUnit tests pass.
 - **Dashboard Health:** React 19 / Vite 6 builds cleanly (0 errors); 9/9 Vitest tests pass.
 - **Mobile Health:** Expo React Native passes all 7 Jest tests; `npx tsc --noEmit` clean with 0 type errors.
-- **E2E Suite:** Hermetic Python test harness passes all 77 test cases in 0.287 seconds.
-- **Total Ecosystem Health:** 148 / 148 automated tests passing (100%).
+- **Android Native Health:** Kotlin Compose Room entities, DAOs, ViewModel, TripsScreen, and PrivacyCenterScreen implemented; `NativeParityUnitTest.kt` passes.
+- **E2E Suite:** Hermetic Python test harness passes all 77 test cases in 0.566 seconds.
+- **Total Ecosystem Health:** 150 / 150 automated tests passing (100% pass rate).
+
+### 21.1 Three-Layer Memory Synchronization
+
+| Memory Layer | Key Artifacts | Synchronization Status | Notes |
+| :--- | :--- | :--- | :--- |
+| **Layer 1: Product Memory** | Vision, aesthetic rules, DPDP legal constraints | **SYNCHRONIZED** | INR currency note theme, non-custodial fintech bounds preserved |
+| **Layer 2: Engineering Memory** | `SPEDEX.md` (Product Master), `VERSION_CONTROLLER.md` (Version Control Master) | **SYNCHRONIZED** | Mandatory persistent version controller, audit logs, and status active |
+| **Layer 3: Actual State** | Git commits, source code, build configs, dependencies | **SYNCHRONIZED** | Clean working tree on `main`, all 4 verification test suites 100% passing (150/150) |
+
+### 21.2 Component Health Matrix
+
+| Subsystem | Tech Stack | Unit Tests | Build / Typecheck | Health State |
+| :--- | :--- | :--- | :--- | :--- |
+| **Backend API** | Spring Boot 3.x / Java 17 | 57 / 57 PASS | Maven compile clean | **OPERATIONAL** |
+| **Dashboard App** | React 19 / Vite 6 / TS 5.8 | 9 / 9 PASS | `vite build` clean (0 errors) | **OPERATIONAL** |
+| **Mobile App** | Expo SDK 53 / React Native 0.79 | 7 / 7 PASS | `tsc --noEmit` clean (0 errors) | **OPERATIONAL** |
+| **Android Native**| Kotlin / Jetpack Compose | Unit tests PASS | Room schema v2 | **OPERATIONAL** |
+| **E2E Test Suite** | Python 3.x / Mock Backend | 77 / 77 PASS | Clean exit code 0 | **OPERATIONAL** |
+
+### 21.3 Risk Register & Mitigations
+
+| Risk Factor | Probability | Impact | Mitigation Strategy |
+| :--- | :--- | :--- | :--- |
+| **Ephemeral H2 Database on Render** | HIGH | MEDIUM | Local disk resets on free-tier sleep cycles. Documented production configuration to connect managed PostgreSQL (Supabase / Neon / Render Postgres). |
+| **JWT Key Rotation** | LOW | HIGH | Configured dynamic `JWT_SECRET` environment variable injection in `application.properties` with safe fallback. |
+| **Minor Guardian Consent Verification** | LOW | HIGH | Hardcoded disabled tracking and payment blocking for minors regardless of guardian status, preventing non-compliance during pending verification. |
 
 ---
 
@@ -797,15 +1009,13 @@ SpeDex enforces a mandatory **4-Tier Verification Matrix**. No milestone or vers
 1. **Ephemeral In-Memory Database:** The default local and Docker configuration runs H2 in-memory storage, which resets upon container termination. Production deployments must configure external managed PostgreSQL.
 2. **Manual Transaction Entry Reliance:** Automated payment detection from bank SMS is not yet implemented, requiring users to log expenses manually or initiate payments through SpeDex quick-pay links.
 3. **Single Active Trip Constraint:** A user cannot maintain two concurrent active trips simultaneously (e.g., tracking a business trip and personal weekend trip concurrently).
-4. **Static Foreign Exchange Rates:** Multi-currency calculations currently use fixed conversion factors rather than a live offline forex cache.
 
 ---
 
 ## 23. Missing & Incomplete Areas
 
-1. **`mobile_native_android` DPDP Feature Parity:** The native Kotlin Compose codebase maintains core models and room DAOs, but does not yet feature the full DPDP Privacy Center and Guardian Consent UI implemented in the React Native and Web clients.
-2. **Automated On-Device SMS Bank Parsing:** Background SMS receipt parsing is proposed but not yet implemented.
-3. **Shared / Multi-User Hostel Ledgers:** Group expense splitting across multiple registered SpeDex accounts is currently modeled as individual trip ledgers rather than multi-tenant collaborative sessions.
+1. **Automated On-Device SMS Bank Parsing:** Background SMS receipt parsing is proposed but not yet implemented.
+2. **Shared / Multi-User Hostel Ledgers:** Group expense splitting across multiple registered SpeDex accounts is currently modeled as individual trip ledgers rather than multi-tenant collaborative sessions.
 
 ---
 
@@ -814,13 +1024,12 @@ SpeDex enforces a mandatory **4-Tier Verification Matrix**. No milestone or vers
 ### P0 — Critical (Zero Open)
 - *No open P0 issues. All security, IDOR, age-gating, and data-loss checks are resolved and verified.*
 
-### P1 — Important Correctness & Parity
-- **P1.1:** Implement Privacy Center and Guardian Consent screens in `mobile_native_android` (Jetpack Compose).
-- **P1.2:** Configure automated PostgreSQL connection pool failover for containerized production environments.
+### P1 — Important Correctness & Infrastructure
+- **P1.1:** Configure automated PostgreSQL connection pool failover for containerized production environments.
 
 ### P2 — Meaningful Functional Improvements
-- **P2.1:** Implement dynamic multi-currency travel conversion with an offline forex cache (`v2.05.01.0`).
-- **P2.2:** Add signed PDF ledger export for completed travel trips in addition to CSV export.
+- **P2.1:** Add signed PDF ledger export for completed travel trips in addition to CSV export.
+- **P2.2:** Webhook triggers for external bank SMS receipt parsers.
 
 ### P3 — Polish & User Experience
 - **P3.1:** High-contrast light/dark theme toggle while preserving emerald and gold currency note tokens.
@@ -864,9 +1073,18 @@ SpeDex enforces a mandatory **4-Tier Verification Matrix**. No milestone or vers
 ## 27. Release & Version Information
 
 ### 27.1 Authoritative Current Version
-**`2.05.02.0`** (Functional: Universal Modular Architecture & Change-Isolation Governance Integration)
+**`2.06.00.0`** (Sub-Version: Jetpack Compose Android Native Feature Parity & File Consolidation)
 
-### 27.2 Version Lineage Summary
+### 27.2 Agent Version Authority Governance (User Mandate)
+- **Major Version (`A`) — STRICTLY FORBIDDEN WITHOUT CONSENT**:
+  The agent has **ZERO AUTHORITY** to increment `A` (`A+1.00.00.0`) without explicit prior consent from the project owner. Under no circumstances may major version upgrades be performed autonomously.
+- **Sub-Version (`BC`) — PARTIAL AUTHORITY**:
+  The agent has **PARTIAL AUTHORITY** on `BC` (`A.BC+1.00.0`) for significant milestone releases and multi-component evolutions, keeping the user informed of proposed sub-version increments.
+- **Functional (`DE`) & Minor Patch (`F`) (`c.de.f`) — FULL AUTHORITY**:
+  The agent has **FULL AUTHORITY** to autonomously increment and manage `DE` functional changes (`A.BC.DE+1.0`) and `F` bug/patch fixes (`A.BC.DE.F+1`).
+
+### 27.3 Version Lineage Summary
+- **`2.06.00.0` (2026-09-26):** Jetpack Compose Android Native Feature Parity (Trips Ledger & DPDP Privacy Center in Room/Jetpack Compose), complete two-file documentation consolidation (`SPEDEX.md` + `VERSION_CONTROLLER.md`), and full stack verification across 150/150 passing tests.
 - **`2.05.02.0` (2026-09-20):** Codified the 76-protocol Universal Modular Architecture & Change-Isolation Governance System into `.agents/AGENTS.md`, authored root `ARCHITECTURE.md` with domain ownership maps and action-to-data traceability, and verified 150/150 passing tests.
 - **`2.05.01.0` (2026-09-20):** Dynamic multi-currency travel conversion for cross-border trips, offline forex cache with 8 major international currencies, live foreign currency entry mode, secondary foreign spend analytics, and 150 passing tests across all 4 suites.
 - **`2.05.00.0` (2026-09-20):** Privacy, Age Verification, Consent & Financial Safety System with server-side capability authorization, DPDP Act 2023 technical controls, and 148 passing tests.

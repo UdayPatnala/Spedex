@@ -4,6 +4,7 @@ import math
 import unittest
 import urllib.error
 import urllib.request
+import uuid
 
 API_BASE = "http://127.0.0.1:8080/api"
 
@@ -39,7 +40,7 @@ def make_request(path, method="GET", headers=None, body=None):
 class SpedexTripsE2ETestCase(unittest.TestCase):
     def setUp(self):
         # Create a unique user for each test to ensure isolation
-        self.rand_id = random.randint(10000, 99999)
+        self.rand_id = uuid.uuid4().hex[:12]
         self.email = f"user_{self.rand_id}@example.com"
         self.password = "password123"
         self.name = f"Tester {self.rand_id}"
@@ -1061,7 +1062,7 @@ class SpedexTripsE2ETestCase(unittest.TestCase):
 
     def test_tier5_dpdp_03_minor_onboarding_and_guardian_consent(self):
         # Register a minor user (age 15)
-        minor_email = f"minor_{random.randint(10000, 99999)}@example.com"
+        minor_email = f"minor_{uuid.uuid4().hex[:12]}@example.com"
         status, res = make_request("/auth/signup", "POST", body={
             "name": "Aarav Minor",
             "email": minor_email,

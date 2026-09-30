@@ -42,6 +42,18 @@ class SpedexViewModel(private val repository: SpedexRepository) : ViewModel() {
     val allReminders: StateFlow<List<Reminder>> = repository.allReminders
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    val activeTrip: StateFlow<Trip?> = repository.activeTrip
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val allTrips: StateFlow<List<Trip>> = repository.allTrips
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val privacySettings: StateFlow<PrivacySettings?> = repository.privacySettings
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val privacyAuditLogs: StateFlow<List<PrivacyAuditLogItem>> = repository.privacyAuditLogs
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     // Currently scanned or inputs for transactions
     private val _scannedUpiState = MutableStateFlow<UpiInfo?>(null)
     val scannedUpiState: StateFlow<UpiInfo?> = _scannedUpiState.asStateFlow()
@@ -155,6 +167,54 @@ class SpedexViewModel(private val repository: SpedexRepository) : ViewModel() {
         viewModelScope.launch {
             repository.updateTransactionStatus(txId, status)
             _activeTransactionStatus.value = status
+            if (status == "SUCCESS") {
+                val tx = allTransactions.value.find { it.id == txId }
+                if (tx != null) {
+                    repository.addSpendToActiveTrip(tx.amount)
+                }
+            }
+        }
+    }
+
+    // CRUD - Trips
+    fun startTrip(name: String, budget: Double, currency: String = "INR", exchangeRate: Double = 1.0) {
+        viewModelScope.launch {
+            repository.startTrip(name, budget, currency, exchangeRate)
+        }
+    }
+
+    fun completeTrip(tripId: String) {
+        viewModelScope.launch {
+            repository.completeTrip(tripId)
+        }
+    }
+
+    // DPDP Act 2023 - Privacy & Minor Safety
+    fun updatePrivacyConsent(analytics: Boolean, marketing: Boolean, location: Boolean, ai: Boolean) {
+        viewModelScope.launch {
+            repository.updatePrivacyConsent(analytics, marketing, location, ai)
+        }
+    }
+
+    fun requestGuardianConsent(guardianName: String, guardianEmail: String) {
+        viewModelScope.launch {
+            repository.requestGuardianConsent(guardianName, guardianEmail)
+        }
+    }
+
+    fun verifyGuardianConsent() {
+        viewModelScope.launch {
+            repository.verifyGuardianConsent()
+        }
+    }
+
+    suspend fun exportUserDataJson(): String {
+        return repository.exportUserDataJson()
+    }
+
+    fun eraseUserData() {
+        viewModelScope.launch {
+            repository.eraseUserData()
         }
     }
 

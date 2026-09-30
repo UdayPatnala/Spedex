@@ -98,3 +98,46 @@ interface ReminderDao {
     @Query("DELETE FROM reminders")
     suspend fun deleteAllReminders()
 }
+
+@Dao
+interface TripDao {
+    @Query("SELECT * FROM trips WHERE status = 'ACTIVE' LIMIT 1")
+    fun getActiveTrip(): Flow<Trip?>
+
+    @Query("SELECT * FROM trips ORDER BY createdAt DESC")
+    fun getAllTrips(): Flow<List<Trip>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertTrip(trip: Trip): Long
+
+    @Update
+    suspend fun updateTrip(trip: Trip)
+
+    @Query("UPDATE trips SET status = 'COMPLETED', completedAt = :completedAt WHERE status = 'ACTIVE'")
+    suspend fun closeAllActiveTrips(completedAt: Long = System.currentTimeMillis())
+
+    @Query("UPDATE trips SET totalSpend = totalSpend + :amount WHERE id = :tripId")
+    suspend fun addSpendToTrip(tripId: Int, amount: Double)
+
+    @Query("DELETE FROM trips")
+    suspend fun deleteAllTrips()
+}
+
+@Dao
+interface PrivacyDao {
+    @Query("SELECT * FROM privacy_settings WHERE id = :id LIMIT 1")
+    fun getPrivacySettings(id: String = "privacy_default"): Flow<PrivacySettings?>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertOrUpdatePrivacySettings(settings: PrivacySettings)
+
+    @Query("SELECT * FROM privacy_audit_logs ORDER BY timestamp DESC")
+    fun getAllAuditLogs(): Flow<List<PrivacyAuditLogItem>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAuditLog(log: PrivacyAuditLogItem): Long
+
+    @Query("DELETE FROM privacy_audit_logs")
+    suspend fun deleteAllAuditLogs()
+}
+

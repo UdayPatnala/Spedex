@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
                 val currentRoute = navBackStackEntry?.destination?.route
 
                 // Hide bottom navigation on scan or pay confirm modes to optimize views and focus actions
-                val showBottomNav = currentRoute in listOf("home", "budgets", "reminders", "analytics")
+                val showBottomNav = currentRoute in listOf("home", "budgets", "trips", "reminders", "analytics")
 
                 Scaffold(
                     bottomBar = {
@@ -57,6 +57,7 @@ class MainActivity : ComponentActivity() {
                                 val items = listOf(
                                     NavigationItem("home", "Home", Icons.Default.Home, Icons.Outlined.Home),
                                     NavigationItem("budgets", "Budgets", Icons.Default.AccountBalanceWallet, Icons.Outlined.AccountBalanceWallet),
+                                    NavigationItem("trips", "Trips", Icons.Default.Luggage, Icons.Outlined.Luggage),
                                     NavigationItem("reminders", "Reminders", Icons.Default.NotificationsActive, Icons.Outlined.Notifications),
                                     NavigationItem("analytics", "Analytics", Icons.Default.Insights, Icons.Outlined.Leaderboard)
                                 )
@@ -108,11 +109,17 @@ class MainActivity : ComponentActivity() {
                         composable("budgets") {
                             BudgetsScreen(navController, viewmodel, Modifier.padding(bottom = if (showBottomNav) 0.dp else innerPadding.calculateBottomPadding()))
                         }
+                        composable("trips") {
+                            TripsScreen(navController, viewmodel, Modifier.padding(bottom = if (showBottomNav) 0.dp else innerPadding.calculateBottomPadding()))
+                        }
                         composable("reminders") {
                             RemindersScreen(navController, viewmodel, Modifier.padding(bottom = if (showBottomNav) 0.dp else innerPadding.calculateBottomPadding()))
                         }
                         composable("analytics") {
                             AnalyticsScreen(navController, viewmodel, Modifier.padding(bottom = if (showBottomNav) 0.dp else innerPadding.calculateBottomPadding()))
+                        }
+                        composable("privacy") {
+                            PrivacyCenterScreen(navController, viewmodel, Modifier.padding(bottom = if (showBottomNav) 0.dp else innerPadding.calculateBottomPadding()))
                         }
                     }
                 }

@@ -1,4 +1,4 @@
-# SpeDex Smart Wallet Platform (v2.05 Enterprise)
+# SpeDex Smart Wallet Platform (v2.06 Enterprise)
 
 SpeDex is a flagship, enterprise-grade Smart Wallet & Financial Intelligence Platform for high-frequency transaction tracking, automated trip ledgers, UPI vendor quick-pays, multi-currency budgeting, and real-time expense analytics.
 
@@ -30,7 +30,7 @@ The name blends **"Speed Index"** and **"Spending Index"** into a unified ecosys
 Spedex/
 ├── backend/                  # Java 17 / Spring Boot REST API (JPA, H2/PostgreSQL, Security, JWT)
 │   ├── src/main/java/        # Application source code (Controllers, Services, Repositories, Models)
-│   └── src/test/java/        # Unit & integration test suites (JUnit 5, Mockito - 55 tests)
+│   └── src/test/java/        # Unit & integration test suites (JUnit 5, Mockito - 57 tests)
 ├── dashboard_app/            # React 19 + Vite 6 + TypeScript Web Dashboard
 │   ├── src/components/       # UI components (Sidebar, Topbar, Modals, MobileSyncSimulator, LandingPage, PrivacyCenter)
 │   ├── src/views/            # Domain view modules (Home, Payments, Analytics, Budget, Trips, Settings, Auth)
@@ -56,7 +56,7 @@ cd backend
 ./mvnw.cmd spring-boot:run
 ```
 - API Endpoint: `http://localhost:8080/api`
-- Run Test Suite: `./mvnw.cmd test` (55/55 tests passing)
+- Run Test Suite: `./mvnw.cmd test` (57/57 tests passing)
 
 ### 2. Web Dashboard (React + Vite + TypeScript)
 
@@ -105,13 +105,13 @@ python test-trips-e2e.py
 
 | Test Suite | Framework | Status | Metrics |
 |---|---|---|---|
-| Backend Services, IDOR & Safety | JUnit 5 / Spring Boot | ✅ PASSING | 55 tests |
+| Backend Services, IDOR & Safety | JUnit 5 / Spring Boot | ✅ PASSING | 57 tests |
 | Dashboard Web App | Vitest / React Testing Library | ✅ PASSING | 9 tests |
 | Mobile Expo App | Jest / Jest-Expo | ✅ PASSING | 5 suites / 7 tests |
 | End-to-End Suite | Python `unittest` | ✅ PASSING | 77 tests |
 | Frontend Typecheck | TypeScript 5.8 | ✅ PASSING | 0 errors |
 | Mobile Typecheck | TypeScript 5.8 | ✅ PASSING | 0 errors |
-| **TOTAL VERIFIED TEST SUITE** | Full Ecosystem | ✅ **PASSING** | **148 / 148 tests (100%)** |
+| **TOTAL VERIFIED TEST SUITE** | Full Ecosystem | ✅ **PASSING** | **150 / 150 tests (100%)** |
 
 ---
 

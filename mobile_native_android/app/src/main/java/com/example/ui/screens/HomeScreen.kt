@@ -48,6 +48,7 @@ fun HomeScreen(
     val transactions by viewModel.allTransactions.collectAsStateWithLifecycle()
     val budgets by viewModel.allBudgets.collectAsStateWithLifecycle()
     val totalExpense by viewModel.totalExpense.collectAsStateWithLifecycle(initialValue = 0.0)
+    val activeTrip by viewModel.activeTrip.collectAsStateWithLifecycle()
 
     val totalBudgetCap = remember(budgets) { budgets.sumOf { it.limitAmount } }
     val progressFraction = remember(totalExpense, totalBudgetCap) {
@@ -174,6 +175,23 @@ fun HomeScreen(
                                 color = BerryPrimary
                             )
                         }
+
+                        // Privacy Center Shield
+                        IconButton(
+                            onClick = { navController.navigate("privacy") },
+                            modifier = Modifier
+                                .size(38.dp)
+                                .clip(CircleShape)
+                                .background(SoftBlushBg)
+                                .testTag("btn_privacy_center")
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Shield,
+                                contentDescription = "Privacy Center",
+                                tint = BerryPrimary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -247,6 +265,80 @@ fun HomeScreen(
                                     color = if (progressFraction > 0.8) RoseAccent else TealAccent
                                 )
                             }
+                        }
+                    }
+                }
+            }
+
+            // Active Expedition Banner (Trips Ledger Parity)
+            activeTrip?.let { trip ->
+                item {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { navController.navigate("trips") }
+                            .testTag("home_active_trip_card"),
+                        colors = CardDefaults.cardColors(containerColor = SoftBlushBg),
+                        shape = RoundedCornerShape(16.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, BerryPrimary.copy(alpha = 0.25f))
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(38.dp)
+                                        .clip(CircleShape)
+                                        .background(BerryPrimary),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.FlightTakeoff,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Text(
+                                            text = trip.name,
+                                            fontSize = 15.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = SpaceTextPrimary
+                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Surface(
+                                            shape = RoundedCornerShape(8.dp),
+                                            color = NeonEmerald.copy(alpha = 0.15f)
+                                        ) {
+                                            Text(
+                                                text = "ACTIVE",
+                                                fontSize = 9.sp,
+                                                fontWeight = FontWeight.Black,
+                                                color = NeonEmerald,
+                                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                            )
+                                        }
+                                    }
+                                    Text(
+                                        text = "Spent ₹%,.0f of ₹%,.0f (${trip.currency})".format(trip.spent, trip.budget),
+                                        fontSize = 11.sp,
+                                        color = SpaceTextSecondary
+                                    )
+                                }
+                            }
+                            Icon(
+                                imageVector = Icons.Default.ChevronRight,
+                                contentDescription = "Open Trip",
+                                tint = BerryPrimary
+                            )
                         }
                     }
                 }

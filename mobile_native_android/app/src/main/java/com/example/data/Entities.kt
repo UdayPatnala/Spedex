@@ -62,3 +62,42 @@ data class Reminder(
     val autopayEnabled: Boolean = false,
     val status: String = "PENDING" // "PENDING", "PAID"
 )
+
+@Entity(tableName = "trips")
+data class Trip(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val name: String,
+    val budget: Double,
+    val currency: String = "INR",
+    val exchangeRate: Double = 1.0,
+    val status: String = "ACTIVE", // "ACTIVE" or "COMPLETED"
+    val totalSpend: Double = 0.0,
+    val createdAt: Long = System.currentTimeMillis(),
+    val completedAt: Long? = null
+)
+
+@Entity(tableName = "privacy_settings")
+data class PrivacySettings(
+    @PrimaryKey val id: String = "privacy_default",
+    val isMinor: Boolean = false,
+    val age: Int = 20,
+    val essentialConsent: Boolean = true,
+    val analyticsConsent: Boolean = false,
+    val marketingConsent: Boolean = false,
+    val locationConsent: Boolean = false,
+    val aiConsent: Boolean = false,
+    val guardianName: String = "",
+    val guardianEmail: String = "",
+    val guardianConsentStatus: String = "NOT_REQUIRED", // "NOT_REQUIRED", "PENDING", "VERIFIED"
+    val lastExportTimestamp: Long = 0L,
+    val updatedAt: Long = System.currentTimeMillis()
+)
+
+@Entity(tableName = "privacy_audit_logs")
+data class PrivacyAuditLogItem(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    val eventType: String,
+    val details: String,
+    val timestamp: Long = System.currentTimeMillis()
+)
+

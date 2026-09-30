@@ -6,8 +6,17 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [User::class, Vendor::class, Transaction::class, Budget::class, Reminder::class],
-    version = 1,
+    entities = [
+        User::class,
+        Vendor::class,
+        Transaction::class,
+        Budget::class,
+        Reminder::class,
+        Trip::class,
+        PrivacySettings::class,
+        PrivacyAuditLogItem::class
+    ],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -16,6 +25,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
     abstract fun budgetDao(): BudgetDao
     abstract fun reminderDao(): ReminderDao
+    abstract fun tripDao(): TripDao
+    abstract fun privacyDao(): PrivacyDao
 
     companion object {
         @Volatile

@@ -12,6 +12,10 @@ class SpedexRepository(private val db: AppDatabase) {
     val allTransactions: Flow<List<Transaction>> = db.transactionDao().getAllTransactions()
     val allBudgets: Flow<List<Budget>> = db.budgetDao().getAllBudgets()
     val allReminders: Flow<List<Reminder>> = db.reminderDao().getAllReminders()
+    val activeTrip: Flow<Trip?> = db.tripDao().getActiveTrip()
+    val allTrips: Flow<List<Trip>> = db.tripDao().getAllTrips()
+    val privacySettings: Flow<PrivacySettings?> = db.privacyDao().getPrivacySettings()
+    val allAuditLogs: Flow<List<PrivacyAuditLogItem>> = db.privacyDao().getAllAuditLogs()
 
     suspend fun saveUser(user: User) = withContext(Dispatchers.IO) {
         db.userDao().insertOrUpdateUser(user)
@@ -83,6 +87,171 @@ class SpedexRepository(private val db: AppDatabase) {
         db.vendorDao().getVendorByUpi(upi)
     }
 
+    // Trip management
+    suspend fun startTrip(name: String, budget: Double, currency: String = "INR", exchangeRate: Double = 1.0): Long = withContext(Dispatchers.IO) {
+        db.tripDao().closeAllActiveTrips()
+        val tripId = db.tripDao().insertTrip(
+            Trip(
+                name = name,
+                budget = budget,
+                currency = currency,
+                exchangeRate = exchangeRate,
+                status = "ACTIVE",
+                totalSpend = 0.0
+            )
+        )
+        db.privacyDao().insertAuditLog(
+            PrivacyAuditLogItem(
+                eventType = "TRIP_STARTED",
+                details = "Started new travel trip '$name' (Budget: $currency $budget, Rate: $exchangeRate)"
+            )
+        )
+        tripId
+    }
+
+    suspend fun completeTrip(tripId: Int) = withContext(Dispatchers.IO) {
+        db.tripDao().closeAllActiveTrips()
+        db.privacyDao().insertAuditLog(
+            PrivacyAuditLogItem(
+                eventType = "TRIP_COMPLETED",
+                details = "Completed trip ID $tripId and archived expense summary"
+            )
+        )
+    }
+
+    suspend fun addSpendToActiveTrip(amount: Double) = withContext(Dispatchers.IO) {
+        val active = db.tripDao().getActiveTrip().firstOrNull()
+        if (active != null) {
+            db.tripDao().addSpendToTrip(active.id, amount)
+        }
+    }
+
+    // Privacy & DPDP Management
+    suspend fun updatePrivacyConsent(
+        essential: Boolean,
+        analytics: Boolean,
+        marketing: Boolean,
+        location: Boolean,
+        ai: Boolean
+    ) = withContext(Dispatchers.IO) {
+        val current = db.privacyDao().getPrivacySettings().firstOrNull() ?: PrivacySettings()
+        val updated = current.copy(
+            essentialConsent = essential,
+            analyticsConsent = analytics,
+            marketingConsent = marketing,
+            locationConsent = location,
+            aiConsent = ai,
+            updatedAt = System.currentTimeMillis()
+        )
+        db.privacyDao().insertOrUpdatePrivacySettings(updated)
+        db.privacyDao().insertAuditLog(
+            PrivacyAuditLogItem(
+                eventType = "CONSENT_UPDATED",
+                details = "Updated consent: analytics=$analytics, marketing=$marketing, location=$location, ai=$ai"
+            )
+        )
+    }
+
+    suspend fun requestGuardianConsent(guardianName: String, guardianEmail: String) = withContext(Dispatchers.IO) {
+        val current = db.privacyDao().getPrivacySettings().firstOrNull() ?: PrivacySettings(isMinor = true, age = 16)
+        val updated = current.copy(
+            guardianName = guardianName,
+            guardianEmail = guardianEmail,
+            guardianConsentStatus = "PENDING",
+            updatedAt = System.currentTimeMillis()
+        )
+        db.privacyDao().insertOrUpdatePrivacySettings(updated)
+        db.privacyDao().insertAuditLog(
+            PrivacyAuditLogItem(
+                eventType = "GUARDIAN_CONSENT_REQUESTED",
+                details = "Dispatched verifiable parental consent token to $guardianEmail ($guardianName)"
+            )
+        )
+    }
+
+    suspend fun verifyGuardianConsent() = withContext(Dispatchers.IO) {
+        val current = db.privacyDao().getPrivacySettings().firstOrNull() ?: return@withContext
+        val updated = current.copy(
+            guardianConsentStatus = "VERIFIED",
+            updatedAt = System.currentTimeMillis()
+        )
+        db.privacyDao().insertOrUpdatePrivacySettings(updated)
+        db.privacyDao().insertAuditLog(
+            PrivacyAuditLogItem(
+                eventType = "GUARDIAN_CONSENT_VERIFIED",
+                details = "Parental consent verified for minor account"
+            )
+        )
+    }
+
+    suspend fun exportUserDataJson(): String = withContext(Dispatchers.IO) {
+        val user = db.userDao().getUserById().firstOrNull()
+        val txs = db.transactionDao().getAllTransactions().firstOrNull() ?: emptyList()
+        val budgets = db.budgetDao().getAllBudgets().firstOrNull() ?: emptyList()
+        val reminders = db.reminderDao().getAllReminders().firstOrNull() ?: emptyList()
+        val trips = db.tripDao().getAllTrips().firstOrNull() ?: emptyList()
+        val privacy = db.privacyDao().getPrivacySettings().firstOrNull()
+        val audit = db.privacyDao().getAllAuditLogs().firstOrNull() ?: emptyList()
+
+        db.privacyDao().insertAuditLog(
+            PrivacyAuditLogItem(
+                eventType = "DATA_EXPORT_REQUESTED",
+                details = "Generated machine-readable personal data export archive (JSON)"
+            )
+        )
+
+        """
+        {
+            "export_version": "2.06.00.0",
+            "timestamp": ${System.currentTimeMillis()},
+            "compliance": "DPDP Act 2023 Section 11",
+            "user": {
+                "id": "${user?.id ?: ""}",
+                "name": "${user?.name ?: ""}",
+                "email": "${user?.email ?: ""}",
+                "plan": "${user?.plan ?: ""}"
+            },
+            "privacy": {
+                "is_minor": ${privacy?.isMinor ?: false},
+                "age": ${privacy?.age ?: 20},
+                "essential_consent": ${privacy?.essentialConsent ?: true},
+                "analytics_consent": ${privacy?.analyticsConsent ?: false},
+                "marketing_consent": ${privacy?.marketingConsent ?: false},
+                "location_consent": ${privacy?.locationConsent ?: false},
+                "ai_consent": ${privacy?.aiConsent ?: false},
+                "guardian_consent_status": "${privacy?.guardianConsentStatus ?: "NOT_REQUIRED"}"
+            },
+            "transactions_count": ${txs.size},
+            "budgets_count": ${budgets.size},
+            "reminders_count": ${reminders.size},
+            "trips_count": ${trips.size},
+            "audit_logs_count": ${audit.size}
+        }
+        """.trimIndent()
+    }
+
+    suspend fun eraseUserData() = withContext(Dispatchers.IO) {
+        db.transactionDao().deleteAllTransactions()
+        db.budgetDao().deleteAllBudgets()
+        db.reminderDao().deleteAllReminders()
+        db.tripDao().deleteAllTrips()
+        db.userDao().insertOrUpdateUser(
+            User(
+                id = "user_default",
+                name = "Erased User",
+                email = "erased@user.local",
+                plan = "Anonymized Account",
+                avatarInitials = "XX"
+            )
+        )
+        db.privacyDao().insertAuditLog(
+            PrivacyAuditLogItem(
+                eventType = "ACCOUNT_DELETION_REQUESTED",
+                details = "Executed irreversible data erasure and account anonymization per DPDP Act Section 12"
+            )
+        )
+    }
+
     private suspend fun recalculateBudgetSpentForCategory(category: String) {
         val txList = db.transactionDao().getAllTransactions().firstOrNull() ?: emptyList()
         val successSpent = txList
@@ -137,6 +306,41 @@ class SpedexRepository(private val db: AppDatabase) {
             db.transactionDao().insertTransaction(Transaction(vendorName = "Campus Canteen", vendorUpi = "campus.canteen@okhdfc", description = "Meal coupon book", category = "Food", amount = 1070.0, status = "SUCCESS", occurredAt = System.currentTimeMillis() - 86400000 * 8)) // 8 days ago
             db.transactionDao().insertTransaction(Transaction(vendorName = "Rickshaw Campus Shuttle", vendorUpi = "riteshauto@oksbi", description = "Station ride", category = "Transport", amount = 120.0, status = "FAILED", occurredAt = System.currentTimeMillis() - 3600000 * 5)) // 5 hrs ago
             db.transactionDao().insertTransaction(Transaction(vendorName = "Hostel Laundry Express", vendorUpi = "laundrexxhostel@paytm", description = "Bedding batch prep", category = "Subscriptions", amount = 200.0, status = "PENDING", occurredAt = System.currentTimeMillis() - 600000)) // 10 mins ago
+
+            // Seed Active Trip
+            db.tripDao().insertTrip(
+                Trip(
+                    id = "trip_demo_1",
+                    name = "Goa Hostel Outing",
+                    budget = 5000.0,
+                    spent = 1450.0,
+                    currency = "INR",
+                    exchangeRate = 1.0,
+                    status = "ACTIVE",
+                    createdAt = System.currentTimeMillis() - 86400000 * 2
+                )
+            )
+
+            // Seed Privacy Settings
+            db.privacyDao().insertOrUpdatePrivacySettings(
+                PrivacySettings(
+                    id = "privacy_default",
+                    isMinor = false,
+                    age = 20,
+                    essentialConsent = true,
+                    analyticsConsent = false,
+                    marketingConsent = false,
+                    locationConsent = false,
+                    aiConsent = false,
+                    guardianConsentStatus = "NOT_REQUIRED"
+                )
+            )
+            db.privacyDao().insertAuditLog(
+                PrivacyAuditLogItem(
+                    eventType = "PRIVACY_INITIALIZED",
+                    details = "Default DPDP compliance settings loaded (privacy-first baseline)"
+                )
+            )
 
             // Re-sync all budgets from transaction values
             recalculateBudgetSpentForCategory("Food")

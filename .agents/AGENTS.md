@@ -187,7 +187,7 @@ Targeted searches, focused file reads, structural audits. Correctness over raw s
 Preserve complete state, history logs, and rollback baselines across sessions.
 
 ### 25. Version & Execution History
-Maintain `docs/VERSION_HISTORY.md` and `docs/EXECUTION_HISTORY.md` as permanent, immutable ledgers.
+Maintain `VERSION_CONTROLLER.md` as the permanent, authoritative version and execution ledger.
 
 ### 26. Final Forensic Audit
 Multi-dimensional review: Product Intent, Code Quality, Architecture, UI/UX, Security, Privacy, Performance, Testing, Deployment, Git, Documentation.
@@ -328,6 +328,24 @@ Do not create:
 ```
 
 Instead escalate according to the appropriate change level.
+
+---
+
+# 3.1 VERSION AUTHORITY BOUNDARIES (USER MANDATE)
+
+The agent operates under explicit authority limits for version transitions:
+
+1. **Major Version (`A`) — STRICTLY FORBIDDEN WITHOUT CONSENT**:
+   - The agent has **ZERO AUTHORITY** to increment `A` (`A+1.00.00.0`) without explicit prior consent from the user.
+   - Any major breaking change or architectural overhaul must remain within the current major line or await explicit instruction.
+
+2. **Sub-Version (`BC`) — PARTIAL AUTHORITY**:
+   - The agent has **PARTIAL AUTHORITY** on `BC` (`A.BC+1.00.0`).
+   - Appropriate for planned substantial release milestones and multi-component evolutions. Keep the user informed of proposed sub-version transitions.
+
+3. **Functional (`DE`) & Minor Patch (`F`) (`c.de.f`) — FULL AUTHORITY**:
+   - The agent has **FULL AUTHORITY** to increment and manage `DE` (`A.BC.DE+1.0`) and `F` (`A.BC.DE.F+1`).
+   - Autonomous governance applies to all new feature modules, workflow enhancements, bug fixes, validation corrections, and refactors.
 
 ---
 
