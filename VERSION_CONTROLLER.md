@@ -2,7 +2,7 @@
 
 ## Current Version
 
-`2.07.01.0` (Milestone P4.1: Real-Time Spending Velocity Engine)
+`2.07.01.1` (Security & Git Push Secret Hygiene Patch)
 
 ## Status
 
@@ -12,6 +12,7 @@ VERIFIED
 
 | Version | Previous | Level | Commit | Change |
 |---|---|---|---|---|
+| 2.07.01.1 | 2.07.01.0 | PATCH | cfe8967 | Security & Git Push Hardening: externalized secrets to .env, multi-tier .gitignore, and automated pre-commit secret scanner |
 | 2.07.01.0 | 2.07.00.0 | FUNCTIONAL | 68c172b | Generative UI Spending Velocity Engine Widget with real-time SVG pacing gauge and forecast simulator |
 | 2.07.00.0 | 2.06.00.0 | SUB-VERSION | e1297a3 | SpeDex V1 Production-Ready MVP (v1.0.0-PROD): 18-step user loop, RESTful transaction & payment reference controllers, CSV export, PostgreSQL profile, Vercel & Render configuration |
 | 2.06.00.0 | 2.05.02.0 | SUB-VERSION | 194c90e | Jetpack Compose Android Native Feature Parity (Trips Ledger & DPDP Privacy Center) |
@@ -55,6 +56,23 @@ None (all milestones verified).
 ---
 
 ## Detailed Historical Release Ledger
+
+### [2.07.01.1] - 2026-10-10
+Type: Patch | Status: Verified | Commit: cfe8967
+- **Security & Git Push Secret Hygiene Hardening**:
+  - **Secret Externalization (`dashboard_app/src/firebase.ts`)**:
+    - Completely removed all hardcoded Firebase credentials from client-side bundle.
+    - Externalized to `import.meta.env.VITE_FIREBASE_*` with zero-leakage mock/no-op fallback during unauthenticated builds and test suites.
+    - Added comprehensive template documentation in `dashboard_app/.env.example` and root `.env.example`.
+  - **Multi-Tier Git Exclusion Defense**:
+    - Hardened root `.gitignore`, added `dashboard_app/.gitignore` and `mobile/.gitignore`.
+    - Explicitly blocked `.env*`, `*.pem`, `*.key`, `*.jks`, `*.keystore`, `*.cert`, `serviceAccount*.json`, and `recovery-codes.txt`.
+  - **Automated Pre-Commit Secret Scanner (`scripts/scan-secrets.py`)**:
+    - Implemented high-performance regex security auditor scanning for API keys (Firebase, AWS, GitHub, Stripe), private keys, hardcoded JWTs, and database URIs with passwords.
+    - Installed automatic `.git/hooks/pre-commit` hook rejecting staged commits with detected credentials.
+  - **Backend Production Security Hardening (`application-prod.properties`)**:
+    - Enforced mandatory externalized `${JWT_SECRET}` in production profile without insecure fallback.
+    - Documented Secret Hygiene & Git Push Security Controls in `docs/security.md`.
 
 ### [2.07.01.0] - 2026-10-10
 Type: Functional | Status: Verified | Commit: 68c172b
