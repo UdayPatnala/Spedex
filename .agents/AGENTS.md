@@ -3556,3 +3556,24 @@ The architecture exists primarily to protect the project from accidental destruc
    - Frontend API clients must sanitize environment variables (e.g. `VITE_API_BASE_URL`).
    - Automatically strip trailing slashes and guarantee required `/api` path prefixes to prevent human misconfiguration errors in cloud hosting dashboards.
 
+---
+
+# 78. SECRET HYGIENE & GIT PUSH SECURITY INVARIANTS
+
+1. **Zero Committed Secrets Invariant**:
+   - Under no circumstances shall real API keys (e.g., Firebase `AIzaSy...`, AWS `AKIA...`, OpenAI/Gemini `sk-...`), JWT signing secrets, database passwords, or private cryptographic keys be hardcoded in committed files.
+   - All credentials must be externalized to environment variables (`.env` or platform secret vaults).
+   - Every module requiring environment configuration MUST maintain a sanitized `.env.example` file documenting variable names with placeholder values.
+
+2. **Multi-Target .gitignore Coverage**:
+   - Root and all submodule `.gitignore` files must explicitly exclude:
+     - `.env`, `.env.local`, `.env.*.local`, `.env.production`, `.env.development` (except `!.env.example`)
+     - Cryptographic keys: `*.pem`, `*.key`, `*.cert`, `*.pfx`, `*.p12`, `*.jks`, `*.keystore`
+     - Service accounts: `serviceAccountKey*.json`, `google-services.json`, `GoogleService-Info.plist`, `firebase-adminsdk*.json`
+     - Ephemeral secrets: `recovery-codes.txt`, `credentials.json`
+
+3. **Pre-Push Automated Secret Audit**:
+   - Prior to creating git commits and pushing to remote branches, an automated secret scan (`python scripts/scan-secrets.py --check-git` or pre-commit hook) must be executed.
+   - If any unmasked credential or high-entropy key pattern is detected, the operation MUST halt immediately.
+
+
