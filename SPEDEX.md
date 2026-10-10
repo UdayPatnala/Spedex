@@ -1,7 +1,7 @@
 # SpeDex — Authoritative Product Master (SPEDEX.md / PRODUCT_MASTER.md)
 
 **Authoritative Product Master File (`SPEDEX.md`)**  
-**Current System Version:** `2.07.01.0` (Milestone P4.1: Real-Time Spending Velocity Engine)  
+**Current System Version:** `2.07.01.1` (Security & Git Push Secret Hygiene Patch)  
 **Governing Architecture:** Universal Reverse-Engineering, Universal Version Control & Universal Modular Architecture (`.agents/AGENTS.md`)  
 **Repository Working Tree:** Verified Clean (`main`)  
 **Automated Test Status:** 162 / 162 Tests Passing (100% Pass Rate across 4 Test Suites)  
@@ -16,7 +16,7 @@
 - **Etymology / Blend:** **Speed Index** (high-frequency, frictionless expense logging) + **Spending Index** (real-time velocity analytics and financial awareness).
 - **Project Type:** Personal financial ledger, travel expense journal, vendor quick-pay directory, and campus budgeting utility.
 - **Product Classification:** Non-custodial financial utility and organizational layer. SpeDex is **not** a bank, **not** a payment processor, and **not** a custodial wallet.
-- **Operating Version:** `2.07.01.0` (Functional Increment: Milestone P4.1 - Real-Time Spending Velocity Engine).
+- **Operating Version:** `2.07.01.1` (Security Patch: Secret Hygiene & Git Push Protection Hardening).
 - **Status:** **OPERATIONAL & 100% VERIFIED**.
 - **Repository Location:** Local workspace `d:\PROJECT\AROH Open Source\Products\Spedex`.
 - **Target Deployment Environments:**

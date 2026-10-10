@@ -3,15 +3,25 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAnalytics, isSupported, Analytics } from "firebase/analytics";
 import { getFirestore, Firestore } from "firebase/firestore";
 
-// SpeDex web app's Firebase configuration
+// Read Firebase client configuration dynamically from environment variables
+const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
+const authDomain = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "spedex-db.firebaseapp.com";
+const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID || "spedex-db";
+const storageBucket = import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "spedex-db.firebasestorage.app";
+const messagingSenderId = import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID;
+const appId = import.meta.env.VITE_FIREBASE_APP_ID;
+const measurementId = import.meta.env.VITE_FIREBASE_MEASUREMENT_ID;
+
+export const isFirebaseConfigured = Boolean(apiKey && projectId && appId);
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDNeeUrxuQUJDtGdm_q03kjLf3e4Vn4vyc",
-  authDomain: "spedex-db.firebaseapp.com",
-  projectId: "spedex-db",
-  storageBucket: "spedex-db.firebasestorage.app",
-  messagingSenderId: "1042102576536",
-  appId: "1:1042102576536:web:d924e50945f18a7ab137ed",
-  measurementId: "G-HWYE0R22VB"
+  apiKey: apiKey || "mock-api-key-for-development",
+  authDomain,
+  projectId,
+  storageBucket,
+  messagingSenderId: messagingSenderId || "000000000000",
+  appId: appId || "1:000000000000:web:mockapp",
+  measurementId,
 };
 
 // Initialize Firebase app singleton
@@ -23,7 +33,7 @@ export const db: Firestore = getFirestore(app);
 // Conditionally initialize Analytics in supported browser environments
 export let analytics: Analytics | null = null;
 
-if (typeof window !== "undefined") {
+if (typeof window !== "undefined" && isFirebaseConfigured) {
   isSupported()
     .then((supported) => {
       if (supported) {
@@ -39,7 +49,7 @@ if (typeof window !== "undefined") {
  * Safe logging helper for SpeDex telemetry & analytics
  */
 export async function logEventSafely(eventName: string, params?: Record<string, any>): Promise<void> {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !isFirebaseConfigured) return;
   try {
     if (!analytics) {
       const supported = await isSupported();

@@ -22,3 +22,11 @@ Attempts by User A to view, update, or delete User B's resources fail immediatel
 - **Financial Learning Mode**: Server-side interceptors block live payment initiation and QR code generation for minors (`403 Forbidden`), while preserving manual expense logging and educational budgeting.
 - **Purpose-Separated Consent**: Explicit individual consent flags for Essential, Telemetry, Marketing, Geolocation, and AI.
 - **Data Erasure**: Complete, hard-gated deletion of all transactions, trips, vendor references, and user records upon double confirmation.
+
+## 5. Secret Hygiene & Git Push Security Controls
+- **Zero Committed Secrets**: Real API keys, database credentials, JWT secrets, private certificates, and cloud tokens are strictly prohibited in Git.
+- **Environment Externalization**: All secrets are loaded through environment variables (`.env`, platform secret managers, or cloud environment settings).
+- **Template Synchronization**: Every component provides a sanitized `.env.example` template with placeholder values.
+- **Multi-Tier Git Exclusions**: Comprehensive `.gitignore` configurations exclude `.env*`, `*.pem`, `*.key`, `*.jks`, `*.keystore`, and service account JSON files across root, frontend, and backend packages.
+- **Automated Pre-Commit Scanner**: Integrated automated scanner (`scripts/scan-secrets.py`) audits staged files for regex patterns (Firebase, AWS, GitHub tokens, private keys) before every commit and git push.
+
