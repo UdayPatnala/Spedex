@@ -12,7 +12,7 @@ VERIFIED
 
 | Version | Previous | Level | Commit | Change |
 |---|---|---|---|---|
-| 2.07.00.0 | 2.06.00.0 | SUB-VERSION | a519db8 | SpeDex V1 Production-Ready MVP (v1.0.0-PROD): 18-step user loop, RESTful transaction & payment reference controllers, CSV export, PostgreSQL profile, Vercel & Render configuration |
+| 2.07.00.0 | 2.06.00.0 | SUB-VERSION | e1297a3 | SpeDex V1 Production-Ready MVP (v1.0.0-PROD): 18-step user loop, RESTful transaction & payment reference controllers, CSV export, PostgreSQL profile, Vercel & Render configuration |
 | 2.06.00.0 | 2.05.02.0 | SUB-VERSION | 194c90e | Jetpack Compose Android Native Feature Parity (Trips Ledger & DPDP Privacy Center) |
 | 2.05.02.0 | 2.05.01.0 | FUNCTIONAL | 01efd40 | Integrated Universal Modular Architecture & Change-Isolation Governance System with root ARCHITECTURE.md |
 | 2.05.01.0 | 2.05.00.0 | FUNCTIONAL | 0271a7c | Dynamic multi-currency travel conversion for cross-border trips & offline forex cache |
@@ -56,7 +56,7 @@ None (all milestones verified).
 ## Detailed Historical Release Ledger
 
 ### [2.07.00.0] - 2026-10-10
-Type: Sub-version | Status: Verified | Commit: a519db8
+Type: Sub-version | Status: Verified | Commit: e1297a3
 - **SpeDex V1 Production-Ready MVP Baseline (`v1.0.0-PROD`)**:
   - **18-Step Verified Core User Loop**:
     - Registration, Login, Profile Management, Add Transaction, Edit Transaction, Delete Transaction, Transaction History, Search/Filters, Category Breakdown, Spending Summaries, Analytics, Save Payment References, Manage References, Personal Dashboard, RFC 4180 CSV Data Export, Account Deletion, Security Settings, and Secure Sign-Out.
