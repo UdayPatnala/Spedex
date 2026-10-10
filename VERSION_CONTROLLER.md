@@ -2,7 +2,7 @@
 
 ## Current Version
 
-`2.07.00.0` (SpeDex V1 Production-Ready MVP Baseline / `v1.0.0-PROD`)
+`2.07.01.0` (Milestone P4.1: Real-Time Spending Velocity Engine)
 
 ## Status
 
@@ -12,6 +12,7 @@ VERIFIED
 
 | Version | Previous | Level | Commit | Change |
 |---|---|---|---|---|
+| 2.07.01.0 | 2.07.00.0 | FUNCTIONAL | 68c172b | Generative UI Spending Velocity Engine Widget with real-time SVG pacing gauge and forecast simulator |
 | 2.07.00.0 | 2.06.00.0 | SUB-VERSION | e1297a3 | SpeDex V1 Production-Ready MVP (v1.0.0-PROD): 18-step user loop, RESTful transaction & payment reference controllers, CSV export, PostgreSQL profile, Vercel & Render configuration |
 | 2.06.00.0 | 2.05.02.0 | SUB-VERSION | 194c90e | Jetpack Compose Android Native Feature Parity (Trips Ledger & DPDP Privacy Center) |
 | 2.05.02.0 | 2.05.01.0 | FUNCTIONAL | 01efd40 | Integrated Universal Modular Architecture & Change-Isolation Governance System with root ARCHITECTURE.md |
@@ -54,6 +55,20 @@ None (all milestones verified).
 ---
 
 ## Detailed Historical Release Ledger
+
+### [2.07.01.0] - 2026-10-10
+Type: Functional | Status: Verified | Commit: 68c172b
+- **Milestone P4.1: Real-Time Spending Velocity Engine Widget**:
+  - **Generative UI Component (`SpendingVelocityWidget.tsx`)**:
+    - Currency note aesthetic with deep forest slate gradient (`#0d2818` to `#0a192f`) and gold accents (`#d4af37`).
+    - Dynamic semi-circle SVG velocity gauge with color-coded speed zones (Green: Conservative, Gold: Target, Magenta: Elevated).
+    - Elevated burn-rate detection comparing actual daily pace against sustainable cycle allowance.
+    - Pacing breakdown cards: Target Daily Cap, Remaining Cycle Days, and Cycle Balance.
+    - Interactive Forecast Simulator with reactive slider enabling real-time end-of-month projected net savings calculations.
+  - **Analytics Integration (`AnalyticsView.tsx`)**:
+    - Seamlessly mounted at top of Analytics screen when spending data exists.
+  - **Unit Test Suite (`SpendingVelocityWidget.test.tsx`)**:
+    - Comprehensive Vitest test suite covering sustainable pacing, elevated burn rates, and slider simulations (100% pass).
 
 ### [2.07.00.0] - 2026-10-10
 Type: Sub-version | Status: Verified | Commit: e1297a3
