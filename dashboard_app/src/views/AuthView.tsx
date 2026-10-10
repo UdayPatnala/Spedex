@@ -96,6 +96,27 @@ export function AuthView({
           <button className="auth-submit" type="button" onClick={onSubmit} disabled={submitting}>
             {submitting ? "Working..." : mode === "login" ? "Enter Spedex" : "Create Account"}
           </button>
+          {mode === "login" && (
+            <button
+              type="button"
+              onClick={() => {
+                onEmailChange("demo@gmail.com");
+                onPasswordChange("password123");
+              }}
+              style={{
+                background: "transparent",
+                border: "1px dashed var(--border-soft)",
+                borderRadius: 10,
+                padding: "8px 12px",
+                color: "var(--text-subtle)",
+                fontSize: 12,
+                cursor: "pointer",
+                marginTop: 6,
+              }}
+            >
+              Prefill Demo Credentials (demo@gmail.com)
+            </button>
+          )}
         </div>
 
         {warmingUp && (

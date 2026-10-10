@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import MobileVersion from "./MobileVersion";
 import "./styles.css";
+import "./firebase";
 
 const path = window.location.pathname.toLowerCase();
 const shouldRenderMobileVersion = path === "/mobile" || path === "/mobile/";

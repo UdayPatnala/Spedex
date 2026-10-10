@@ -3538,3 +3538,21 @@ less dependent on individual agent memory
 
 The architecture exists primarily to protect the project from accidental destruction during future development.
 
+---
+
+# 77. CLOUD & FRONTEND ARCHITECTURAL INVARIANTS
+
+1. **Instant Public Entry Invariant (No Blocking Session Restores)**:
+   - Public landing pages must mount immediately on initial render.
+   - Never gate unauthenticated public pages behind asynchronous `localStorage` token verification or backend health checks.
+   - Run session validation asynchronously in the background. Transition to workspace only upon verified credentials.
+
+2. **Polyglot Monorepo Blueprint Invariant**:
+   - In repositories containing both Java/JVM backend and JavaScript/TypeScript frontend, always provide an authoritative `render.yaml` specifying `runtime: docker`.
+   - Never rely on cloud PaaS automatic runtime detection.
+   - Dockerfiles must expose dynamic `$PORT` bindings (`-Dserver.port=${PORT:-8080}`) and build targets must use deterministic names (`<finalName>`).
+
+3. **Client-Side API Base URL Normalization**:
+   - Frontend API clients must sanitize environment variables (e.g. `VITE_API_BASE_URL`).
+   - Automatically strip trailing slashes and guarantee required `/api` path prefixes to prevent human misconfiguration errors in cloud hosting dashboards.
+

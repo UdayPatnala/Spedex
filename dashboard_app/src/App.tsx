@@ -40,6 +40,7 @@ import { BudgetView } from "./views/BudgetView";
 import { HomeView } from "./views/HomeView";
 import { PaymentsView } from "./views/PaymentsView";
 import { SettingsView } from "./views/SettingsView";
+import { TransactionsView } from "./views/TransactionsView";
 import { TripsView } from "./views/TripsView";
 
 const STORAGE_KEY = "spedex.dashboard.session";
@@ -51,7 +52,6 @@ export default function App() {
   const [vendors, setVendors] = useState<VendorDirectoryData | null>(null);
   const [budget, setBudget] = useState<BudgetScreenData | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
-  const [sessionReady, setSessionReady] = useState(false);
   const [sessionUser, setSessionUser] = useState<DashboardOverview["user"] | null>(null);
   const [capabilities, setCapabilities] = useState<UserCapabilities | null>(null);
   const [authMode, setAuthMode] = useState<AuthMode>("login");
@@ -94,43 +94,29 @@ export default function App() {
           const parsed = JSON.parse(raw) as { token?: string };
           if (parsed.token) {
             setAuthToken(parsed.token);
+            const [currentUser, userCaps] = await Promise.all([
+              getCurrentUser().catch(() => null),
+              getCapabilities().catch(() => null),
+            ]);
+            if (mounted && currentUser) {
+              setSessionUser(currentUser);
+              if (userCaps) setCapabilities(userCaps);
+            } else if (mounted) {
+              setAuthToken(null);
+              window.localStorage.removeItem(STORAGE_KEY);
+              setSessionUser(null);
+            }
+          } else if (mounted) {
+            setSessionUser(null);
           }
+        } else if (mounted) {
+          setSessionUser(null);
         }
-
-        // Always set default session user to bypass login/signup requirement
+      } catch {
         if (mounted) {
-          setSessionUser({
-            id: 0,
-            name: "Demo User",
-            email: "demo@gmail.com",
-            plan: "Pro Member",
-            avatar_initials: "DU",
-            member_since: "2026-07-01T00:00:00",
-          });
-        }
-
-        const [currentUser, userCaps] = await Promise.all([
-          getCurrentUser().catch(() => null),
-          getCapabilities().catch(() => null),
-        ]);
-        if (mounted) {
-          if (currentUser) setSessionUser(currentUser);
-          if (userCaps) setCapabilities(userCaps);
-        }
-      } catch (e: any) {
-        if (mounted) {
-          setSessionUser({
-            id: 0,
-            name: "Demo User",
-            email: "demo@gmail.com",
-            plan: "Pro Member",
-            avatar_initials: "DU",
-            member_since: "2026-07-01T00:00:00",
-          });
-        }
-      } finally {
-        if (mounted) {
-          setSessionReady(true);
+          setAuthToken(null);
+          window.localStorage.removeItem(STORAGE_KEY);
+          setSessionUser(null);
         }
       }
     }
@@ -245,18 +231,6 @@ export default function App() {
     }
   }
 
-  if (!sessionReady) {
-    return (
-      <main className="auth-shell">
-        <section className="auth-card" style={{ textAlign: "center" }}>
-          <BrandLockup />
-          <p className="eyebrow">Loading</p>
-          <h2 className="page-title">Restoring your session...</h2>
-        </section>
-      </main>
-    );
-  }
-
   if (!sessionUser) {
     if (!showAuthPortal) {
       return <LandingPage onLaunchDashboard={() => setShowAuthPortal(true)} />;
@@ -294,6 +268,8 @@ export default function App() {
           onAddVendor={() => setShowAddVendor(true)}
         />
       );
+    } else if (activeView === "transactions") {
+      content = <TransactionsView />;
     } else if (activeView === "payments") {
       content = (
         <PaymentsView

@@ -11,7 +11,7 @@
     </parent>
     <groupId>com.spedex</groupId>
     <artifactId>spedex-backend</artifactId>
-    <version>2.06.00.0</version>
+    <version>2.07.00.0</version>
     <name>Spedex Backend</name>
     <description>Student Hostel Smart Wallet API</description>
     <properties>
@@ -45,6 +45,12 @@
             <version>2.4.240</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- PostgreSQL Database (Production) -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
         <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -71,6 +77,7 @@
         </dependency>
     </dependencies>
     <build>
+        <finalName>spedex-backend</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

@@ -18,10 +18,13 @@ public class Vendor {
     private String icon;
     private String accent;
     private String upiHandle;
+    private String paymentUrl;
+    private String qrCodeRef;
+    private String notes;
     private Double defaultAmount = 0.0;
     private Boolean isQuickPay = false;
 
-    // Getters and setters omitted for brevity
+    // Getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public User getUser() { return user; }
@@ -36,6 +39,12 @@ public class Vendor {
     public void setAccent(String accent) { this.accent = accent; }
     public String getUpiHandle() { return upiHandle; }
     public void setUpiHandle(String upiHandle) { this.upiHandle = upiHandle; }
+    public String getPaymentUrl() { return paymentUrl; }
+    public void setPaymentUrl(String paymentUrl) { this.paymentUrl = paymentUrl; }
+    public String getQrCodeRef() { return qrCodeRef; }
+    public void setQrCodeRef(String qrCodeRef) { this.qrCodeRef = qrCodeRef; }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
     public Double getDefaultAmount() { return defaultAmount; }
     public void setDefaultAmount(Double defaultAmount) { this.defaultAmount = defaultAmount; }
     public Boolean getIsQuickPay() { return isQuickPay; }

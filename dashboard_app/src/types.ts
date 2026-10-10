@@ -30,6 +30,9 @@ export type Vendor = {
   icon: string;
   accent: string;
   upi_handle: string;
+  payment_url?: string;
+  qr_code_ref?: string;
+  notes?: string;
   default_amount: number;
   is_quick_pay: boolean;
 };
@@ -37,7 +40,10 @@ export type Vendor = {
 export type VendorCreate = {
   name: string;
   category: string;
-  upi_handle: string;
+  upi_handle?: string;
+  payment_url?: string;
+  qr_code_ref?: string;
+  notes?: string;
   default_amount?: number;
   is_quick_pay?: boolean;
 };
@@ -51,7 +57,40 @@ export type Transaction = {
   payment_method: string;
   account_label: string;
   status: string;
+  external_reference?: string;
   occurred_at: string;
+  vendor_name?: string;
+  vendor_id?: number;
+  trip_id?: number;
+};
+
+export type TransactionCreate = {
+  description: string;
+  amount: number;
+  category: string;
+  direction?: "expense" | "income";
+  payment_method?: string;
+  account_label?: string;
+  occurred_at?: string;
+  vendor_id?: number;
+};
+
+export type TransactionUpdate = Partial<TransactionCreate>;
+
+export type PaginatedTransactions = {
+  content: Transaction[];
+  total_elements: number;
+  total_pages: number;
+  page_number: number;
+  page_size: number;
+};
+
+export type Category = {
+  id: string;
+  name: string;
+  icon: string;
+  accent: string;
+  description: string;
 };
 
 export type Reminder = {
@@ -245,6 +284,7 @@ export type LegalDocument = {
 export type ViewId =
   | "landing"
   | "home"
+  | "transactions"
   | "payments"
   | "analytics"
   | "budget"

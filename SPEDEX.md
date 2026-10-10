@@ -1,10 +1,10 @@
 # SpeDex — Authoritative Product Master (SPEDEX.md / PRODUCT_MASTER.md)
 
 **Authoritative Product Master File (`SPEDEX.md`)**  
-**Current System Version:** `2.06.00.0`  
+**Current System Version:** `2.07.00.0` (SpeDex V1 Production-Ready MVP Baseline / `v1.0.0-PROD`)  
 **Governing Architecture:** Universal Reverse-Engineering, Universal Version Control & Universal Modular Architecture (`.agents/AGENTS.md`)  
 **Repository Working Tree:** Verified Clean (`main`)  
-**Automated Test Status:** 150 / 150 Tests Passing (100% Pass Rate across 4 Test Suites)  
+**Automated Test Status:** 159 / 159 Tests Passing (100% Pass Rate across 4 Test Suites)  
 **Authoritative Version Controller:** [`VERSION_CONTROLLER.md`](file:///d:/PROJECT/AROH%20Open%20Source/Products/Spedex/VERSION_CONTROLLER.md)  
 **Governance Invariant:** Exactly two authoritative Markdown documents are maintained at repository root (`SPEDEX.md` as Product Master and `VERSION_CONTROLLER.md` as Version Control Master).
 
@@ -16,7 +16,7 @@
 - **Etymology / Blend:** **Speed Index** (high-frequency, frictionless expense logging) + **Spending Index** (real-time velocity analytics and financial awareness).
 - **Project Type:** Personal financial ledger, travel expense journal, vendor quick-pay directory, and campus budgeting utility.
 - **Product Classification:** Non-custodial financial utility and organizational layer. SpeDex is **not** a bank, **not** a payment processor, and **not** a custodial wallet.
-- **Operating Version:** `2.06.00.0` (Sub-Version: Jetpack Compose Android Native Feature Parity & File Consolidation).
+- **Operating Version:** `2.07.00.0` (Sub-Version: SpeDex V1 Production-Ready MVP Baseline / `v1.0.0-PROD`).
 - **Status:** **OPERATIONAL & 100% VERIFIED**.
 - **Repository Location:** Local workspace `d:\PROJECT\AROH Open Source\Products\Spedex`.
 - **Target Deployment Environments:**
@@ -102,7 +102,9 @@ SpeDex aims to become the default personal financial utility for Indian youth by
 - [x] Centralized server-side capability engine (`UserCapabilityService`) governing adult vs. minor capabilities.
 - [x] Minor protection framework (<18) with Financial Learning Mode, server-side payment blocking, and verifiable parental consent link lifecycle.
 - [x] Comprehensive DPDP Act 2023 technical controls: purpose-separated consent, immutable audit logging, machine-readable JSON export, hard-gated erasure, and grievance redressal ticketing.
-- [x] 100% test coverage across 4 automated verification suites (148/148 passing tests).
+- [x] Complete SpeDex V1 18-step user loop (Register, Login, Profile, Add/Edit/Delete Transactions, History, Search/Filters, Categories, Spending Summaries, Analytics, Payment References CRUD, Personal Dashboard, RFC 4180 CSV Export, Account Deletion, Settings, Sign Out).
+- [x] Production deployment configuration for Render (PostgreSQL profile `application-prod.properties`) and Vercel (SPA fallback rewrite `vercel.json`).
+- [x] 100% test coverage across 4 automated verification suites (159/159 passing tests).
 - [x] Authoritative version control and change governance under `A.BC.DE.F` formatting.
 
 ### 4.2 Medium & Long-Term Goals
@@ -1073,7 +1075,7 @@ SpeDex enforces a mandatory **4-Tier Verification Matrix**. No milestone or vers
 ## 27. Release & Version Information
 
 ### 27.1 Authoritative Current Version
-**`2.06.00.0`** (Sub-Version: Jetpack Compose Android Native Feature Parity & File Consolidation)
+**`2.07.00.0`** (Sub-Version: SpeDex V1 Production-Ready MVP Baseline / `v1.0.0-PROD`)
 
 ### 27.2 Agent Version Authority Governance (User Mandate)
 - **Major Version (`A`) — STRICTLY FORBIDDEN WITHOUT CONSENT**:
@@ -1084,6 +1086,7 @@ SpeDex enforces a mandatory **4-Tier Verification Matrix**. No milestone or vers
   The agent has **FULL AUTHORITY** to autonomously increment and manage `DE` functional changes (`A.BC.DE+1.0`) and `F` bug/patch fixes (`A.BC.DE.F+1`).
 
 ### 27.3 Version Lineage Summary
+- **`2.07.00.0` (2026-09-30):** SpeDex V1 Production-Ready MVP Baseline (`v1.0.0-PROD`): Complete 18-step user loop, RESTful transaction and payment reference controllers, RFC 4180 CSV export, Render cloud PostgreSQL profile, Vercel SPA routing fallback, and 100% test pass rate across 159/159 automated tests.
 - **`2.06.00.0` (2026-09-26):** Jetpack Compose Android Native Feature Parity (Trips Ledger & DPDP Privacy Center in Room/Jetpack Compose), complete two-file documentation consolidation (`SPEDEX.md` + `VERSION_CONTROLLER.md`), and full stack verification across 150/150 passing tests.
 - **`2.05.02.0` (2026-09-20):** Codified the 76-protocol Universal Modular Architecture & Change-Isolation Governance System into `.agents/AGENTS.md`, authored root `ARCHITECTURE.md` with domain ownership maps and action-to-data traceability, and verified 150/150 passing tests.
 - **`2.05.01.0` (2026-09-20):** Dynamic multi-currency travel conversion for cross-border trips, offline forex cache with 8 major international currencies, live foreign currency entry mode, secondary foreign spend analytics, and 150 passing tests across all 4 suites.

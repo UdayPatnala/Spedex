@@ -4,7 +4,8 @@ import { APP_VERSION } from "../../version";
 
 export const navItems: Array<{ id: ViewId; label: string; icon: string }> = [
   { id: "home", label: "Overview", icon: "home" },
-  { id: "payments", label: "UPI Desk", icon: "wallet" },
+  { id: "transactions", label: "Ledger", icon: "receipt_long" },
+  { id: "payments", label: "UPI & Payees", icon: "wallet" },
   { id: "trips", label: "Trips", icon: "flight_takeoff" },
   { id: "analytics", label: "Signals", icon: "insights" },
   { id: "budget", label: "Budgets", icon: "calendar_month" },

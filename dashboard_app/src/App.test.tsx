@@ -8,29 +8,71 @@ vi.mock("./api", () => ({
   login: vi.fn(),
   signUp: vi.fn(),
   getCurrentUser: vi.fn(),
+  getCapabilities: vi.fn().mockResolvedValue({
+    canInitiatePayment: true,
+    canOpenPaymentLink: true,
+    canSavePaymentMethod: true,
+    canUseMerchantQR: true,
+    canRecordManualTransaction: true,
+    canManageBudgets: true,
+    canUseAnalytics: true,
+    canReceiveMarketing: true,
+    mode: "FULL_TRANSACTIONAL",
+  }),
+  getTrips: vi.fn().mockResolvedValue([]),
   loadDashboardBundle: vi.fn().mockResolvedValue({
     overview: {
       user: { id: 1, name: "Demo User", email: "demo@gmail.com", plan: "Pro Member", avatar_initials: "DU", member_since: "2026-07-01T00:00:00" },
       activeTrip: null,
-      summary: { totalBalance: 15400, monthlySpend: 4200, activeVendorsCount: 3 },
+      monthly_total: 4200,
+      monthly_budget: 20000,
+      budget_used_ratio: 0.21,
+      budget_copy: "You're on track",
       weekly_spending: [1200, 2400, 1800, 3100, 2900, 1500, 4200],
-      recent_transactions: [],
+      peak_day_label: "Saturday",
+      weekly_average: 2450,
+      security_message: "Protected by end-to-end encryption",
+      recent_transactions: [
+        {
+          id: 1,
+          description: "Cafeteria Lunch",
+          category: "Food",
+          amount: 180,
+          direction: "expense",
+          payment_method: "UPI",
+          account_label: "Primary",
+          status: "completed",
+          occurred_at: "2026-09-30T12:00:00",
+        },
+      ],
       quick_pay: [],
-      reminders: []
+      reminders: [],
     },
-    vendors: [],
-    budget: { monthlyLimit: 20000, currentSpend: 4200, categoryLimits: [] },
-    analytics: { weeklyTrends: [], topCategories: [] }
+    vendors: { user: { id: 1, name: "Demo User", email: "demo@gmail.com", plan: "Pro Member", avatar_initials: "DU", member_since: "2026-07-01T00:00:00" }, groups: {} },
+    budget: { remaining_budget: 15800, budgets: [], reminders: [], savings_tip: "Great pace!" },
+    analytics: { total_spent: 4200, smart_insight: "Normal spending", category_breakdown: [], weekly_spend: [], highest_sector: { title: "Food", subtitle: "40%", accent: "rose", icon: "restaurant" }, busiest_day: { title: "Sat", subtitle: "Peak", accent: "amber", icon: "calendar" }, weekday_ratio: 0.6, weekend_ratio: 0.4 },
   }),
   warmUpBackend: vi.fn().mockResolvedValue(true),
   setAuthToken: vi.fn(),
   addVendor: vi.fn(),
   updateProfile: vi.fn(),
+  getCategories: vi.fn().mockResolvedValue([]),
+  getPaymentReferences: vi.fn().mockResolvedValue([]),
+  getTransactions: vi.fn().mockResolvedValue({
+    content: [],
+    total_elements: 0,
+    total_pages: 0,
+    page_number: 0,
+    page_size: 15,
+  }),
 }));
 
-describe("App Workspace Direct Access (Login Page Removed)", () => {
+describe("App Authentication & Workspace Flow", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it("renders Landing Page when unauthenticated", async () => {
     Object.defineProperty(window, "localStorage", {
       value: {
         getItem: vi.fn().mockReturnValue(null),
@@ -40,25 +82,74 @@ describe("App Workspace Direct Access (Login Page Removed)", () => {
       },
       writable: true,
     });
+
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/The Elegant Smart Wallet/i)).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole("button", { name: /Enter Workspace/i })).toBeInTheDocument();
   });
 
-  it("loads Dashboard Workspace directly without login prompt", async () => {
+  it("loads Dashboard Workspace directly when session token exists", async () => {
+    Object.defineProperty(window, "localStorage", {
+      value: {
+        getItem: vi.fn().mockReturnValue(JSON.stringify({ token: "valid-jwt-token" })),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+        clear: vi.fn(),
+      },
+      writable: true,
+    });
+
+    vi.mocked(api.getCurrentUser).mockResolvedValue({
+      id: 1,
+      name: "Demo User",
+      email: "demo@gmail.com",
+      plan: "Pro Member",
+      avatar_initials: "DU",
+      member_since: "2026-07-01T00:00:00",
+    });
+
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Recent Transactions/i)).toBeInTheDocument();
+    });
+  });
+
+  it("navigates cleanly across workspace views including Ledger", async () => {
+    Object.defineProperty(window, "localStorage", {
+      value: {
+        getItem: vi.fn().mockReturnValue(JSON.stringify({ token: "valid-jwt-token" })),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+        clear: vi.fn(),
+      },
+      writable: true,
+    });
+
+    vi.mocked(api.getCurrentUser).mockResolvedValue({
+      id: 1,
+      name: "Demo User",
+      email: "demo@gmail.com",
+      plan: "Pro Member",
+      avatar_initials: "DU",
+      member_since: "2026-07-01T00:00:00",
+    });
+
     render(<App />);
 
     await waitFor(() => {
       expect(screen.getByText(/Recent Transactions/i)).toBeInTheDocument();
     });
 
-    expect(screen.queryByText(/Sign in to your personal wallet/i)).not.toBeInTheDocument();
-  });
-
-  it("navigates cleanly across workspace views", async () => {
-    render(<App />);
+    const ledgerBtn = screen.getByRole("button", { name: /Ledger/i });
+    fireEvent.click(ledgerBtn);
 
     await waitFor(() => {
-      expect(screen.getByText(/Recent Transactions/i)).toBeInTheDocument();
+      expect(screen.getByText(/Transaction History/i)).toBeInTheDocument();
     });
-
-    expect(screen.getAllByText(/Quick Pay/i).length).toBeGreaterThan(0);
   });
 });

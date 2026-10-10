@@ -16,8 +16,13 @@ import type {
 const RENDER_API = "https://spedex.onrender.com/api";
 
 function resolveApiBaseUrl() {
-  if (import.meta.env.VITE_API_BASE_URL) {
-    return import.meta.env.VITE_API_BASE_URL;
+  let envUrl = import.meta.env.VITE_API_BASE_URL;
+  if (envUrl && typeof envUrl === "string") {
+    let clean = envUrl.trim().replace(/\/+$/, "");
+    if (!clean.endsWith("/api")) {
+      clean += "/api";
+    }
+    return clean;
   }
 
   if (typeof window !== "undefined") {
@@ -267,6 +272,123 @@ export function eraseUserData(payload: { confirmationText: string }) {
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+// ── Transaction Endpoints ──
+
+export type TransactionFilterParams = {
+  page?: number;
+  size?: number;
+  search?: string;
+  category?: string;
+  direction?: string;
+  startDate?: string;
+  endDate?: string;
+  minAmount?: number;
+  maxAmount?: number;
+};
+
+export function getTransactions(params?: TransactionFilterParams) {
+  const query = new URLSearchParams();
+  if (params?.page !== undefined) query.set("page", params.page.toString());
+  if (params?.size !== undefined) query.set("size", params.size.toString());
+  if (params?.search) query.set("search", params.search);
+  if (params?.category) query.set("category", params.category);
+  if (params?.direction) query.set("direction", params.direction);
+  if (params?.startDate) query.set("startDate", params.startDate);
+  if (params?.endDate) query.set("endDate", params.endDate);
+  if (params?.minAmount !== undefined) query.set("minAmount", params.minAmount.toString());
+  if (params?.maxAmount !== undefined) query.set("maxAmount", params.maxAmount.toString());
+
+  const qs = query.toString();
+  return request<import("./types").PaginatedTransactions>(`/transactions${qs ? `?${qs}` : ""}`);
+}
+
+export function createTransaction(payload: import("./types").TransactionCreate) {
+  return request<import("./types").Transaction>("/transactions", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function getTransaction(id: number) {
+  return request<import("./types").Transaction>(`/transactions/${id}`);
+}
+
+export function updateTransaction(id: number, payload: import("./types").TransactionUpdate) {
+  return request<import("./types").Transaction>(`/transactions/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteTransaction(id: number) {
+  return request<{ status: string; message: string; deleted_id: number }>(`/transactions/${id}`, {
+    method: "DELETE",
+  });
+}
+
+// ── Categories ──
+
+export function getCategories() {
+  return request<import("./types").Category[]>("/categories");
+}
+
+// ── Payment References ──
+
+export function getPaymentReferences() {
+  return request<import("./types").Vendor[]>("/payment-references");
+}
+
+export function createPaymentReference(payload: import("./types").VendorCreate) {
+  return request<import("./types").Vendor>("/payment-references", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function updatePaymentReference(id: number, payload: Partial<import("./types").VendorCreate>) {
+  return request<import("./types").Vendor>(`/payment-references/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deletePaymentReference(id: number) {
+  return request<{ status: string; message: string; deleted_id: number }>(`/payment-references/${id}`, {
+    method: "DELETE",
+  });
+}
+
+// ── CSV Export ──
+
+export async function downloadTransactionsCsv(): Promise<void> {
+  const token = authToken || (() => {
+    try {
+      const raw = localStorage.getItem("spedex.dashboard.session");
+      return raw ? JSON.parse(raw).token : null;
+    } catch {
+      return null;
+    }
+  })();
+
+  const res = await fetch(`${API_BASE_URL}/export/transactions`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to export transactions CSV");
+  }
+
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `spedex-transactions-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  window.URL.revokeObjectURL(url);
 }
 
 

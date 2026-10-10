@@ -1,25 +1,27 @@
-# SpeDex Smart Wallet Platform (v2.06 Enterprise)
+# SpeDex Smart Wallet Platform (v1.0.0 / v2.07 Production MVP)
 
-SpeDex is a flagship, enterprise-grade Smart Wallet & Financial Intelligence Platform for high-frequency transaction tracking, automated trip ledgers, UPI vendor quick-pays, multi-currency budgeting, and real-time expense analytics.
+SpeDex is a production-ready personal expense tracking, financial awareness, and merchant payment directory platform. It provides high-frequency transaction logging, instant search and categorization, automated trip ledgers, non-custodial saved payment references, multi-currency budgeting, and real-time expense analytics.
 
 The name blends **"Speed Index"** and **"Spending Index"** into a unified ecosystem spanning desktop web, cross-platform mobile, native Android, and scalable backend infrastructure.
 
 > **Authoritative Documentation**:
 > - 📘 **Project Master Knowledge File**: [`SPEDEX.md`](./SPEDEX.md) (Single source of truth for architecture, domain models, APIs, and guardrails)
 > - 📜 **Version Controller & History Ledger**: [`VERSION_CONTROLLER.md`](./VERSION_CONTROLLER.md) (Mandatory persistent version governor under `A.BC.DE.F`)
+> - 📋 **Release Changelog**: [`CHANGELOG.md`](./CHANGELOG.md)
+> - 📚 **Architecture & System Guides**: [`docs/`](./docs/) ([Architecture](./docs/architecture.md) | [Deployment](./docs/deployment.md) | [Security](./docs/security.md) | [API](./docs/api.md) | [Database](./docs/database.md) | [Testing](./docs/testing.md) | [ADRs](./docs/adr/))
 
 ---
 
 ## 🚀 Key Features & Capabilities
 
-- **Automated Trip Ledger**: Create active trip sessions, track categorized trip expenses (cash vs online/card splits), auto-close completed trips, and generate detailed breakdown summaries.
-- **UPI Vendor Quick-Pay**: Manage vendor directories, execute instant payments, and track default payment methods.
+- **Complete 18-Step User Journey**: Full end-to-end functionality across user registration, login, profile management, transaction creation, editing, deletion, categorized listing, search & date filtering, spending summaries, analytics, saved payment references directory, personal dashboard, RFC 4180 CSV export, account erasure, and secure sign-out.
+- **Automated Trip Ledger**: Create active travel sessions, track categorized trip expenses (cash vs online/card splits), auto-close completed trips, and generate detailed breakdown summaries.
+- **Non-Custodial Saved Payment References**: Securely store merchant UPI IDs (VPAs), payment links, and QR codes with strict URI scheme validation (`upi://`, `http://`, `https://`).
 - **Multi-Currency Budgeting & Analytics**: Visual budget progress bars, category breakdowns, and real-time spending velocity charts.
 - **Age Gating & Minor Financial Learning Mode**: Dedicated `<18` protective mode where payment preparation is blocked server-side (HTTP 403 Forbidden) while manual bookkeeping and educational budgeting remain active.
-- **DPDP Act 2023 Compliance**: Purpose-separated consent toggles, verifiable parental verification links, machine-readable JSON data export (`GET /api/privacy/export`), hard-gated erasure (`POST /api/privacy/erase`), and in-app grievance redressal.
-- **Interactive Mobile Sync Simulator**: Embedded side-by-side companion simulator in the Web Dashboard for real-time mobile sync testing.
-- **Direct Frictionless Workspace Access**: Immediate access to the financial dashboard with landing page exploration option.
-- **Indian Rupee Currency Note Aesthetics**: Curated design system inspired by INR currency notes (₹2000 Magenta, ₹500 Stone Grey, ₹200 Bright Yellow, ₹100 Lavender, ₹50 Cyan, ₹20 Green, ₹10 Chocolate) paired with Cormorant Garamond headings and Sora body typography.
+- **DPDP Act 2023 Compliance**: Purpose-separated consent toggles, verifiable parental verification links, machine-readable JSON data export (`GET /api/privacy/export`), RFC 4180 CSV export (`GET /api/export/transactions`), hard-gated erasure (`POST /api/privacy/erase`), and in-app grievance redressal.
+- **Firebase Analytics & Telemetry**: Safe client-side analytics telemetry integrated with DPDP consent controls.
+- **Indian Rupee Currency Note Aesthetics**: Curated design system inspired by INR currency notes paired with Cormorant Garamond headings and Sora body typography.
 - **IDOR Protection & Enterprise Security**: Strict resource-ownership validation across all REST endpoints returning `403 Forbidden` ("Access denied") on unauthorized access attempts.
 
 ---
@@ -28,21 +30,23 @@ The name blends **"Speed Index"** and **"Spending Index"** into a unified ecosys
 
 ```text
 Spedex/
-├── backend/                  # Java 17 / Spring Boot REST API (JPA, H2/PostgreSQL, Security, JWT)
-│   ├── src/main/java/        # Application source code (Controllers, Services, Repositories, Models)
-│   └── src/test/java/        # Unit & integration test suites (JUnit 5, Mockito - 57 tests)
-├── dashboard_app/            # React 19 + Vite 6 + TypeScript Web Dashboard
-│   ├── src/components/       # UI components (Sidebar, Topbar, Modals, MobileSyncSimulator, LandingPage, PrivacyCenter)
-│   ├── src/views/            # Domain view modules (Home, Payments, Analytics, Budget, Trips, Settings, Auth)
-│   └── src/api.ts            # REST API client with offline/fallback support
+├── backend/                  # Java 17 / Spring Boot REST API (JPA, PostgreSQL/H2, Security, JWT)
+│   ├── src/main/java/        # Controllers, Services, Repositories, Models, Security
+│   └── src/test/java/        # Integration & Unit test suites (65 tests)
+├── dashboard_app/            # React 19 + Vite 6 + TypeScript Web Dashboard (Vercel target)
+│   ├── src/components/       # UI components (Transactions, Modals, Sidebar, PrivacyCenter)
+│   ├── src/views/            # Domain views (TransactionsView, Home, Analytics, Budget, Trips, Settings, Auth)
+│   ├── src/firebase.ts       # Firebase app & analytics configuration
+│   └── src/api.ts            # REST API client with full error handling and auth token injection
 ├── mobile/                   # Cross-platform Expo React Native application
 │   ├── src/screens/          # Touch-optimized mobile screens (Home, Trips, Budget, Reminders, Analytics, Privacy)
 │   └── src/auth/             # Authentication & biometrics provider
 ├── mobile_native_android/    # Native Kotlin Android codebase (Jetpack Compose, Room DB)
 ├── e2e_tests/                # Python end-to-end testing suite (77 test cases)
-├── Dockerfile                # Multi-stage container build configuration
+├── docs/                     # Comprehensive architecture, deployment, API, database, and ADR docs
 ├── SPEDEX.md                 # Authoritative Project Master Knowledge File
-└── VERSION_CONTROLLER.md     # Authoritative Version Controller Ledger
+├── VERSION_CONTROLLER.md     # Authoritative Version Controller Ledger
+└── CHANGELOG.md              # Product release changelog
 ```
 
 ---
@@ -56,7 +60,7 @@ cd backend
 ./mvnw.cmd spring-boot:run
 ```
 - API Endpoint: `http://localhost:8080/api`
-- Run Test Suite: `./mvnw.cmd test` (57/57 tests passing)
+- Run Test Suite: `./mvnw.cmd test` (65/65 tests passing)
 
 ### 2. Web Dashboard (React + Vite + TypeScript)
 
@@ -67,7 +71,7 @@ npm run dev
 ```
 - Local URL: `http://localhost:5173`
 - Run Build: `npm run build`
-- Run Tests: `npm test -- --run` (9/9 tests passing)
+- Run Tests: `npm test -- --run` (10/10 tests passing)
 - Run Typecheck: `npx tsc --noEmit`
 
 ### 3. Mobile App (Expo / React Native)
@@ -91,13 +95,17 @@ python test-trips-e2e.py
 
 ## 🚢 Production Deployment
 
-### Docker Multi-Stage Build
-- Built using root multi-stage `Dockerfile`.
-- Uses deterministic artifact target `COPY --from=build /app/target/spedex-backend-1.0.0.jar /app/app.jar`.
-- Health check configured on `/api/health`.
+### Frontend (Vercel)
+- Root directory: `dashboard_app`
+- Build command: `npm run build`
+- Output directory: `dist`
+- Configured via `dashboard_app/vercel.json` with catch-all SPA rewrite rules (`/(.*) -> /index.html`).
 
-### Vercel Deployment (Dashboard)
-- Configured via `dashboard_app/vercel.json` with catch-all SPA rewrite rules (`/(.*) -> /index.html`) to support client-side routing.
+### Backend (Render)
+- Runtime: Docker / Java 17
+- Spring Profile: `prod` (uses `application-prod.properties` with PostgreSQL driver)
+- Database: Managed PostgreSQL (Render / Supabase) via `DATABASE_URL`
+- Health check: `GET /api/health`
 
 ---
 
@@ -105,13 +113,13 @@ python test-trips-e2e.py
 
 | Test Suite | Framework | Status | Metrics |
 |---|---|---|---|
-| Backend Services, IDOR & Safety | JUnit 5 / Spring Boot | ✅ PASSING | 57 tests |
-| Dashboard Web App | Vitest / React Testing Library | ✅ PASSING | 9 tests |
+| Backend Controllers, Services, IDOR & Safety | JUnit 5 / Spring Boot | ✅ PASSING | 65 tests |
+| Dashboard Web App & Ledger | Vitest / React Testing Library | ✅ PASSING | 10 tests |
 | Mobile Expo App | Jest / Jest-Expo | ✅ PASSING | 5 suites / 7 tests |
 | End-to-End Suite | Python `unittest` | ✅ PASSING | 77 tests |
 | Frontend Typecheck | TypeScript 5.8 | ✅ PASSING | 0 errors |
 | Mobile Typecheck | TypeScript 5.8 | ✅ PASSING | 0 errors |
-| **TOTAL VERIFIED TEST SUITE** | Full Ecosystem | ✅ **PASSING** | **150 / 150 tests (100%)** |
+| **TOTAL VERIFIED TEST SUITE** | Full Ecosystem | ✅ **PASSING** | **159 / 159 tests (100%)** |
 
 ---
 

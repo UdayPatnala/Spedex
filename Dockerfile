@@ -1,13 +1,12 @@
 # Build stage
 FROM maven:3.9.6-eclipse-temurin-17 AS build
-# Copy only the backend folder content to /app
 COPY backend /app
 WORKDIR /app
 RUN mvn clean package -DskipTests
 
 # Run stage
 FROM eclipse-temurin:17-jre-jammy
-COPY --from=build /app/target/spedex-backend-1.0.0.jar /app/app.jar
 WORKDIR /app
+COPY --from=build /app/target/spedex-backend.jar /app/app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT:-8080} -jar app.jar"]
