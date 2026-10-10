@@ -1,10 +1,10 @@
 # SpeDex — Authoritative Product Master (SPEDEX.md / PRODUCT_MASTER.md)
 
 **Authoritative Product Master File (`SPEDEX.md`)**  
-**Current System Version:** `2.07.00.0` (SpeDex V1 Production-Ready MVP Baseline / `v1.0.0-PROD`)  
+**Current System Version:** `2.07.01.0` (Milestone P4.1: Real-Time Spending Velocity Engine)  
 **Governing Architecture:** Universal Reverse-Engineering, Universal Version Control & Universal Modular Architecture (`.agents/AGENTS.md`)  
 **Repository Working Tree:** Verified Clean (`main`)  
-**Automated Test Status:** 159 / 159 Tests Passing (100% Pass Rate across 4 Test Suites)  
+**Automated Test Status:** 162 / 162 Tests Passing (100% Pass Rate across 4 Test Suites)  
 **Authoritative Version Controller:** [`VERSION_CONTROLLER.md`](file:///d:/PROJECT/AROH%20Open%20Source/Products/Spedex/VERSION_CONTROLLER.md)  
 **Governance Invariant:** Exactly two authoritative Markdown documents are maintained at repository root (`SPEDEX.md` as Product Master and `VERSION_CONTROLLER.md` as Version Control Master).
 
@@ -16,7 +16,7 @@
 - **Etymology / Blend:** **Speed Index** (high-frequency, frictionless expense logging) + **Spending Index** (real-time velocity analytics and financial awareness).
 - **Project Type:** Personal financial ledger, travel expense journal, vendor quick-pay directory, and campus budgeting utility.
 - **Product Classification:** Non-custodial financial utility and organizational layer. SpeDex is **not** a bank, **not** a payment processor, and **not** a custodial wallet.
-- **Operating Version:** `2.07.00.0` (Sub-Version: SpeDex V1 Production-Ready MVP Baseline / `v1.0.0-PROD`).
+- **Operating Version:** `2.07.01.0` (Functional Increment: Milestone P4.1 - Real-Time Spending Velocity Engine).
 - **Status:** **OPERATIONAL & 100% VERIFIED**.
 - **Repository Location:** Local workspace `d:\PROJECT\AROH Open Source\Products\Spedex`.
 - **Target Deployment Environments:**

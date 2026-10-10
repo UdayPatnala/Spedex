@@ -5,6 +5,7 @@ import {
   categoryLabel,
   formatCurrency,
 } from "../utils/formatters";
+import { SpendingVelocityWidget } from "../components/analytics/SpendingVelocityWidget";
 
 export function AnalyticsView({ analytics }: { analytics: AnalyticsData }) {
   if (analytics.total_spent === 0) {
@@ -23,6 +24,7 @@ export function AnalyticsView({ analytics }: { analytics: AnalyticsData }) {
 
   return (
     <div className="analytics-shell">
+      <SpendingVelocityWidget totalSpent={analytics.total_spent} />
       <section className="card">
         <div className="section-header">
           <div>
