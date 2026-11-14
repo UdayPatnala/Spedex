@@ -285,7 +285,13 @@ export default function App() {
     } else if (activeView === "budget") {
       content = <BudgetView budget={budget!} />;
     } else if (activeView === "settings") {
-      content = <SettingsView overview={overview!} onRefresh={handleRefresh} />;
+      content = (
+        <SettingsView
+          overview={overview!}
+          onRefresh={handleRefresh}
+          onNavigateToPrivacy={() => setActiveView("privacy")}
+        />
+      );
     } else if (activeView === "privacy") {
       content = <PrivacyCenter onOpenDoc={(doc) => setActiveLegalDoc(doc)} onLogout={handleSignOut} />;
     }

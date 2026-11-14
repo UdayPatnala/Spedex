@@ -73,4 +73,38 @@ describe("PrivacyCenter Component", () => {
       });
     });
   });
+
+  it("displays accidental data loss prevention shield in erasure modal", async () => {
+    (api.getPrivacySettings as any).mockResolvedValue({
+      analyticsConsent: true,
+      marketingConsent: false,
+      isMinor: false,
+      age: 22,
+      guardianConsentStatus: "NOT_REQUIRED",
+      canExport: true,
+      canRequestErasure: true,
+    });
+    (api.getGrievances as any).mockResolvedValue([]);
+    (api.exportUserData as any).mockResolvedValue({ user: { id: 1, name: "Test" } });
+
+    render(<PrivacyCenter onOpenDoc={vi.fn()} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Request Account Erasure")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("Request Account Erasure"));
+
+    expect(screen.getByText("Confirm Permanent Erasure")).toBeInTheDocument();
+    expect(screen.getByText("Accidental Data Loss Prevention Shield")).toBeInTheDocument();
+    expect(screen.getByText(/Download Full Backup \(JSON\) First/i)).toBeInTheDocument();
+
+    const deleteBtn = screen.getByRole("button", { name: "Permanently Erase" });
+    expect(deleteBtn).toBeDisabled();
+
+    const input = screen.getByPlaceholderText("DELETE MY DATA");
+    fireEvent.change(input, { target: { value: "DELETE MY DATA" } });
+
+    expect(deleteBtn).not.toBeDisabled();
+  });
 });

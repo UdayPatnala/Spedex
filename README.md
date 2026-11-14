@@ -71,7 +71,7 @@ npm run dev
 ```
 - Local URL: `http://localhost:5173`
 - Run Build: `npm run build`
-- Run Tests: `npm test -- --run` (10/10 tests passing)
+- Run Tests: `npm test -- --run` (17/17 tests passing)
 - Run Typecheck: `npx tsc --noEmit`
 
 ### 3. Mobile App (Expo / React Native)
@@ -114,12 +114,12 @@ python test-trips-e2e.py
 | Test Suite | Framework | Status | Metrics |
 |---|---|---|---|
 | Backend Controllers, Services, IDOR & Safety | JUnit 5 / Spring Boot | ✅ PASSING | 65 tests |
-| Dashboard Web App & Ledger | Vitest / React Testing Library | ✅ PASSING | 10 tests |
+| Dashboard Web App & Ledger | Vitest / React Testing Library | ✅ PASSING | 17 tests |
 | Mobile Expo App | Jest / Jest-Expo | ✅ PASSING | 5 suites / 7 tests |
 | End-to-End Suite | Python `unittest` | ✅ PASSING | 77 tests |
 | Frontend Typecheck | TypeScript 5.8 | ✅ PASSING | 0 errors |
 | Mobile Typecheck | TypeScript 5.8 | ✅ PASSING | 0 errors |
-| **TOTAL VERIFIED TEST SUITE** | Full Ecosystem | ✅ **PASSING** | **159 / 159 tests (100%)** |
+| **TOTAL VERIFIED TEST SUITE** | Full Ecosystem | ✅ **PASSING** | **166 / 166 tests (100%)** |
 
 ---
 

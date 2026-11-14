@@ -588,8 +588,25 @@ export const PrivacyCenter: React.FC<PrivacyCenterProps> = ({ onOpenDoc, onLogou
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
           <div className="bg-[#0D1117] border border-red-700/60 w-full max-w-md rounded-2xl p-6 shadow-2xl text-gray-200 space-y-4">
             <h3 className="text-lg font-bold text-red-400 font-serif">Confirm Permanent Erasure</h3>
+            <div className="p-3 bg-amber-950/40 border border-amber-600/40 rounded-xl space-y-2">
+              <div className="flex items-center gap-2 text-amber-300 font-semibold text-xs">
+                <span>🛡️</span>
+                <span>Accidental Data Loss Prevention Shield</span>
+              </div>
+              <p className="text-[11px] text-amber-200/80 leading-relaxed">
+                This action is permanent and irreversible. All transactions, trip ledgers, and saved payment references will be deleted. We strongly recommend downloading an offline backup before proceeding.
+              </p>
+              <button
+                type="button"
+                onClick={handleExport}
+                disabled={saving}
+                className="w-full py-1.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+              >
+                <span>📥</span> Download Full Backup (JSON) First
+              </button>
+            </div>
             <p className="text-xs text-gray-300 leading-relaxed">
-              This action is permanent and irreversible. Your credentials will be destroyed, personal identifying data deleted, and financial records anonymized per DPDP Act Section 12.
+              Your credentials will be destroyed, personal identifying data deleted, and financial records anonymized per DPDP Act Section 12.
             </p>
             <div>
               <label className="block text-xs text-gray-400 mb-1">

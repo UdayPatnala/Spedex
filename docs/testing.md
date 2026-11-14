@@ -17,10 +17,12 @@ SpeDex enforces a 4-tier verification protocol with 100% pass invariant across a
 ### Tier 2: Frontend Web Dashboard Tests (Vitest + Testing Library)
 - **Command**: `cd dashboard_app && npm test -- --run`
 - **Scope**:
-  - `App.test.tsx`: Authenticated vs unauthenticated routing, workspace navigation including Ledger.
-  - `api.test.ts`: REST client endpoints, token attachment, error handling.
-  - `PrivacyCenter.test.tsx`: Consent switches and DPDP dialogs.
-- **Total**: 10 / 10 passing (and 0 Vite build errors).
+  - `App.test.tsx`: Authenticated vs unauthenticated routing, workspace navigation including Ledger (3 tests).
+  - `api.test.ts`: REST client endpoints, token attachment, error handling (5 tests).
+  - `PrivacyCenter.test.tsx`: Consent switches, DPDP dialogs, and Accidental Data Loss Prevention shield (3 tests).
+  - `SpendingVelocityWidget.test.tsx`: Real-time SVG velocity gauge, pacing calculations, and forecast simulator (3 tests).
+  - `SettingsView.test.tsx`: Profile metadata, preference toggles, and Accidental Data Loss Prevention offline backups (3 tests).
+- **Total**: 17 / 17 passing (and 0 Vite build errors).
 
 ### Tier 3: Mobile Client Tests (Jest + TypeScript)
 - **Command**: `cd mobile && npm test && npx tsc --noEmit`
@@ -33,4 +35,4 @@ SpeDex enforces a 4-tier verification protocol with 100% pass invariant across a
 - **Total**: 77 / 77 passing.
 
 ### Grand Total
-**159 / 159 tests passing (100% pass rate).**
+**166 / 166 tests passing (100% pass rate).**

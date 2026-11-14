@@ -1,10 +1,10 @@
 # SpeDex — Authoritative Product Master (SPEDEX.md / PRODUCT_MASTER.md)
 
 **Authoritative Product Master File (`SPEDEX.md`)**  
-**Current System Version:** `2.07.01.1` (Security & Git Push Secret Hygiene Patch)  
+**Current System Version:** `2.07.02.0` (Complete SpeDex V1 with Accidental Data Loss Prevention Safeguards & Failover Resilience)  
 **Governing Architecture:** Universal Reverse-Engineering, Universal Version Control & Universal Modular Architecture (`.agents/AGENTS.md`)  
 **Repository Working Tree:** Verified Clean (`main`)  
-**Automated Test Status:** 162 / 162 Tests Passing (100% Pass Rate across 4 Test Suites)  
+**Automated Test Status:** 166 / 166 Tests Passing (100% Pass Rate across 4 Test Suites)  
 **Authoritative Version Controller:** [`VERSION_CONTROLLER.md`](file:///d:/PROJECT/AROH%20Open%20Source/Products/Spedex/VERSION_CONTROLLER.md)  
 **Governance Invariant:** Exactly two authoritative Markdown documents are maintained at repository root (`SPEDEX.md` as Product Master and `VERSION_CONTROLLER.md` as Version Control Master).
 
@@ -16,7 +16,7 @@
 - **Etymology / Blend:** **Speed Index** (high-frequency, frictionless expense logging) + **Spending Index** (real-time velocity analytics and financial awareness).
 - **Project Type:** Personal financial ledger, travel expense journal, vendor quick-pay directory, and campus budgeting utility.
 - **Product Classification:** Non-custodial financial utility and organizational layer. SpeDex is **not** a bank, **not** a payment processor, and **not** a custodial wallet.
-- **Operating Version:** `2.07.01.1` (Security Patch: Secret Hygiene & Git Push Protection Hardening).
+- **Operating Version:** `2.07.02.0` (Functional Increment: Complete V1 with Accidental Data Loss Prevention Safeguards & Failover Resilience).
 - **Status:** **OPERATIONAL & 100% VERIFIED**.
 - **Repository Location:** Local workspace `d:\PROJECT\AROH Open Source\Products\Spedex`.
 - **Target Deployment Environments:**
@@ -1027,7 +1027,7 @@ SpeDex enforces a mandatory **4-Tier Verification Matrix**. No milestone or vers
 - *No open P0 issues. All security, IDOR, age-gating, and data-loss checks are resolved and verified.*
 
 ### P1 — Important Correctness & Infrastructure
-- **P1.1:** Configure automated PostgreSQL connection pool failover for containerized production environments.
+- [x] **P1.1:** Configured automated PostgreSQL HikariCP connection pool failover, validation timeouts, keepalive, and leak detection for containerized production environments.
 
 ### P2 — Meaningful Functional Improvements
 - **P2.1:** Add signed PDF ledger export for completed travel trips in addition to CSV export.
@@ -1075,7 +1075,7 @@ SpeDex enforces a mandatory **4-Tier Verification Matrix**. No milestone or vers
 ## 27. Release & Version Information
 
 ### 27.1 Authoritative Current Version
-**`2.07.00.0`** (Sub-Version: SpeDex V1 Production-Ready MVP Baseline / `v1.0.0-PROD`)
+**`2.07.02.0`** (Functional Increment: Complete SpeDex V1 with Accidental Data Loss Prevention Safeguards & Failover Resilience)
 
 ### 27.2 Agent Version Authority Governance (User Mandate)
 - **Major Version (`A`) — STRICTLY FORBIDDEN WITHOUT CONSENT**:
@@ -1086,6 +1086,9 @@ SpeDex enforces a mandatory **4-Tier Verification Matrix**. No milestone or vers
   The agent has **FULL AUTHORITY** to autonomously increment and manage `DE` functional changes (`A.BC.DE+1.0`) and `F` bug/patch fixes (`A.BC.DE.F+1`).
 
 ### 27.3 Version Lineage Summary
+- **`2.07.02.0` (2026-11-14):** Complete SpeDex V1 with Accidental Data Loss Prevention (ADLP) safeguards in Settings & Privacy Center, HikariCP failover resilience (P1.1), comprehensive API specification for all 11 controllers, and 100% test pass rate across 166/166 automated tests.
+- **`2.07.01.1` (2026-10-10):** Security & Git Push Secret Hygiene Hardening: externalized credentials to `.env`, multi-tier `.gitignore`, and automated pre-commit secret scanner.
+- **`2.07.01.0` (2026-10-10):** Milestone P4.1: Real-Time Spending Velocity Engine Widget with generative UI gauge and forecast simulator.
 - **`2.07.00.0` (2026-09-30):** SpeDex V1 Production-Ready MVP Baseline (`v1.0.0-PROD`): Complete 18-step user loop, RESTful transaction and payment reference controllers, RFC 4180 CSV export, Render cloud PostgreSQL profile, Vercel SPA routing fallback, and 100% test pass rate across 159/159 automated tests.
 - **`2.06.00.0` (2026-09-26):** Jetpack Compose Android Native Feature Parity (Trips Ledger & DPDP Privacy Center in Room/Jetpack Compose), complete two-file documentation consolidation (`SPEDEX.md` + `VERSION_CONTROLLER.md`), and full stack verification across 150/150 passing tests.
 - **`2.05.02.0` (2026-09-20):** Codified the 76-protocol Universal Modular Architecture & Change-Isolation Governance System into `.agents/AGENTS.md`, authored root `ARCHITECTURE.md` with domain ownership maps and action-to-data traceability, and verified 150/150 passing tests.
