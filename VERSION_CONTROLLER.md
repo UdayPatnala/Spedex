@@ -2,7 +2,7 @@
 
 ## Current Version
 
-`2.07.02.0` (Complete SpeDex V1 with Accidental Data Loss Prevention Safeguards & Failover Resilience)
+`2.07.02.1` (Render Cloud Deployment Hardening, JVM Memory Limits, PostgreSQL URL Normalization & CORS Whitelist)
 
 ## Status
 
@@ -12,6 +12,7 @@ VERIFIED
 
 | Version | Previous | Level | Commit | Change |
 |---|---|---|---|---|
+| 2.07.02.1 | 2.07.02.0 | PATCH | 018ca80 | Render cloud deployment hardening: Docker entrypoint, JVM RAM optimization, Postgres URL normalization, and CORS whitelist |
 | 2.07.02.0 | 2.07.01.1 | FUNCTIONAL | 2601bb5 | Complete SpeDex V1: Accidental Data Loss Prevention safeguards in Settings & Privacy, HikariCP failover (P1.1), API catalog |
 | 2.07.01.1 | 2.07.01.0 | PATCH | cfe8967 | Security & Git Push Hardening: externalized secrets to .env, multi-tier .gitignore, and automated pre-commit secret scanner |
 | 2.07.01.0 | 2.07.00.0 | FUNCTIONAL | 68c172b | Generative UI Spending Velocity Engine Widget with real-time SVG pacing gauge and forecast simulator |

@@ -1,0 +1,26 @@
+{
+  "name": "spedex-monorepo",
+  "version": "2.07.02.1",
+  "private": true,
+  "description": "Student Hostel Smart Wallet & Expense Tracker Monorepo",
+  "workspaces": [
+    "dashboard_app",
+    "mobile"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=dashboard_app",
+    "preview": "npm run preview --workspace=dashboard_app",
+    "start": "npm run preview --workspace=dashboard_app",
+    "test": "npm run test --workspace=dashboard_app",
+    "test:mobile": "npm run test --workspace=mobile"
+  },
+  "keywords": [
+    "spedex",
+    "wallet",
+    "finance",
+    "react",
+    "spring-boot"
+  ],
+  "author": "AROH Open Source",
+  "license": "MIT"
+}

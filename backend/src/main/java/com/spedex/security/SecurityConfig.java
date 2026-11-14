@@ -69,6 +69,7 @@ public class SecurityConfig {
             config.setAllowedOrigins(Arrays.asList(
                 "https://spe-dex.vercel.app",
                 "https://spedex.vercel.app",
+                "https://aos-spedex.vercel.app",
                 "http://localhost:5173",
                 "http://localhost:3000"
             ));
