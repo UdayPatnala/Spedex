@@ -2,7 +2,7 @@
 
 ## Current Version
 
-`2.07.01.1` (Security & Git Push Secret Hygiene Patch)
+`2.07.02.0` (Complete SpeDex V1 with Accidental Data Loss Prevention Safeguards & Failover Resilience)
 
 ## Status
 
@@ -12,6 +12,7 @@ VERIFIED
 
 | Version | Previous | Level | Commit | Change |
 |---|---|---|---|---|
+| 2.07.02.0 | 2.07.01.1 | FUNCTIONAL | 2601bb5 | Complete SpeDex V1: Accidental Data Loss Prevention safeguards in Settings & Privacy, HikariCP failover (P1.1), API catalog |
 | 2.07.01.1 | 2.07.01.0 | PATCH | cfe8967 | Security & Git Push Hardening: externalized secrets to .env, multi-tier .gitignore, and automated pre-commit secret scanner |
 | 2.07.01.0 | 2.07.00.0 | FUNCTIONAL | 68c172b | Generative UI Spending Velocity Engine Widget with real-time SVG pacing gauge and forecast simulator |
 | 2.07.00.0 | 2.06.00.0 | SUB-VERSION | e1297a3 | SpeDex V1 Production-Ready MVP (v1.0.0-PROD): 18-step user loop, RESTful transaction & payment reference controllers, CSV export, PostgreSQL profile, Vercel & Render configuration |
@@ -56,6 +57,19 @@ None (all milestones verified).
 ---
 
 ## Detailed Historical Release Ledger
+
+### [2.07.02.0] - 2026-11-14
+Type: Functional | Status: Verified | Commit: 2601bb5
+- **Complete SpeDex V1 with Accidental Data Loss Prevention & Infrastructure Failover**:
+  - **Accidental Data Loss Prevention (ADLP) Safeguards**:
+    - `PrivacyCenter.tsx`: Added ADLP Shield banner and mandatory pre-erasure "Download Full Backup (JSON) First" button to prevent irreversible data loss during DPDP Section 12 account deletion.
+    - `SettingsView.tsx`: Integrated dedicated Data Safety & Offline Backups Hub with direct one-click actions for machine-readable JSON exports (DPDP Section 11), RFC 4180 CSV ledger exports, interactive preference switches, and direct routing to privacy controls.
+    - `SettingsView.test.tsx`: Added comprehensive unit test suite covering profile metadata rendering, ADLP backup downloads, and interactive preference switches.
+  - **PostgreSQL Connection Pool Failover Resilience (Backlog P1.1)**:
+    - Hardened `application-prod.properties` HikariCP pool configurations with validation timeouts (3000ms), connection keepalives (30000ms), and connection leak detection thresholds (60000ms).
+  - **Comprehensive V1 API Specification & Documentation Synchronization**:
+    - Expanded `docs/api.md` to fully document all 11 backend REST controllers across Auth, Dashboard, Capabilities, Transactions, Categories, Payment References, Payment Intent, Trips, Privacy, and Health probes.
+    - Synchronized verified 166-test pass count across `README.md`, `docs/testing.md`, and `SPEDEX.md`.
 
 ### [2.07.01.1] - 2026-10-10
 Type: Patch | Status: Verified | Commit: cfe8967
